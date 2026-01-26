@@ -1,15 +1,191 @@
 
-import streamlit as st
-import pandas as pd
-import plotly.graph_objects as go
-from datetime import datetime, timedelta
-from nifty_themes import THEMES
-import os
-from rrg_helper import RRGCalculator
+import numpy as np
 
-# ---------------------------------------------------------
-# PAGE CONFIGURATION
-# ---------------------------------------------------------
+# ... (inside app code) ...
+
+if category == "Sector Rotation (RRG)":
+    st.title("Relative Rotation Graph (RRG)")
+    st.markdown("*Cycle analysis of themes vs Nifty 50*")
+    
+    col1, col2 = st.columns(2)
+    with col1:
+        timeframe = st.selectbox("Timeframe", ["Daily", "Weekly", "Monthly"], index=1)
+    with col2:
+        tail = st.slider("Tail Length (Periods)", 1, 12, 5)
+        
+    # Multiselect for filtering with Bulk Actions
+    sector_keys = [k for k in index_config.keys() if "NIFTY" in k and "50" not in k]
+    industry_keys = [k for k in index_config.keys() if k not in sector_keys and "Nifty" not in k]
+    broad_keys = ["Nifty 500", "Nifty Smallcap 500"]
+    all_keys = broad_keys + sector_keys + industry_keys
+    
+    # Initialize Session State for Multiselect
+    if 'rrg_multiselect' not in st.session_state:
+        st.session_state['rrg_multiselect'] = sector_keys # Default to Sectors
+
+    # Bulk Action Buttons
+    b1, b2, b3 = st.columns([1, 1, 5])
+    if b1.button("Select All", type="secondary"):
+        st.session_state['rrg_multiselect'] = all_keys
+        st.rerun()
+    if b2.button("Deselect All", type="secondary"):
+        st.session_state['rrg_multiselect'] = []
+        st.rerun()
+    
+    selected_rrg_themes = st.multiselect("Select Themes to Display", all_keys, key='rrg_multiselect')
+        
+    tf_map = {"Daily": "D", "Weekly": "W", "Monthly": "M"}
+    
+    with st.spinner("Calculating RRG Metrics..."):
+        # ... (Data Loading Logic Same as Before) ...
+        baseline_file = index_config["Nifty 50"]["file"]
+        baseline_df = load_data_v2(baseline_file)
+        
+        if baseline_df is None:
+            st.error("Nifty 50 data missing for baseline.")
+        else:
+            calculator = RRGCalculator(baseline_df)
+            data_dict = {}
+            
+            # Check if selection is empty
+            if not selected_rrg_themes:
+                st.warning("Please select at least one theme to display.")
+            else:
+                for name in selected_rrg_themes:
+                    config = index_config.get(name)
+                    if config:
+                        fpath = config['file']
+                        if os.path.exists(fpath):
+                            d = load_data_v2(fpath)
+                            if d is not None:
+                                data_dict[name] = d
+                
+                rrg_df = calculator.calculate_rrg_metrics(
+                    data_dict, 
+                    timeframe=tf_map[timeframe], 
+                    tail_length=tail
+                )
+                
+                if not rrg_df.empty:
+                    rrg_view = rrg_df.groupby('Ticker').tail(tail)
+                    
+                    # Calculate Dynamic Range
+                    min_x = rrg_view['RS_Ratio'].min()
+                    max_x = rrg_view['RS_Ratio'].max()
+                    min_y = rrg_view['RS_Momentum'].min()
+                    max_y = rrg_view['RS_Momentum'].max()
+                    
+                    pad = 1.5
+                    x_range = [min_x - pad, max_x + pad]
+                    y_range = [min_y - pad, max_y + pad]
+                    
+                    # Draw Plot
+                    fig = go.Figure()
+                    
+                    # Quadrants (Large background rectangles)
+                    rect_max = 500 # Make it huge to cover dynamic range
+                    rect_min = -500
+                    
+                    # Leading (UR): Ratio > 100, Mom > 100 (Green)
+                    fig.add_shape(type="rect", x0=100, y0=100, x1=rect_max, y1=rect_max, fillcolor="rgba(34, 197, 94, 0.1)", line_width=0, layer="below")
+                    # Weakening (LR): Ratio > 100, Mom < 100 (Yellow)
+                    fig.add_shape(type="rect", x0=100, y0=rect_min, x1=rect_max, y1=100, fillcolor="rgba(234, 179, 8, 0.1)", line_width=0, layer="below")
+                    # Lagging (LL): Ratio < 100, Mom < 100 (Red)
+                    fig.add_shape(type="rect", x0=rect_min, y0=rect_min, x1=100, y1=100, fillcolor="rgba(239, 68, 68, 0.1)", line_width=0, layer="below")
+                    # Improving (UL): Ratio < 100, Mom > 100 (Blue)
+                    fig.add_shape(type="rect", x0=rect_min, y0=100, x1=100, y1=rect_max, fillcolor="rgba(59, 130, 246, 0.1)", line_width=0, layer="below")
+                    
+                    unique_tickers = rrg_view['Ticker'].unique()
+                    
+                    # Palette for distinct lines
+                    colors = [
+                        '#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', 
+                        '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf',
+                        '#ffffff', '#00ff00', '#ffff00', '#0000ff', '#ff00ff'
+                    ]
+                    
+                    for i, ticker in enumerate(unique_tickers):
+                        t_data = rrg_view[rrg_view['Ticker'] == ticker]
+                        color = colors[i % len(colors)]
+                        
+                        # 1. Main Trail (Lines + Small Markers)
+                        fig.add_trace(go.Scatter(
+                            x=t_data['RS_Ratio'],
+                            y=t_data['RS_Momentum'],
+                            mode='lines+markers', # removed 'text' to avoid clutter on trail
+                            name=ticker,
+                            marker=dict(size=4, symbol="circle", color=color, opacity=0.7),
+                            line=dict(width=2, color=color),
+                            hovertemplate=f"<b>{ticker}</b><br>Ratio: %{{x:.2f}}<br>Mom: %{{y:.2f}}<extra></extra>"
+                        ))
+                        
+                        # 2. Arrowhead (Latest Point)
+                        if len(t_data) >= 2:
+                            head = t_data.iloc[-1]
+                            prev = t_data.iloc[-2]
+                            
+                            dx = head['RS_Ratio'] - prev['RS_Ratio']
+                            dy = head['RS_Momentum'] - prev['RS_Momentum']
+                            
+                            # Calculate angle in degrees
+                            # atan2 returns -pi to pi.
+                            # Plotly marker rotation: 0 is Up? No, 0 is Right for 'triangle-right', Up for 'triangle-up'.
+                            # Let's assume standard math conventions: 0 is Right.
+                            # vector (1,0) -> 0 deg.
+                            # vector (0,1) -> 90 deg.
+                            # If we use 'triangle-up':
+                            # At 0 rotation, it points Up (90 deg math).
+                            # So we need to rotate it by (theta - 90).
+                            angle = np.degrees(np.arctan2(dy, dx)) - 90
+                            
+                            fig.add_trace(go.Scatter(
+                                x=[head['RS_Ratio']],
+                                y=[head['RS_Momentum']],
+                                mode='markers+text',
+                                name=ticker,
+                                text=[ticker],
+                                textposition="top center",
+                                textfont=dict(color=color, size=12, weight="bold"),
+                                marker=dict(
+                                    symbol="triangle-up", 
+                                    size=12, 
+                                    color=color, 
+                                    angle=angle,
+                                    line=dict(width=1, color='white')
+                                ),
+                                hoverinfo='skip',
+                                showlegend=False
+                            ))
+                        else:
+                            # Fallback if only 1 point (no direction)
+                            head = t_data.iloc[-1]
+                            fig.add_trace(go.Scatter(
+                                x=[head['RS_Ratio']],
+                                y=[head['RS_Momentum']],
+                                mode='markers+text',
+                                text=[ticker],
+                                marker=dict(symbol="circle", size=10, color=color),
+                                showlegend=False
+                            ))
+
+                    # Place labels dynamically relative to view or 100 center?
+                    # User liked fixed placement.
+                    fig.add_annotation(x=100.2, y=100.2, text="LEADING", showarrow=False, font=dict(color="green", size=20, weight="bold"), xanchor="left", yanchor="bottom")
+                    fig.add_annotation(x=100.2, y=99.8, text="WEAKENING", showarrow=False, font=dict(color="orange", size=20, weight="bold"), xanchor="left", yanchor="top")
+                    fig.add_annotation(x=99.8, y=99.8, text="LAGGING", showarrow=False, font=dict(color="red", size=20, weight="bold"), xanchor="right", yanchor="top")
+                    fig.add_annotation(x=99.8, y=100.2, text="IMPROVING", showarrow=False, font=dict(color="blue", size=20, weight="bold"), xanchor="right", yanchor="bottom")
+
+                    fig.update_layout(
+                        title=f"Sector Rotation (vs Nifty 50) - {timeframe}",
+                        xaxis_title="RS-Ratio (Trend)",
+                        yaxis_title="RS-Momentum (ROC)",
+                        xaxis=dict(range=x_range, zeroline=True, zerolinecolor="gray", zerolinewidth=1), 
+                        yaxis=dict(range=y_range, zeroline=True, zerolinecolor="gray", zerolinewidth=1),
+                        template="plotly_dark",
+                        height=850,
+                        showlegend=False
+                    )
+                    st.plotly_chart(fig, use_container_width=True)
 st.set_page_config(
     page_title="Nifty 500 Market Breadth",
     page_icon="📈",
