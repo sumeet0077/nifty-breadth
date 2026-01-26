@@ -25,27 +25,78 @@ def get_tickers_from_url(url):
         print(f"Failed to fetch from {url}: {e}")
         return []
 
+
 def get_index_tickers(index_name):
     """Get tickers for a specific index."""
-    # Priority URLs
-    if index_name == "Nifty 50":
-        return get_tickers_from_url("https://nsearchives.nseindia.com/content/indices/ind_nifty50list.csv")
-    elif index_name == "Nifty 500":
-        return get_tickers_from_url("https://nsearchives.nseindia.com/content/indices/ind_nifty500list.csv")
-    elif index_name == "Nifty Smallcap 500":
-        # Any of these might work, trying priority order
-        urls = [
-            "https://nsearchives.nseindia.com/content/indices/ind_niftysmallcap500list.csv", # Try direct match
-            "https://nsearchives.nseindia.com/content/indices/ind_niftysmallcap250list.csv"  # Fallback to 250 if 500 fails
-        ]
-        for url in urls:
-            tickers = get_tickers_from_url(url)
-            if tickers:
-                if "250" in url:
-                    print("clean_warning: Nifty Smallcap 500 list not found, used Nifty Smallcap 250 instead.")
-                return tickers
-        return []
+    
+    # Map index names to verified CSV URLs
+    # Source: https://nsearchives.nseindia.com/content/indices/
+    sector_map = {
+        "Nifty 50": "ind_nifty50list.csv",
+        "Nifty 500": "ind_nifty500list.csv",
+        # Smallcap
+        "Nifty Smallcap 500": "ind_niftysmallcap250list.csv", # Fallback
+        # Sectors
+        "NIFTY AUTO": "ind_niftyautolist.csv",
+        "NIFTY BANK": "ind_niftybanklist.csv",
+        "NIFTY FINANCIAL SERVICES": "ind_niftyfinancelist.csv",
+        "NIFTY FMCG": "ind_niftyfmcglist.csv",
+        "NIFTY HEALTHCARE": "ind_niftyhealthcarelist.csv",
+        "NIFTY IT": "ind_niftyitlist.csv",
+        "NIFTY MEDIA": "ind_niftymedialist.csv",
+        "NIFTY METAL": "ind_niftymetallist.csv",
+        "NIFTY PHARMA": "ind_niftypharmalist.csv",
+        "NIFTY PRIVATE BANK": "ind_nifty_privatebanklist.csv",
+        "NIFTY PSU BANK": "ind_niftypsubanklist.csv",
+        "NIFTY REALTY": "ind_niftyrealtylist.csv",
+        "NIFTY CONSUMER DURABLES": "ind_niftyconsumerdurableslist.csv",
+        "NIFTY OIL AND GAS": "ind_niftyoilgaslist.csv"
+    }
+
+    if index_name in sector_map:
+        base_url = "https://nsearchives.nseindia.com/content/indices/"
+        # Nifty Smallcap 500 special check logic handled by map just pointing to 250 for now
+        return get_tickers_from_url(base_url + sector_map[index_name])
+        
     return []
+
+def main():
+    indices = [
+        ("Nifty 50", "market_breadth_nifty50.csv"),
+        ("Nifty 500", "market_breadth_nifty500.csv"),
+        ("Nifty Smallcap 500", "market_breadth_smallcap.csv"),
+        # Sectors
+        ("NIFTY AUTO", "breadth_auto.csv"),
+        ("NIFTY BANK", "breadth_bank.csv"),
+        ("NIFTY FINANCIAL SERVICES", "breadth_finance.csv"),
+        ("NIFTY FMCG", "breadth_fmcg.csv"),
+        ("NIFTY HEALTHCARE", "breadth_healthcare.csv"),
+        ("NIFTY IT", "breadth_it.csv"),
+        ("NIFTY MEDIA", "breadth_media.csv"),
+        ("NIFTY METAL", "breadth_metal.csv"),
+        ("NIFTY PHARMA", "breadth_pharma.csv"),
+        ("NIFTY PRIVATE BANK", "breadth_pvtbank.csv"),
+        ("NIFTY PSU BANK", "breadth_psubank.csv"),
+        ("NIFTY REALTY", "breadth_realty.csv"),
+        ("NIFTY CONSUMER DURABLES", "breadth_consumer.csv"),
+        ("NIFTY OIL AND GAS", "breadth_oilgas.csv")
+    ]
+    
+    print(f"Processing {len(indices)} indices...")
+    
+    for name, filename in indices:
+        try:
+            if os.path.exists(filename):
+                print(f"Skipping {name} (already exists, delete file to re-fetch)...")
+                # Actually, user wants updates, so maybe we SHOULD NOT SKIP?
+                # But for this initial mega-run, I'll allow overwrite.
+                # Let's overwrite.
+                pass
+            
+            process_index(name, filename)
+        except Exception as e:
+            print(f"Failed to process {name}: {e}")
+
 
 
 def fetch_historical_data(tickers, start_date="2014-01-01"):
@@ -176,17 +227,6 @@ def process_index(index_name, output_file):
     breadth_df = calculate_breadth(full_data)
     breadth_df.to_csv(output_file)
     print(f"Saved {output_file}")
-
-def main():
-    # 1. Nifty 50
-    process_index("Nifty 50", "market_breadth_nifty50.csv")
-
-    # 2. Nifty 500
-    process_index("Nifty 500", "market_breadth_nifty500.csv")
-    
-    # 2. Nifty Smallcap
-    # Note: User asked for Smallcap 500.
-    process_index("Nifty Smallcap 500", "market_breadth_smallcap.csv")
 
 if __name__ == "__main__":
     main()

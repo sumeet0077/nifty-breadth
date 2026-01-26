@@ -73,36 +73,56 @@ def load_data(file_path):
     except FileNotFoundError:
         return None
 
-# ---------------------------------------------------------
-# SIDEBAR / NAVIGATION
-# ---------------------------------------------------------
 st.sidebar.title("Configuration")
-selected_index = st.sidebar.radio(
-    "Select Index",
-    ["Nifty 50", "Nifty 500", "Nifty Smallcap"],
-    index=1
+
+# Category Selection
+category = st.sidebar.radio(
+    "Market Segment",
+    ["Broad Market", "Sectoral Indices"],
+    index=0
 )
 
-# Map selection to file
+# Index Selection based on Category
+if category == "Broad Market":
+    selected_index = st.sidebar.radio(
+        "Select Index",
+        ["Nifty 50", "Nifty 500", "Nifty Smallcap 500"]
+    )
+else:
+    sector_options = [
+        "NIFTY AUTO", "NIFTY BANK", "NIFTY FINANCIAL SERVICES", "NIFTY FMCG",
+        "NIFTY HEALTHCARE", "NIFTY IT", "NIFTY MEDIA", "NIFTY METAL",
+        "NIFTY PHARMA", "NIFTY PRIVATE BANK", "NIFTY PSU BANK", 
+        "NIFTY REALTY", "NIFTY CONSUMER DURABLES", "NIFTY OIL AND GAS"
+    ]
+    selected_index = st.sidebar.selectbox("Select Sector", sector_options)
+
+# Configuration Map
+# Note: Nifty Chemicals omitted (no public CSV)
 index_config = {
-    "Nifty 50": {
-        "file": "market_breadth_nifty50.csv",
-        "title": "Nifty 50",
-        "description": "Tracking the top 50 blue-chip companies."
-    },
-    "Nifty 500": {
-        "file": "market_breadth_nifty500.csv",
-        "title": "Nifty 500",
-        "description": "Tracking the top 500 companies listed on NSE."
-    },
-    "Nifty Smallcap": {
-        "file": "market_breadth_smallcap.csv",
-        "title": "Nifty Smallcap",
-        "description": "Tracking the Smallcap segment performance."
-    }
+    # Broad
+    "Nifty 50": {"file": "market_breadth_nifty50.csv", "title": "Nifty 50", "description": "Top 50 Blue-chip Companies"},
+    "Nifty 500": {"file": "market_breadth_nifty500.csv", "title": "Nifty 500", "description": "Top 500 Companies"},
+    "Nifty Smallcap 500": {"file": "market_breadth_smallcap.csv", "title": "Nifty Smallcap 250", "description": "Smallcap Segment"},
+    
+    # Sectors
+    "NIFTY AUTO": {"file": "breadth_auto.csv", "title": "Nifty Auto", "description": "Automobile Sector"},
+    "NIFTY BANK": {"file": "breadth_bank.csv", "title": "Nifty Bank", "description": "Banking Sector"},
+    "NIFTY FINANCIAL SERVICES": {"file": "breadth_finance.csv", "title": "Nifty Financial Services", "description": "Financial Services (Banks, NBFCs, Insurance)"},
+    "NIFTY FMCG": {"file": "breadth_fmcg.csv", "title": "Nifty FMCG", "description": "Fast Moving Consumer Goods"},
+    "NIFTY HEALTHCARE": {"file": "breadth_healthcare.csv", "title": "Nifty Healthcare", "description": "Healthcare & Hospitals"},
+    "NIFTY IT": {"file": "breadth_it.csv", "title": "Nifty IT", "description": "Information Technology"},
+    "NIFTY MEDIA": {"file": "breadth_media.csv", "title": "Nifty Media", "description": "Media & Entertainment"},
+    "NIFTY METAL": {"file": "breadth_metal.csv", "title": "Nifty Metal", "description": "Metals & Mining"},
+    "NIFTY PHARMA": {"file": "breadth_pharma.csv", "title": "Nifty Pharma", "description": "Pharmaceuticals"},
+    "NIFTY PRIVATE BANK": {"file": "breadth_pvtbank.csv", "title": "Nifty Private Bank", "description": "Private Sector Banks"},
+    "NIFTY PSU BANK": {"file": "breadth_psubank.csv", "title": "Nifty PSU Bank", "description": "Public Sector Banks"},
+    "NIFTY REALTY": {"file": "breadth_realty.csv", "title": "Nifty Realty", "description": "Real Estate"},
+    "NIFTY CONSUMER DURABLES": {"file": "breadth_consumer.csv", "title": "Nifty Consumer Durables", "description": "Consumer Durables"},
+    "NIFTY OIL AND GAS": {"file": "breadth_oilgas.csv", "title": "Nifty Oil & Gas", "description": "Oil, Gas & Petroleum"}
 }
 
-current_config = index_config[selected_index]
+current_config = index_config.get(selected_index, index_config["Nifty 50"])
 
 # ---------------------------------------------------------
 # MAIN LAYOUT
