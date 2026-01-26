@@ -95,7 +95,7 @@ else:
         "NIFTY PHARMA", "NIFTY PRIVATE BANK", "NIFTY PSU BANK", 
         "NIFTY REALTY", "NIFTY CONSUMER DURABLES", "NIFTY OIL AND GAS"
     ]
-    selected_index = st.sidebar.selectbox("Select Sector", sector_options)
+    selected_index = st.sidebar.radio("Select Sector", sector_options)
 
 # Configuration Map
 # Note: Nifty Chemicals omitted (no public CSV)
