@@ -148,7 +148,8 @@ fig_line.add_trace(go.Scatter(
     name='Breadth %',
     line=dict(color='#22d3ee', width=2),
     fill='tozeroy',
-    fillcolor='rgba(34, 211, 238, 0.1)'
+    fillcolor='rgba(34, 211, 238, 0.1)',
+    hovertemplate='%{y:.1f}%<extra></extra>'
 ))
 
 # Reference Zones
@@ -160,6 +161,11 @@ fig_line.update_layout(
     template="plotly_dark",
     height=500,
     hovermode="x unified",
+    hoverlabel=dict(
+        bgcolor="#1f2937",
+        font_size=14,
+        font_family="Inter"
+    ),
     margin=dict(l=20, r=20, t=20, b=20),
     yaxis=dict(
         title="Percentage of Stocks Above 200 SMA",
