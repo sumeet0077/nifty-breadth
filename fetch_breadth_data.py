@@ -4,7 +4,7 @@ import requests
 import io
 import time
 import os
-
+from nifty_themes import THEMES
 
 def get_tickers_from_url(url):
     """Generic function to fetch tickers from NSE CSV URL."""
@@ -25,10 +25,13 @@ def get_tickers_from_url(url):
         print(f"Failed to fetch from {url}: {e}")
         return []
 
-
 def get_index_tickers(index_name):
-    """Get tickers for a specific index."""
+    """Get tickers for a specific index or theme."""
     
+    # Check Custom Themes first
+    if index_name in THEMES:
+        return THEMES[index_name]
+
     # Map index names to verified CSV URLs
     # Source: https://nsearchives.nseindia.com/content/indices/
     sector_map = {
@@ -60,45 +63,6 @@ def get_index_tickers(index_name):
         
     return []
 
-def main():
-    indices = [
-        ("Nifty 50", "market_breadth_nifty50.csv"),
-        ("Nifty 500", "market_breadth_nifty500.csv"),
-        ("Nifty Smallcap 500", "market_breadth_smallcap.csv"),
-        # Sectors
-        ("NIFTY AUTO", "breadth_auto.csv"),
-        ("NIFTY BANK", "breadth_bank.csv"),
-        ("NIFTY FINANCIAL SERVICES", "breadth_finance.csv"),
-        ("NIFTY FMCG", "breadth_fmcg.csv"),
-        ("NIFTY HEALTHCARE", "breadth_healthcare.csv"),
-        ("NIFTY IT", "breadth_it.csv"),
-        ("NIFTY MEDIA", "breadth_media.csv"),
-        ("NIFTY METAL", "breadth_metal.csv"),
-        ("NIFTY PHARMA", "breadth_pharma.csv"),
-        ("NIFTY PRIVATE BANK", "breadth_pvtbank.csv"),
-        ("NIFTY PSU BANK", "breadth_psubank.csv"),
-        ("NIFTY REALTY", "breadth_realty.csv"),
-        ("NIFTY CONSUMER DURABLES", "breadth_consumer.csv"),
-        ("NIFTY OIL AND GAS", "breadth_oilgas.csv")
-    ]
-    
-    print(f"Processing {len(indices)} indices...")
-    
-    for name, filename in indices:
-        try:
-            if os.path.exists(filename):
-                print(f"Skipping {name} (already exists, delete file to re-fetch)...")
-                # Actually, user wants updates, so maybe we SHOULD NOT SKIP?
-                # But for this initial mega-run, I'll allow overwrite.
-                # Let's overwrite.
-                pass
-            
-            process_index(name, filename)
-        except Exception as e:
-            print(f"Failed to process {name}: {e}")
-
-
-
 def fetch_historical_data(tickers, start_date="2014-01-01"):
     """Fetch historical data for tickers in chunks."""
     chunk_size = 50
@@ -122,9 +86,6 @@ def fetch_historical_data(tickers, start_date="2014-01-01"):
             )
             
             # Extract Close prices
-            # yf.download with group_by='ticker' returns MultiIndex (Ticker, PriceType)
-            # We want a DataFrame where columns are Tickers and values are Close prices
-            
             close_df = pd.DataFrame()
             
             if len(chunk) == 1:
@@ -168,35 +129,28 @@ def fetch_historical_data(tickers, start_date="2014-01-01"):
 
 def calculate_breadth(full_data):
     """Calculate market breadth metrics."""
-    print("Calculating 200-day SMA and Breadth metrics...")
-    
     # 1. Calculate 200 SMA
     # min_periods=150 allows for some missing data (holidays, trading suspensions)
-    # ensuring we still have a representative average (~75% of data points)
     sma_200 = full_data.rolling(window=200, min_periods=150).mean()
     
     # 2. Compare Close vs SMA
     is_above = full_data > sma_200
     
     # 3. Valid Universe per day: Stocks that have a valid Price AND a valid SMA on that day
-    # (Checking sma_200.notna() is sufficient as it implies price existed 200 days back and today)
     valid_universe = sma_200.notna() & full_data.notna()
     
     # 4. Count
-    # We only count boolean where valid_universe is True
     above_count = (is_above & valid_universe).sum(axis=1)
     
     # Total valid stocks on that day
     total_valid = valid_universe.sum(axis=1)
     
     # Calculate Below
-    # below_count = total_valid - above_count 
     below_count = total_valid - above_count
     
     # Percentage
-    # Handle division by zero
     percentage = (above_count / total_valid) * 100
-    percentage = percentage.fillna(0) # or NaN, but 0 is safer for plotting if total_valid is 0
+    percentage = percentage.fillna(0)
     
     breadth_df = pd.DataFrame({
         'Above': above_count,
@@ -207,26 +161,101 @@ def calculate_breadth(full_data):
     
     return breadth_df
 
-def process_index(index_name, output_file):
-    print(f"\nProcessing {index_name}...")
-    tickers = get_index_tickers(index_name)
+def main():
+    # 1. Define all tasks
+    broad_indices = [
+        ("Nifty 50", "market_breadth_nifty50.csv"),
+        ("Nifty 500", "market_breadth_nifty500.csv"),
+        ("Nifty Smallcap 500", "market_breadth_smallcap.csv"),
+    ]
     
-    if not tickers:
-        print(f"No tickers found for {index_name}!")
-        return
+    sector_indices = [
+        ("NIFTY AUTO", "breadth_auto.csv"),
+        ("NIFTY BANK", "breadth_bank.csv"),
+        ("NIFTY FINANCIAL SERVICES", "breadth_finance.csv"),
+        ("NIFTY FMCG", "breadth_fmcg.csv"),
+        ("NIFTY HEALTHCARE", "breadth_healthcare.csv"),
+        ("NIFTY IT", "breadth_it.csv"),
+        ("NIFTY MEDIA", "breadth_media.csv"),
+        ("NIFTY METAL", "breadth_metal.csv"),
+        ("NIFTY PHARMA", "breadth_pharma.csv"),
+        ("NIFTY PRIVATE BANK", "breadth_pvtbank.csv"),
+        ("NIFTY PSU BANK", "breadth_psubank.csv"),
+        ("NIFTY REALTY", "breadth_realty.csv"),
+        ("NIFTY CONSUMER DURABLES", "breadth_consumer.csv"),
+        ("NIFTY OIL AND GAS", "breadth_oilgas.csv")
+    ]
+    
+    # Add Themes to list (Name, CSV Name)
+    # CSV name = breadth_theme_name_sanitized.csv
+    theme_indices = []
+    sorted_themes = sorted(THEMES.keys())
+    for theme_name in sorted_themes:
+        # Sanitize filename
+        safe_name = theme_name.lower().replace(" ", "_").replace("&", "and").replace("-", "_").replace("(", "").replace(")", "").replace("__", "_")
+        filename = f"breadth_theme_{safe_name}.csv"
+        theme_indices.append((theme_name, filename))
         
-    print(f"Index: {index_name} | Tickers: {len(tickers)}")
+    all_tasks = broad_indices + sector_indices + theme_indices
     
-    # 2014 start for warm up
-    full_data = fetch_historical_data(tickers, start_date="2014-01-01")
+    print(f"Total Indices/Themes to process: {len(all_tasks)}")
     
-    if full_data.empty:
-        print("No data fetched.")
+    # OPTIMIZATION:
+    # 1. Collect ALL distinct tickers across ALL tasks
+    # 2. Fetch data ONCE
+    # 3. Process individually
+    
+    all_tickers = set()
+    task_map = {} # Name -> [Tickers]
+    
+    print("Gathering ticker lists...")
+    for name, filename in all_tasks:
+        tickers = get_index_tickers(name)
+        if tickers:
+            task_map[name] = tickers
+            all_tickers.update(tickers)
+        else:
+            print(f"Warning: No tickers found for {name}")
+
+    print(f"Total Unique Tickers to fetch: {len(all_tickers)}")
+    
+    # Fetch Master Data
+    master_data = fetch_historical_data(list(all_tickers), start_date="2014-01-01")
+    
+    if master_data.empty:
+        print("CRITICAL: No data fetched at all.")
         return
-        
-    breadth_df = calculate_breadth(full_data)
-    breadth_df.to_csv(output_file)
-    print(f"Saved {output_file}")
+
+    # Process each task using Master Data
+    print("\nProcessing Breadth for all groups...")
+    for name, filename in all_tasks:
+        try:
+            # Check if file exists and skip if needed? No, user wants rebuild.
+            
+            if name not in task_map:
+                continue
+                
+            tickers = task_map[name]
+            # Filter master data for these tickers
+            # Intersect with columns present in master_data
+            available_tickers = [t for t in tickers if t in master_data.columns]
+            
+            if not available_tickers:
+                print(f"Skipping {name}: No data for constituent tickers.")
+                continue
+                
+            subset_data = master_data[available_tickers].copy()
+            
+            # Check if sufficient data
+            if subset_data.empty:
+                continue
+                
+            breadth_df = calculate_breadth(subset_data)
+            breadth_df.to_csv(filename)
+            print(f"Saved {filename} ({name})")
+            
+        except Exception as e:
+            print(f"Failed to process {name}: {e}")
 
 if __name__ == "__main__":
     main()

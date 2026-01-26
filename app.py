@@ -73,22 +73,26 @@ def load_data(file_path):
     except FileNotFoundError:
         return None
 
+from nifty_themes import THEMES
+
 st.sidebar.title("Configuration")
 
 # Category Selection
 category = st.sidebar.radio(
     "Market Segment",
-    ["Broad Market", "Sectoral Indices"],
+    ["Broad Market", "Sectoral Indices", "Industries"],
     index=0
 )
 
 # Index Selection based on Category
+selected_index = None
+
 if category == "Broad Market":
     selected_index = st.sidebar.radio(
         "Select Index",
         ["Nifty 50", "Nifty 500", "Nifty Smallcap 500"]
     )
-else:
+elif category == "Sectoral Indices":
     sector_options = [
         "NIFTY AUTO", "NIFTY BANK", "NIFTY FINANCIAL SERVICES", "NIFTY FMCG",
         "NIFTY HEALTHCARE", "NIFTY IT", "NIFTY MEDIA", "NIFTY METAL",
@@ -96,6 +100,10 @@ else:
         "NIFTY REALTY", "NIFTY CONSUMER DURABLES", "NIFTY OIL AND GAS"
     ]
     selected_index = st.sidebar.radio("Select Sector", sector_options)
+else: # Industries
+    # Sort themes alphabetically
+    industry_options = sorted(THEMES.keys())
+    selected_index = st.sidebar.radio("Select Industry", industry_options)
 
 # Configuration Map
 # Note: Nifty Chemicals omitted (no public CSV)
@@ -121,6 +129,17 @@ index_config = {
     "NIFTY CONSUMER DURABLES": {"file": "breadth_consumer.csv", "title": "Nifty Consumer Durables", "description": "Consumer Durables"},
     "NIFTY OIL AND GAS": {"file": "breadth_oilgas.csv", "title": "Nifty Oil & Gas", "description": "Oil, Gas & Petroleum"}
 }
+
+# Dynamically add Themes to config
+for theme_name in THEMES:
+    # Match the sanitization logic in fetch_breadth_data.py
+    safe_name = theme_name.lower().replace(" ", "_").replace("&", "and").replace("-", "_").replace("(", "").replace(")", "").replace("__", "_")
+    filename = f"breadth_theme_{safe_name}.csv"
+    index_config[theme_name] = {
+        "file": filename,
+        "title": theme_name,
+        "description": f"Custom Theme: {theme_name}"
+    }
 
 current_config = index_config.get(selected_index, index_config["Nifty 50"])
 
