@@ -61,7 +61,7 @@ st.markdown("""
 # DATA LOADING
 # ---------------------------------------------------------
 @st.cache_data(ttl=3600)  # Cache for 1 hour
-def load_data(file_path):
+def load_data_v2(file_path):
     try:
         # Load the CSV
         df = pd.read_csv(file_path)
@@ -73,7 +73,7 @@ def load_data(file_path):
         return None
 
 @st.cache_data(ttl=3600)
-def get_performance_summary(config_map):
+def get_performance_summary_v2(config_map):
     """Load all CSVs and calculate performance metrics for a heatmap."""
     summary_data = []
     
@@ -95,7 +95,7 @@ def get_performance_summary(config_map):
             
         try:
             # Optimize: Read only necessary columns if possible, but load_data does filtering
-            df = load_data(file_path)
+            df = load_data_v2(file_path)
             if df is None or df.empty or 'Index_Close' not in df.columns:
                 continue
                 
@@ -175,7 +175,7 @@ if category == "Performance Overview":
     st.markdown("*Comparative returns of all sectors and themes based on Equal-Weighted Index*")
     
     with st.spinner("Calculating performance across all themes..."):
-        perf_summary = get_performance_summary(index_config)
+        perf_summary = get_performance_summary_v2(index_config)
     
     if not perf_summary.empty:
         # Sort by 1 Year return by default if available
@@ -228,7 +228,7 @@ else:
     st.title(f"{current_config['title']} Market Breadth")
     st.markdown(f"*{current_config['description']}*")
 
-    df = load_data(current_config['file'])
+    df = load_data_v2(current_config['file'])
 
     if df is not None:
         latest = df.iloc[-1]
