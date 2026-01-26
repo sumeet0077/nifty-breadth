@@ -73,10 +73,31 @@ def load_data_v2(file_path):
         return None
 
 @st.cache_data(ttl=3600)
-def get_performance_summary_v2(config_map):
-    """Load all CSVs and calculate performance metrics for a heatmap."""
+def get_performance_summary_v3(config_map):
+    """Load all CSVs and calculate performance metrics for a heatmap + RS."""
     summary_data = []
     
+    # Load Nifty 50 Baseline first
+    baseline_file = config_map.get("Nifty 50", {}).get('file')
+    baseline_df = None
+    baseline_returns = {} # Store 20-day return for RS if needed, or just price ratio
+    
+    if baseline_file and os.path.exists(baseline_file):
+        baseline_df = load_data_v2(baseline_file)
+    
+    # Pre-calculate Baseline values for RS (20 Days)
+    # RS = (Theme/Nifty) change
+    nifty_latest_price = 0
+    nifty_20d_price = 0
+    
+    if baseline_df is not None and not baseline_df.empty and 'Index_Close' in baseline_df.columns:
+        latest = baseline_df.iloc[-1]
+        nifty_latest_price = latest['Index_Close']
+        target_date = latest['Date'] - timedelta(days=20)
+        mask = baseline_df['Date'] <= target_date
+        if mask.any():
+            nifty_20d_price = baseline_df[mask].iloc[-1]['Index_Close']
+            
     periods = {
         "1 Day": 1,
         "1 Week": 7,
@@ -94,7 +115,6 @@ def get_performance_summary_v2(config_map):
             continue
             
         try:
-            # Optimize: Read only necessary columns if possible, but load_data does filtering
             df = load_data_v2(file_path)
             if df is None or df.empty or 'Index_Close' not in df.columns:
                 continue
@@ -105,9 +125,9 @@ def get_performance_summary_v2(config_map):
             
             row = {"Theme/Index": name}
             
+            # Standard Periods
             for p_name, days in periods.items():
                 target_date = current_date - timedelta(days=days)
-                # Find closest date strictly before or equal
                 mask = df['Date'] <= target_date
                 if mask.any():
                     past_row = df[mask].iloc[-1]
@@ -119,6 +139,27 @@ def get_performance_summary_v2(config_map):
                         row[p_name] = None
                 else:
                     row[p_name] = None
+            
+            # -------------------------------------
+            # Relative Strength (vs Nifty 50, 20D)
+            # -------------------------------------
+            # RS = % Change of (Theme/Nifty) Ratio over 20 days
+            # Formula: ((Theme_T / Nifty_T) / (Theme_T-20 / Nifty_T-20) - 1) * 100
+            
+            rs_val = None
+            if nifty_latest_price > 0 and nifty_20d_price > 0:
+                # Get Theme 20d price
+                t_target = current_date - timedelta(days=20)
+                t_mask = df['Date'] <= t_target
+                if t_mask.any():
+                    t_past_price = df[t_mask].iloc[-1]['Index_Close']
+                    if t_past_price > 0:
+                        # Calculate RS Ratio Change
+                        current_ratio = current_price / nifty_latest_price
+                        past_ratio = t_past_price / nifty_20d_price
+                        rs_val = ((current_ratio - past_ratio) / past_ratio) * 100
+            
+            row["RS (20D)"] = rs_val
             
             summary_data.append(row)
         except Exception:
@@ -175,7 +216,7 @@ if category == "Performance Overview":
     st.markdown("*Comparative returns of all sectors and themes based on Equal-Weighted Index*")
     
     with st.spinner("Calculating performance across all themes..."):
-        perf_summary = get_performance_summary_v2(index_config)
+        perf_summary = get_performance_summary_v3(index_config)
     
     if not perf_summary.empty:
         # Sort by 1 Year return by default if available
