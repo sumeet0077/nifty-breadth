@@ -5,35 +5,46 @@ import io
 import time
 import os
 
-def get_nifty500_tickers():
-    """Fetch Nifty 500 tickers from NSE website or fallback."""
-    url = "https://nsearchives.nseindia.com/content/indices/ind_nifty500list.csv"
+
+def get_tickers_from_url(url):
+    """Generic function to fetch tickers from NSE CSV URL."""
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
     }
-    
-    print("Fetching Nifty 500 ticker list...")
     try:
+        print(f"Fetching from {url}...")
         response = requests.get(url, headers=headers, timeout=15)
         response.raise_for_status()
         df = pd.read_csv(io.StringIO(response.content.decode('utf-8')))
-        # Column name might vary slightly
         symbol_col = next((col for col in df.columns if 'Symbol' in col), None)
         if symbol_col:
             tickers = [x + ".NS" for x in df[symbol_col] if isinstance(x, str)]
-            print(f"Successfully fetched {len(tickers)} tickers.")
             return tickers
-        else:
-            raise ValueError("Symbol column not found")
+        return []
     except Exception as e:
-        print(f"Error fetching tickers: {e}")
-        print("Using fallback list (top 10 weighted) for testing...")
-        # Fallback to a smaller list just in case, but ideally we want 500
-        # If this fails, the user might need to provide a list or I try another source
-        return [
-            'RELIANCE.NS', 'HDFCBANK.NS', 'ICICIBANK.NS', 'INFY.NS', 'TCS.NS', 
-            'ITC.NS', 'LICI.NS', 'SBIN.NS', 'BHARTIARTL.NS', 'HINDUNILVR.NS'
+        print(f"Failed to fetch from {url}: {e}")
+        return []
+
+def get_index_tickers(index_name):
+    """Get tickers for a specific index."""
+    # Priority URLs
+    if index_name == "Nifty 500":
+        return get_tickers_from_url("https://nsearchives.nseindia.com/content/indices/ind_nifty500list.csv")
+    elif index_name == "Nifty Smallcap 500":
+        # Any of these might work, trying priority order
+        urls = [
+            "https://nsearchives.nseindia.com/content/indices/ind_niftysmallcap500list.csv", # Try direct match
+            "https://nsearchives.nseindia.com/content/indices/ind_niftysmallcap250list.csv"  # Fallback to 250 if 500 fails
         ]
+        for url in urls:
+            tickers = get_tickers_from_url(url)
+            if tickers:
+                if "250" in url:
+                    print("clean_warning: Nifty Smallcap 500 list not found, used Nifty Smallcap 250 instead.")
+                return tickers
+        return []
+    return []
+
 
 def fetch_historical_data(tickers, start_date="2014-01-01"):
     """Fetch historical data for tickers in chunks."""
@@ -143,31 +154,34 @@ def calculate_breadth(full_data):
     
     return breadth_df
 
-def main():
-    tickers = get_nifty500_tickers()
+def process_index(index_name, output_file):
+    print(f"\nProcessing {index_name}...")
+    tickers = get_index_tickers(index_name)
+    
     if not tickers:
-        print("No tickers found. Aborting.")
+        print(f"No tickers found for {index_name}!")
         return
         
-    print(f"Total Tickers: {len(tickers)}")
+    print(f"Index: {index_name} | Tickers: {len(tickers)}")
     
-    # Start from 2014 to ensure we have SMA ready by 2015
+    # 2014 start for warm up
     full_data = fetch_historical_data(tickers, start_date="2014-01-01")
     
     if full_data.empty:
-        print("No data fetched. Aborting.")
+        print("No data fetched.")
         return
         
-    print(f"Data fetched for {len(full_data.columns)} stocks. Date range: {full_data.index.min()} to {full_data.index.max()}")
-    
     breadth_df = calculate_breadth(full_data)
-    
-    output_file = "market_breadth_history.csv"
     breadth_df.to_csv(output_file)
-    print(f"Market breadth data saved to {output_file}")
+    print(f"Saved {output_file}")
+
+def main():
+    # 1. Nifty 500
+    process_index("Nifty 500", "market_breadth_nifty500.csv")
     
-    # Also save the list of tickers used for reference
-    pd.Series(tickers).to_csv("nifty500_tickers.csv", index=False)
+    # 2. Nifty Smallcap
+    # Note: User asked for Smallcap 500.
+    process_index("Nifty Smallcap 500", "market_breadth_smallcap.csv")
 
 if __name__ == "__main__":
     main()
