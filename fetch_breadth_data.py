@@ -28,7 +28,9 @@ def get_tickers_from_url(url):
 def get_index_tickers(index_name):
     """Get tickers for a specific index."""
     # Priority URLs
-    if index_name == "Nifty 500":
+    if index_name == "Nifty 50":
+        return get_tickers_from_url("https://nsearchives.nseindia.com/content/indices/ind_nifty50list.csv")
+    elif index_name == "Nifty 500":
         return get_tickers_from_url("https://nsearchives.nseindia.com/content/indices/ind_nifty500list.csv")
     elif index_name == "Nifty Smallcap 500":
         # Any of these might work, trying priority order
@@ -176,7 +178,10 @@ def process_index(index_name, output_file):
     print(f"Saved {output_file}")
 
 def main():
-    # 1. Nifty 500
+    # 1. Nifty 50
+    process_index("Nifty 50", "market_breadth_nifty50.csv")
+
+    # 2. Nifty 500
     process_index("Nifty 500", "market_breadth_nifty500.csv")
     
     # 2. Nifty Smallcap

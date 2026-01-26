@@ -79,12 +79,17 @@ def load_data(file_path):
 st.sidebar.title("Configuration")
 selected_index = st.sidebar.radio(
     "Select Index",
-    ["Nifty 500", "Nifty Smallcap"],
-    index=0
+    ["Nifty 50", "Nifty 500", "Nifty Smallcap"],
+    index=1
 )
 
 # Map selection to file
 index_config = {
+    "Nifty 50": {
+        "file": "market_breadth_nifty50.csv",
+        "title": "Nifty 50",
+        "description": "Tracking the top 50 blue-chip companies."
+    },
     "Nifty 500": {
         "file": "market_breadth_nifty500.csv",
         "title": "Nifty 500",
