@@ -78,6 +78,7 @@ def get_performance_summary(config_map):
     summary_data = []
     
     periods = {
+        "1 Day": 1,
         "1 Week": 7,
         "1 Month": 30,
         "3 Months": 90,
@@ -106,6 +107,7 @@ def get_performance_summary(config_map):
             
             for p_name, days in periods.items():
                 target_date = current_date - timedelta(days=days)
+                # Find closest date strictly before or equal
                 mask = df['Date'] <= target_date
                 if mask.any():
                     past_row = df[mask].iloc[-1]
@@ -263,7 +265,16 @@ else:
         if 'Index_Close' in df.columns:
             st.subheader("Performance Trend (Equal Weighted)")
             
-            periods = {"1 Week": 7, "1 Month": 30, "3 Months": 90, "6 Months": 180, "1 Year": 365, "3 Years": 365*3, "5 Years": 365*5}
+            periods = {
+                "1 Day": 1,
+                "1 Week": 7, 
+                "1 Month": 30, 
+                "3 Months": 90, 
+                "6 Months": 180, 
+                "1 Year": 365, 
+                "3 Years": 365*3, 
+                "5 Years": 365*5
+            }
             metrics = {}
             current_price = latest['Index_Close']
             
