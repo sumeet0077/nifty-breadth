@@ -3,6 +3,7 @@ import streamlit as st
 import pandas as pd
 import plotly.graph_objects as go
 from datetime import datetime, timedelta
+from nifty_themes import THEMES
 
 # ---------------------------------------------------------
 # PAGE CONFIGURATION
@@ -58,9 +59,6 @@ st.markdown("""
 # ---------------------------------------------------------
 # DATA LOADING
 # ---------------------------------------------------------
-# ---------------------------------------------------------
-# DATA LOADING
-# ---------------------------------------------------------
 @st.cache_data(ttl=3600)  # Cache for 1 hour
 def load_data(file_path):
     try:
@@ -72,8 +70,6 @@ def load_data(file_path):
         return df.sort_values('Date')
     except FileNotFoundError:
         return None
-
-from nifty_themes import THEMES
 
 st.sidebar.title("Configuration")
 
@@ -146,158 +142,182 @@ current_config = index_config.get(selected_index, index_config["Nifty 50"])
 # ---------------------------------------------------------
 # MAIN LAYOUT
 # ---------------------------------------------------------
-df = load_data(current_config["file"])
+st.title(f"{current_config['title']} Market Breadth")
+st.markdown(f"*{current_config['description']}*")
 
-col_title, col_refresh = st.columns([6, 1])
-with col_title:
-    st.title(f"⚡ {current_config['title']} Market Breadth")
-    st.markdown(f"{current_config['description']} **(% Stocks > 200 SMA)**")
+df = load_data(current_config['file'])
 
-if df is None:
-    st.warning(f"⚠️ Data file `{current_config['file']}` not found.")
-    st.info("Please run the data fetching script to generate it.")
-    if st.button("Run Fetch Script Now"):
-        with st.spinner("Fetching data for all indices..."):
-            import subprocess
-            subprocess.run(["python3", "fetch_breadth_data.py"])
-        st.rerun()
-    st.stop()
+if df is not None:
+    # -----------------------------------------------------
+    # 1. SUMMARY METRICS
+    # -----------------------------------------------------
+    latest = df.iloc[-1]
+    prev = df.iloc[-2] if len(df) > 1 else latest
+    
+    col1, col2, col3, col4 = st.columns(4)
+    
+    with col1:
+        st.metric("Total Stocks", int(latest['Total']))
+    
+    with col2:
+        st.metric(
+            "Stocks > 200 SMA", 
+            int(latest['Above']),
+            delta=int(latest['Above'] - prev['Above'])
+        )
+        
+    with col3:
+        st.metric(
+            "Stocks < 200 SMA", 
+            int(latest['Below']),
+            delta=int(latest['Below'] - prev['Below']),
+            delta_color="inverse"
+        )
+        
+    with col4:
+        st.metric(
+            "Breadth (%)", 
+            f"{latest['Percentage']:.2f}%",
+            delta=f"{latest['Percentage'] - prev['Percentage']:.2f}%"
+        )
 
-# Get latest data points
-latest = df.iloc[-1]
-prev = df.iloc[-2] if len(df) > 1 else latest
-latest_date = latest['Date'].strftime('%d %b %Y')
+    # -----------------------------------------------------
+    # 2. PERFORMANCE METRICS
+    # -----------------------------------------------------
+    if 'Index_Close' in df.columns:
+        st.subheader("Performance Trend (Equal Weighted)")
+        
+        # Calculate returns
+        periods = {
+            "1 Week": 7,
+            "1 Month": 30,
+            "3 Months": 90,
+            "6 Months": 180,
+            "1 Year": 365,
+            "3 Years": 365*3,
+            "5 Years": 365*5
+        }
+        
+        metrics = {}
+        current_price = latest['Index_Close']
+        current_date = latest['Date']
+        
+        for name, days in periods.items():
+            target_date = current_date - timedelta(days=days)
+            # Find closest date strictly before or equal
+            mask = df['Date'] <= target_date
+            if mask.any():
+                past_row = df[mask].iloc[-1]
+                past_price = past_row['Index_Close']
+                if past_price > 0:
+                    ret = ((current_price - past_price) / past_price) * 100
+                    metrics[name] = ret
+                else:
+                    metrics[name] = None
+            else:
+                metrics[name] = None
+                
+        # Create DataFrame for display
+        perf_df = pd.DataFrame([metrics])
+        
+        # Formatting function
+        def color_return(val):
+            if pd.isna(val):
+                return ""
+            color = 'green' if val >= 0 else 'red'
+            return f'color: {color}'
 
-# ---------------------------------------------------------
-# TOP METRICS
-# ---------------------------------------------------------
-m1, m2, m3, m4 = st.columns(4)
+        st.dataframe(
+            perf_df.style.map(color_return).format("{:.2f}%"),
+            use_container_width=True,
+            hide_index=True
+        )
 
-with m1:
-    st.metric(
-        "Current Breadth (%)",
-        f"{latest['Percentage']:.1f}%",
-        f"{latest['Percentage'] - prev['Percentage']:.1f}%"
-    )
+    # -----------------------------------------------------
+    # 3. INTERACTIVE CHARTS
+    # -----------------------------------------------------
+    tab1, tab2 = st.tabs(["Breadth Chart", "Constituents"])
+    
+    with tab1:
+        # Chart 1: Percentage Above 200 SMA
+        fig_pct = go.Figure()
 
-with m2:
-    st.metric(
-        "Stocks > 200 SMA",
-        f"{int(latest['Above'])}",
-        f"{int(latest['Above'] - prev['Above'])}"
-    )
+        fig_pct.add_trace(go.Scatter(
+            x=df['Date'], 
+            y=df['Percentage'],
+            mode='lines',
+            name='% Above 200 SMA',
+            line=dict(color='#3b82f6', width=2),
+            hovertemplate='%{y:.2f}%<extra></extra>'
+        ))
 
-with m3:
-    st.metric(
-        "Stocks < 200 SMA",
-        f"{int(latest['Below'])}",
-        f"{int(latest['Below'] - prev['Below'])}",
-        delta_color="inverse"
-    )
+        # Add 50% reference line
+        fig_pct.add_hline(y=50, line_dash="dash", line_color="gray", annotation_text="Neutral (50%)")
 
-with m4:
-    st.metric(
-        "Data As Of",
-        latest_date,
-        delta=None
-    )
+        fig_pct.update_layout(
+            title="Percentage of Stocks Above 200-Day SMA",
+            yaxis_title="Percentage (%)",
+            xaxis_title="Date",
+            template="plotly_dark",
+            height=500,
+            yaxis=dict(range=[0, 100]),
+            hovermode="x unified"
+        )
 
-st.markdown("---")
+        st.plotly_chart(fig_pct, use_container_width=True)
 
-# ---------------------------------------------------------
-# MAIN CHART: BREADTH PERCENTAGE
-# ---------------------------------------------------------
-st.subheader("📈 Historical Market Breadth (2015 - Present)")
+        # Chart 2: Stacked Area (Above vs Below)
+        fig_count = go.Figure()
 
-chart_data = df.copy()
+        fig_count.add_trace(go.Scatter(
+            x=df['Date'], 
+            y=df['Above'],
+            mode='lines',
+            name='Above 200 SMA',
+            stackgroup='one',
+            line=dict(width=0),
+            fillcolor='rgba(34, 197, 94, 0.6)' # Green
+        ))
 
-fig_line = go.Figure()
+        fig_count.add_trace(go.Scatter(
+            x=df['Date'], 
+            y=df['Below'],
+            mode='lines',
+            name='Below 200 SMA',
+            stackgroup='one',
+            line=dict(width=0),
+            fillcolor='rgba(239, 68, 68, 0.6)' # Red
+        ))
 
-# Green Fill (Above 50%)
-fig_line.add_trace(go.Scatter(
-    x=chart_data['Date'], 
-    y=chart_data['Percentage'],
-    mode='lines',
-    name='Breadth %',
-    line=dict(color='#22d3ee', width=2),
-    fill='tozeroy',
-    fillcolor='rgba(34, 211, 238, 0.1)',
-    hovertemplate='%{y:.1f}%<extra></extra>'
-))
+        fig_count.update_layout(
+            title="Market Participation (Count of Stocks)",
+            yaxis_title="Number of Stocks",
+            xaxis_title="Date",
+            template="plotly_dark",
+            height=400,
+            hovermode="x unified"
+        )
 
-# Reference Zones
-fig_line.add_hrect(y0=0, y1=20, fillcolor="rgba(239, 68, 68, 0.15)", line_width=0, annotation_text="Oversold", annotation_position="left")
-fig_line.add_hrect(y0=80, y1=100, fillcolor="rgba(34, 197, 94, 0.15)", line_width=0, annotation_text="Overbought", annotation_position="left")
-fig_line.add_hline(y=50, line_dash="dot", line_color="rgba(255,255,255,0.3)")
+        st.plotly_chart(fig_count, use_container_width=True)
 
-fig_line.update_layout(
-    template="plotly_dark",
-    height=500,
-    hovermode="x unified",
-    hoverlabel=dict(
-        bgcolor="#1f2937",
-        font_size=14,
-        font_family="Inter"
-    ),
-    margin=dict(l=20, r=20, t=20, b=20),
-    yaxis=dict(
-        title="Percentage of Stocks Above 200 SMA",
-        range=[0, 100],
-        gridcolor="rgba(255,255,255,0.1)"
-    ),
-    xaxis=dict(
-        gridcolor="rgba(255,255,255,0.1)",
-        rangeslider=dict(visible=False),
-        hoverformat='%d %b %Y'  # Force Day Month Year format
-    )
-)
+    # -----------------------------------------------------
+    # 4. CONSTITUENTS
+    # -----------------------------------------------------
+    with tab2:
+        st.subheader(f"Constituents of {current_config['title']}")
+        
+        # Check if it's a theme
+        if current_config['title'] in THEMES:
+            tickers = THEMES[current_config['title']]
+            st.write(f"**Total Stocks:** {len(tickers)}")
+            
+            # Formatted list
+            t_df = pd.DataFrame(tickers, columns=["Ticker Symbol"])
+            st.dataframe(t_df, use_container_width=True, hide_index=True)
+            
+        else:
+            st.info("Constituent list available only for Custom Industries.")
 
-st.plotly_chart(fig_line, use_container_width=True)
-
-# ---------------------------------------------------------
-# SECONDARY CHART: STACKED AREA (PARTICIPATION)
-# ---------------------------------------------------------
-st.subheader("📊 Participation Count")
-
-fig_area = go.Figure()
-
-fig_area.add_trace(go.Scatter(
-    x=chart_data['Date'], y=chart_data['Above'],
-    mode='lines',
-    name='Stocks Above',
-    stackgroup='one',
-    line=dict(width=0),
-    fillcolor='rgba(34, 197, 94, 0.6)' # Green
-))
-
-fig_area.add_trace(go.Scatter(
-    x=chart_data['Date'], y=chart_data['Below'],
-    mode='lines',
-    name='Stocks Below',
-    stackgroup='one',
-    line=dict(width=0),
-    fillcolor='rgba(239, 68, 68, 0.6)' # Red
-))
-
-fig_area.update_layout(
-    template="plotly_dark",
-    height=400,
-    hovermode="x unified",
-    margin=dict(l=20, r=20, t=20, b=20),
-    yaxis=dict(title="Number of Stocks"),
-    legend=dict(orientation="h", y=1.02, x=0.5, xanchor="center"),
-    xaxis=dict(hoverformat='%d %b %Y')
-)
-
-st.plotly_chart(fig_area, use_container_width=True)
-
-# ---------------------------------------------------------
-# RAW DATA EXPANDER
-# ---------------------------------------------------------
-with st.expander("Explore Raw Data"):
-    st.dataframe(df.style.format({
-        'Percentage': '{:.2f}%',
-        'Above': '{:.0f}',
-        'Below': '{:.0f}',
-        'Total': '{:.0f}'
-    }), use_container_width=True)
+else:
+    st.error(f"Data file not found: {current_config['file']}")
+    st.info("Please run `fetch_breadth_data.py` to generate the data.")

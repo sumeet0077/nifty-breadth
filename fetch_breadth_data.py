@@ -128,7 +128,7 @@ def fetch_historical_data(tickers, start_date="2014-01-01"):
     return full_data
 
 def calculate_breadth(full_data):
-    """Calculate market breadth metrics."""
+    """Calculate market breadth metrics and Equal-Weighted Index."""
     # 1. Calculate 200 SMA
     # min_periods=150 allows for some missing data (holidays, trading suspensions)
     sma_200 = full_data.rolling(window=200, min_periods=150).mean()
@@ -152,11 +152,25 @@ def calculate_breadth(full_data):
     percentage = (above_count / total_valid) * 100
     percentage = percentage.fillna(0)
     
+    # 5. Calculate Equal-Weighted Index History
+    # Calculate daily percent change for each stock
+    daily_returns = full_data.pct_change()
+    
+    # Average daily return of the constituent stocks (Equal Weight)
+    # We use mean(axis=1) to get the daily index return
+    index_daily_return = daily_returns.mean(axis=1)
+    
+    # Compute cumulative index value starting at 100
+    # (1 + r).cumprod() * 100
+    # Fill NaN at start with 0 return (value 1.0)
+    index_close = (1 + index_daily_return.fillna(0)).cumprod() * 100
+    
     breadth_df = pd.DataFrame({
         'Above': above_count,
         'Below': below_count,
         'Total': total_valid,
-        'Percentage': percentage
+        'Percentage': percentage,
+        'Index_Close': index_close
     })
     
     return breadth_df
