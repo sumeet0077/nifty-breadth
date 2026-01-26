@@ -212,74 +212,146 @@ if category == "Sector Rotation (RRG)":
     with col2:
         tail = st.slider("Tail Length (Periods)", 1, 12, 5)
         
+    # Multiselect for filtering
+    # Categorize options for easier selection
+    sector_keys = [k for k in index_config.keys() if "NIFTY" in k and "50" not in k]
+    industry_keys = [k for k in index_config.keys() if k not in sector_keys and "Nifty" not in k]
+    broad_keys = ["Nifty 500", "Nifty Smallcap 500"]
+    
+    all_keys = broad_keys + sector_keys + industry_keys
+    default_selection = sector_keys # Default to Sectors to avoid clutter
+    
+    selected_rrg_themes = st.multiselect("Select Themes to Display", all_keys, default=default_selection)
+        
     tf_map = {"Daily": "D", "Weekly": "W", "Monthly": "M"}
     
-    with st.spinner("Calculating RRG Metrics..."):
-        baseline_file = index_config["Nifty 50"]["file"]
-        baseline_df = load_data_v2(baseline_file)
-        
-        if baseline_df is None:
-            st.error("Nifty 50 data missing for baseline.")
-        else:
-            calculator = RRGCalculator(baseline_df)
-            data_dict = {}
-            for name, config in index_config.items():
-                if name == "Nifty 50": continue 
-                fpath = config['file']
-                if os.path.exists(fpath):
-                    d = load_data_v2(fpath)
-                    if d is not None:
-                        data_dict[name] = d
+    if not selected_rrg_themes:
+        st.warning("Please select at least one theme to display.")
+    else:
+        with st.spinner("Calculating RRG Metrics..."):
+            baseline_file = index_config["Nifty 50"]["file"]
+            baseline_df = load_data_v2(baseline_file)
             
-            rrg_df = calculator.calculate_rrg_metrics(
-                data_dict, 
-                timeframe=tf_map[timeframe], 
-                tail_length=tail
-            )
-            
-            if not rrg_df.empty:
-                rrg_view = rrg_df.groupby('Ticker').tail(tail)
+            if baseline_df is None:
+                st.error("Nifty 50 data missing for baseline.")
+            else:
+                calculator = RRGCalculator(baseline_df)
+                data_dict = {}
                 
-                fig = go.Figure()
+                # Only load selected themes
+                for name in selected_rrg_themes:
+                    config = index_config.get(name)
+                    if config:
+                        fpath = config['file']
+                        if os.path.exists(fpath):
+                            d = load_data_v2(fpath)
+                            if d is not None:
+                                data_dict[name] = d
                 
-                # Quadrants
-                fig.add_shape(type="rect", x0=100, y0=100, x1=120, y1=120, fillcolor="rgba(34, 197, 94, 0.1)", line_width=0, layer="below")
-                fig.add_shape(type="rect", x0=100, y0=80, x1=120, y1=100, fillcolor="rgba(234, 179, 8, 0.1)", line_width=0, layer="below")
-                fig.add_shape(type="rect", x0=80, y0=80, x1=100, y1=100, fillcolor="rgba(239, 68, 68, 0.1)", line_width=0, layer="below")
-                fig.add_shape(type="rect", x0=80, y0=100, x1=100, y1=120, fillcolor="rgba(59, 130, 246, 0.1)", line_width=0, layer="below")
-                
-                unique_tickers = rrg_view['Ticker'].unique()
-                for ticker in unique_tickers:
-                    t_data = rrg_view[rrg_view['Ticker'] == ticker]
-                    fig.add_trace(go.Scatter(
-                        x=t_data['RS_Ratio'],
-                        y=t_data['RS_Momentum'],
-                        mode='lines+markers+text',
-                        name=ticker,
-                        text=[ticker if i == len(t_data)-1 else "" for i in range(len(t_data))],
-                        textposition="top center",
-                        marker=dict(size=6, symbol="circle"),
-                        line=dict(width=2),
-                        hovertemplate=f"<b>{ticker}</b><br>Ratio: %{{x:.2f}}<br>Mom: %{{y:.2f}}<extra></extra>"
-                    ))
-
-                # Labels
-                fig.add_annotation(x=101, y=119, text="LEADING", showarrow=False, font=dict(color="green", size=14, weight="bold"))
-                fig.add_annotation(x=101, y=81, text="WEAKENING", showarrow=False, font=dict(color="orange", size=14, weight="bold"))
-                fig.add_annotation(x=81, y=81, text="LAGGING", showarrow=False, font=dict(color="red", size=14, weight="bold"))
-                fig.add_annotation(x=81, y=119, text="IMPROVING", showarrow=False, font=dict(color="blue", size=14, weight="bold"))
-
-                fig.update_layout(
-                    title=f"Sector Rotation (vs Nifty 50) - {timeframe}",
-                    xaxis_title="RS-Ratio (Trend)",
-                    yaxis_title="RS-Momentum (ROC)",
-                    xaxis=dict(range=[90, 110], zeroline=True, zerolinecolor="gray"), 
-                    yaxis=dict(range=[90, 110], zeroline=True, zerolinecolor="gray"),
-                    template="plotly_dark",
-                    height=800,
-                    showlegend=False
+                rrg_df = calculator.calculate_rrg_metrics(
+                    data_dict, 
+                    timeframe=tf_map[timeframe], 
+                    tail_length=tail
                 )
-                st.plotly_chart(fig, use_container_width=True)
+                
+                if not rrg_df.empty:
+                    rrg_view = rrg_df.groupby('Ticker').tail(tail)
+                    
+                    # Calculate Dynamic Range
+                    min_x = rrg_view['RS_Ratio'].min()
+                    max_x = rrg_view['RS_Ratio'].max()
+                    min_y = rrg_view['RS_Momentum'].min()
+                    max_y = rrg_view['RS_Momentum'].max()
+                    
+                    # Add padding (at least +/- 2, but fit 100 center)
+                    # We want 100 to be visible? Ideally yes, but if all far away, 100 might be far.
+                    # Usually RRG is centered at 100,100.
+                    # If points are far, we expand range.
+                    
+                    # Ensure 100 is included or at least context is kept
+                    # Actually standard RRG views zoom to fit.
+                    pad = 1.5
+                    x_range = [min_x - pad, max_x + pad]
+                    y_range = [min_y - pad, max_y + pad]
+                    
+                    # Draw Plot
+                    fig = go.Figure()
+                    
+                    # Watermarks (Quadrants)
+                    # We use annotations with absolute positioning relative to axis (if logic holds)
+                    # OR we use 'paper' coordinates (0-1) but that doesn't align with quadrants if the center isn't 0.5,0.5
+                    # Dynamic quadrants need dynamic shapes.
+                    # Shapes need to cover the visible area.
+                    # Let's use large Rectangles that extend far beyond expected range
+                    rect_max = 200
+                    rect_min = 0
+                    
+                    # Leading (UR): Ratio > 100, Mom > 100 (Green)
+                    fig.add_shape(type="rect", x0=100, y0=100, x1=rect_max, y1=rect_max, fillcolor="rgba(34, 197, 94, 0.1)", line_width=0, layer="below")
+                    # Weakening (LR): Ratio > 100, Mom < 100 (Yellow)
+                    fig.add_shape(type="rect", x0=100, y0=rect_min, x1=rect_max, y1=100, fillcolor="rgba(234, 179, 8, 0.1)", line_width=0, layer="below")
+                    # Lagging (LL): Ratio < 100, Mom < 100 (Red)
+                    fig.add_shape(type="rect", x0=rect_min, y0=rect_min, x1=100, y1=100, fillcolor="rgba(239, 68, 68, 0.1)", line_width=0, layer="below")
+                    # Improving (UL): Ratio < 100, Mom > 100 (Blue)
+                    fig.add_shape(type="rect", x0=rect_min, y0=100, x1=100, y1=rect_max, fillcolor="rgba(59, 130, 246, 0.1)", line_width=0, layer="below")
+                    
+                    unique_tickers = rrg_view['Ticker'].unique()
+                    for ticker in unique_tickers:
+                        t_data = rrg_view[rrg_view['Ticker'] == ticker]
+                        
+                        # Last point color and marker
+                        # We use one color for the whole trace for simplicity
+                        
+                        fig.add_trace(go.Scatter(
+                            x=t_data['RS_Ratio'],
+                            y=t_data['RS_Momentum'],
+                            mode='lines+markers+text',
+                            name=ticker,
+                            text=[ticker if i == len(t_data)-1 else "" for i in range(len(t_data))],
+                            textposition="top center",
+                            marker=dict(size=6, symbol="circle"),
+                            line=dict(width=2),
+                            hovertemplate=f"<b>{ticker}</b><br>Ratio: %{{x:.2f}}<br>Mom: %{{y:.2f}}<extra></extra>"
+                        ))
+
+                    # Watermark Text (Centered in quadrants roughly, or corner?)
+                    # Best: Corner of the view?
+                    # Let's put them at fixed offsets from 100 if inside view, or corner of view.
+                    # Simple approach: Fixed large labels at corners of the plot Area
+                    # x, y refer to plot coordinates? No, 'paper' is easier for corners.
+                    # But quadrants are fixed data coordinates.
+                    # Let's use data coordinates with a check, OR just placed at 102, 102 etc?
+                    # If graph is zoomed in far away from 100, watermarks at 100 won't be seen.
+                    # Watermarks should be fixed to the background quadrants.
+                    # If I use 'paper', I don't know which quadrant is where if 100,100 is off-screen.
+                    # So Use Data coordinates, but maybe centered in the visible range of that quadrant?
+                    # Too complex.
+                    # Let's just place them at (max_x, max_y) etc? 
+                    # User asked for "watermark view on each quadrant".
+                    # I'll place them at 102, 102 etc. If zoomed out they are visible. If zoomed in elsewhere, you don't see the quadrant name (correct behavior).
+                    
+                    # Font adjustments
+                    wm_font = dict(size=20, color="rgba(128,128,128,0.3)", weight="bold")
+                    
+                    # Place slightly offset from center
+                    fig.add_annotation(x=100.5, y=100.5, text="LEADING", showarrow=False, font=dict(color="green", size=20, weight="bold"), xanchor="left", yanchor="bottom")
+                    fig.add_annotation(x=100.5, y=99.5, text="WEAKENING", showarrow=False, font=dict(color="orange", size=20, weight="bold"), xanchor="left", yanchor="top")
+                    fig.add_annotation(x=99.5, y=99.5, text="LAGGING", showarrow=False, font=dict(color="red", size=20, weight="bold"), xanchor="right", yanchor="top")
+                    fig.add_annotation(x=99.5, y=100.5, text="IMPROVING", showarrow=False, font=dict(color="blue", size=20, weight="bold"), xanchor="right", yanchor="bottom")
+
+                    fig.update_layout(
+                        title=f"Sector Rotation (vs Nifty 50) - {timeframe}",
+                        xaxis_title="RS-Ratio (Trend)",
+                        yaxis_title="RS-Momentum (ROC)",
+                        xaxis=dict(range=x_range, zeroline=True, zerolinecolor="gray", zerolinewidth=1), 
+                        yaxis=dict(range=y_range, zeroline=True, zerolinecolor="gray", zerolinewidth=1),
+                        template="plotly_dark",
+                        height=800,
+                        showlegend=False,
+                        # Fix ratio to square if possible?
+                        # yaxis_scaleanchor="x", 
+                    )
+                    st.plotly_chart(fig, use_container_width=True)
 
 elif category == "Performance Overview":
     st.title("Market Performance Heatmap")
