@@ -174,7 +174,8 @@ fig_line.update_layout(
     ),
     xaxis=dict(
         gridcolor="rgba(255,255,255,0.1)",
-        rangeslider=dict(visible=False)
+        rangeslider=dict(visible=False),
+        hoverformat='%d %b %Y'  # Force Day Month Year format
     )
 )
 
