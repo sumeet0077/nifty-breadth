@@ -51,7 +51,7 @@ def check_and_update_data():
             st.error(f"Auto-update failed: {e}")
 
 # Run check immediately
-check_and_update_data()
+# Check moved after page_config
 
 # ---------------------------------------------------------
 # PAGE CONFIGURATION
@@ -62,6 +62,10 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="collapsed"
 )
+
+# Run check immediately (AFTER page config to avoid Streamlit error)
+check_and_update_data()
+st.error(f"⚠️ DEBUG: Loaded at {datetime.now().strftime('%H:%M:%S')} | CWD: {os.getcwd()}")
 
 # ---------------------------------------------------------
 # CUSTOM STYLING (Dark Theme Optimization)
@@ -107,7 +111,15 @@ st.markdown("""
 # ---------------------------------------------------------
 # DATA LOADING
 # ---------------------------------------------------------
-@st.cache_data(ttl=3600)  # Cache for 1 hour
+# ---------------------------------------------------------
+# GLOBAL DEBUG HEADER (ROOT CAUSE ANALYSIS)
+# ---------------------------------------------------------
+st.error(f"⚠️ DEBUG MODE ACTIVE: Last Refreshed: {datetime.now().strftime('%H:%M:%S')} | CWD: {os.getcwd()}")
+
+# ---------------------------------------------------------
+# DATA LOADING
+# ---------------------------------------------------------
+# REMOVING CACHE FOR DEBUGGING
 def load_data_v2(file_path):
     try:
         # Load the CSV
@@ -115,7 +127,13 @@ def load_data_v2(file_path):
         df['Date'] = pd.to_datetime(df['Date'])
         # Filter: Only show 2015 onwards
         df = df[df['Date'] >= "2015-01-01"]
-        return df.sort_values('Date')
+        sorted_df = df.sort_values('Date')
+        
+        # DEBUG PRINT INSIDE LOADER
+        latest_date = sorted_df['Date'].iloc[-1].strftime('%Y-%m-%d')
+        st.toast(f"Loaded {file_path}: Latest {latest_date}")
+        
+        return sorted_df
     except FileNotFoundError:
         return None
 
@@ -566,6 +584,25 @@ else:
 
     df = load_data_v2(current_config['file'])
 
+    # --- DEBUG SECTION (TEMPORARY) ---
+    with st.expander("🛠 System Debug Info (Check this if data seems old)", expanded=True):
+        st.write(f"**Current Working Directory:** `{os.getcwd()}`")
+        abs_path = os.path.abspath(current_config['file'])
+        st.write(f"**Loading File:** `{abs_path}`")
+        
+        if os.path.exists(abs_path):
+            mtime = datetime.fromtimestamp(os.path.getmtime(abs_path))
+            st.write(f"**File Modified Time:** {mtime}")
+        else:
+            st.error("File NOT found on disk!")
+
+        if df is not None and not df.empty:
+            st.write("**Last 3 Data Points Loaded:**")
+            st.dataframe(df.tail(3))
+        else:
+            st.write("DataFrame is Empty or None")
+    # ---------------------------------
+
     if df is not None:
         latest = df.iloc[-1]
         prev = df.iloc[-2] if len(df) > 1 else latest
@@ -604,7 +641,8 @@ else:
             fig_pct.add_hrect(y0=80, y1=100, fillcolor="green", opacity=0.1, layer="below", line_width=0)
             fig_pct.add_hrect(y0=0, y1=20, fillcolor="red", opacity=0.1, layer="below", line_width=0)
             fig_pct.add_hline(y=50, line_dash="dash", line_color="gray", annotation_text="Neutral (50%)")
-            fig_pct.update_layout(title="Percentage of Stocks Above 200-Day SMA", yaxis_title="Percentage (%)", xaxis_title="Date", template="plotly_dark", height=500, yaxis=dict(range=[0, 100]), hovermode="x unified", xaxis=dict(hoverformat='%d %b %Y'))
+            title_text = f"Percentage of Stocks Above 200-Day SMA (Latest: {latest['Date'].strftime('%d %b %Y')}) [DEBUG]"
+            fig_pct.update_layout(title=title_text, yaxis_title="Percentage (%)", xaxis_title="Date", template="plotly_dark", height=500, yaxis=dict(range=[0, 100]), hovermode="x unified", xaxis=dict(hoverformat='%d %b %Y'))
             st.plotly_chart(fig_pct, use_container_width=True)
 
             fig_count = go.Figure()
