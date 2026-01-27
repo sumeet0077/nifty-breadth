@@ -56,6 +56,22 @@ def get_index_tickers(index_name):
         "NIFTY OIL AND GAS": "ind_niftyoilgaslist.csv"
     }
 
+    if index_name == "Nifty 50":
+        # Hardcoded list to avoid NSE CSV issues (e.g. DUMMYHDLVR, missing TATA MOTORS)
+        return [
+            "ADANIENT.NS", "ADANIPORTS.NS", "APOLLOHOSP.NS", "ASIANPAINT.NS", "AXISBANK.NS",
+            "BAJAJ-AUTO.NS", "BAJFINANCE.NS", "BAJAJFINSV.NS", "BEL.NS", "BPCL.NS",
+            "BHARTIARTL.NS", "BRITANNIA.NS", "CIPLA.NS", "COALINDIA.NS", "DIVISLAB.NS",
+            "DRREDDY.NS", "EICHERMOT.NS", "GRASIM.NS", "HCLTECH.NS", "HDFCBANK.NS",
+            "HDFCLIFE.NS", "HEROMOTOCO.NS", "HINDALCO.NS", "HINDUNILVR.NS", "ICICIBANK.NS",
+            "ITC.NS", "INDUSINDBK.NS", "INFY.NS", "JSWSTEEL.NS", "KOTAKBANK.NS",
+            "LT.NS", "LTIM.NS", "M&M.NS", "MARUTI.NS", "NTPC.NS",
+            "NESTLEIND.NS", "ONGC.NS", "POWERGRID.NS", "RELIANCE.NS", "SBILIFE.NS",
+            "SHRIRAMFIN.NS", "SBIN.NS", "SUNPHARMA.NS", "TCS.NS", "TATACONSUM.NS",
+            "TATAMOTORS.NS", "TATASTEEL.NS", "TECHM.NS", "TITAN.NS", "ULTRACEMCO.NS",
+            "WIPRO.NS", "TRENT.NS"
+        ]
+
     if index_name in sector_map:
         base_url = "https://nsearchives.nseindia.com/content/indices/"
         # Nifty Smallcap 500 special check logic handled by map just pointing to 250 for now
