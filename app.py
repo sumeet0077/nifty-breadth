@@ -345,23 +345,37 @@ if category == "Sector Rotation (RRG)":
                                 hovertemplate=f"<b>{ticker}</b><br>Ratio: %{{x:.2f}}<br>Mom: %{{y:.2f}}<extra></extra>"
                             ))
                             
-                            # Arrowhead
+                            # Arrowhead (Annotation) & Label
                             if len(t_data) >= 2:
                                 head = t_data.iloc[-1]
                                 prev = t_data.iloc[-2]
-                                dx = head['RS_Ratio'] - prev['RS_Ratio']
-                                dy = head['RS_Momentum'] - prev['RS_Momentum']
-                                angle = np.degrees(np.arctan2(dy, dx)) - 90
                                 
+                                # Add Annotation Arrow
+                                # We use data coordinates for both head (x, y) and tail (ax, ay)
+                                fig.add_annotation(
+                                    x=head['RS_Ratio'],
+                                    y=head['RS_Momentum'],
+                                    ax=prev['RS_Ratio'],
+                                    ay=prev['RS_Momentum'],
+                                    xref="x", yref="y",
+                                    axref="x", ayref="y",
+                                    showarrow=True,
+                                    arrowhead=2, # Sharp arrow
+                                    arrowsize=1.2,
+                                    arrowwidth=2,
+                                    arrowcolor=color,
+                                    opacity=0.9
+                                )
+                                
+                                # Label (Text Only)
                                 fig.add_trace(go.Scatter(
                                     x=[head['RS_Ratio']],
                                     y=[head['RS_Momentum']],
-                                    mode='markers+text',
+                                    mode='text',
                                     name=ticker,
                                     text=[ticker],
                                     textposition="top center",
                                     textfont=dict(color=color, size=12, weight="bold"),
-                                    marker=dict(symbol="triangle-up", size=12, color=color, angle=angle, line=dict(width=1, color='white')),
                                     hoverinfo='skip',
                                     showlegend=False
                                 ))
@@ -372,7 +386,9 @@ if category == "Sector Rotation (RRG)":
                                     y=[head['RS_Momentum']],
                                     mode='markers+text',
                                     text=[ticker],
-                                    marker=dict(symbol="circle", size=10, color=color),
+                                    textposition="top center",
+                                    marker=dict(symbol="circle", size=8, color=color),
+                                    textfont=dict(color=color, size=12, weight="bold"),
                                     showlegend=False
                                 ))
 
@@ -395,7 +411,7 @@ if category == "Sector Rotation (RRG)":
                             xaxis_title="RS-Ratio (Trend)",
                             yaxis_title="RS-Momentum (ROC)",
                             xaxis=dict(range=x_range, zeroline=True, zerolinecolor="gray", zerolinewidth=1), 
-                            yaxis=dict(range=y_range, zeroline=True, zerolinecolor="gray", zerolinewidth=1),
+                            yaxis=dict(range=y_range, zeroline=True, zerolinecolor="gray", zerolinewidth=1, scaleanchor="x", scaleratio=1),
                             template="plotly_dark",
                             height=850,
                             showlegend=False
