@@ -219,7 +219,7 @@ if category == "Sector Rotation (RRG)":
     rrg_keys = sorted([k for k in THEMES.keys() if k in index_config])
     
     # Initialize Session State
-    if 'rrg_multiselect' not in st.session_state:
+    if 'rrg_multiselect' not in st.session_state or not st.session_state['rrg_multiselect']:
         st.session_state['rrg_multiselect'] = rrg_keys 
         
     b1, b2, b3 = st.columns([1, 1, 5])
