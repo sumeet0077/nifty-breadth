@@ -20,16 +20,31 @@ def get_tickers_from_url(url):
         if symbol_col:
             raw_tickers = df[symbol_col].dropna().astype(str).tolist()
             cleaned_tickers = []
+            
+            # Special handling for Nifty 50 CSV known data issues
+            is_nifty50 = "nifty50list.csv" in url
+            
             for t in raw_tickers:
                 # Filter Garbage
                 if "DUMMY" in t or "ETERNAL" in t:
                     continue
                 
                 # Transformations
-                if t == "TMPV": t = "TATAMOTORS" # Mapping for Nifty 50 CSV quirk
+                if t == "TMPV": 
+                    # TATAMOTORS.NS is failing on Yahoo, use BSE as fallback
+                    cleaned_tickers.append("TATAMOTORS.BO") 
+                    continue
                 
                 cleaned_tickers.append(t + ".NS")
-            return cleaned_tickers
+            
+            if is_nifty50:
+                # Manually restore missing stocks (likely replaced by DUMMY/ETERNAL in CSV)
+                missing = ["INDUSINDBK.NS", "BPCL.NS"]
+                for m in missing:
+                    if m not in cleaned_tickers:
+                        cleaned_tickers.append(m)
+                        
+            return sorted(list(set(cleaned_tickers)))
         return []
     except Exception as e:
         print(f"Failed to fetch from {url}: {e}")
