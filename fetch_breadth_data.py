@@ -63,7 +63,7 @@ def get_index_tickers(index_name):
         "Nifty 50": "ind_nifty50list.csv",
         "Nifty 500": "ind_nifty500list.csv",
         # Smallcap
-        "Nifty Smallcap 500": "ind_niftysmallcap250list.csv", # Fallback
+        "Nifty Smallcap 250": "ind_niftysmallcap250list.csv", # Fallback
         # Sectors
         "NIFTY AUTO": "ind_niftyautolist.csv",
         "NIFTY BANK": "ind_niftybanklist.csv",
@@ -205,7 +205,7 @@ def main():
     broad_indices = [
         ("Nifty 50", "market_breadth_nifty50.csv"),
         ("Nifty 500", "market_breadth_nifty500.csv"),
-        ("Nifty Smallcap 500", "market_breadth_smallcap.csv"),
+        ("Nifty Smallcap 250", "market_breadth_smallcap.csv"),
     ]
     
     sector_indices = [

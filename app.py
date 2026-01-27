@@ -8,6 +8,7 @@ from nifty_themes import THEMES
 import os
 import subprocess
 from rrg_helper import RRGCalculator
+from fetch_breadth_data import get_index_tickers
 
 # ---------------------------------------------------------
 # AUTO-UPDATE LOGIC
@@ -131,6 +132,11 @@ def load_data_v2(file_path):
     except FileNotFoundError:
         return None
 
+@st.cache_data
+def get_cached_constituents(index_name):
+    """Cached wrapper for fetching index tickers (avoids frequent network calls for Nifty lists)."""
+    return get_index_tickers(index_name)
+
 @st.cache_data(ttl=3600)
 def get_performance_summary_v3(config_map):
     """Load all CSVs and calculate performance metrics for a heatmap + RS."""
@@ -229,7 +235,7 @@ if st.sidebar.button("🔄 Refresh Data", help="Click if data seems stale"):
 index_config = {
     "Nifty 50": {"file": "market_breadth_nifty50.csv", "title": "Nifty 50", "description": "Top 50 Blue-chip Companies"},
     "Nifty 500": {"file": "market_breadth_nifty500.csv", "title": "Nifty 500", "description": "Top 500 Companies"},
-    "Nifty Smallcap 500": {"file": "market_breadth_smallcap.csv", "title": "Nifty Smallcap 250", "description": "Smallcap Segment"},
+    "Nifty Smallcap 250": {"file": "market_breadth_smallcap.csv", "title": "Nifty Smallcap 250", "description": "Smallcap Segment"},
     "NIFTY AUTO": {"file": "breadth_auto.csv", "title": "Nifty Auto", "description": "Automobile Sector"},
     "NIFTY BANK": {"file": "breadth_bank.csv", "title": "Nifty Bank", "description": "Banking Sector"},
     "NIFTY FINANCIAL SERVICES": {"file": "breadth_finance.csv", "title": "Nifty Financial Services", "description": "Financial Services (Banks, NBFCs, Insurance)"},
@@ -558,7 +564,7 @@ else:
     # Single Index View logic
     selected_index = None
     if category == "Broad Market":
-        selected_index = st.sidebar.radio("Select Index", ["Nifty 50", "Nifty 500", "Nifty Smallcap 500"])
+        selected_index = st.sidebar.radio("Select Index", ["Nifty 50", "Nifty 500", "Nifty Smallcap 250"])
     elif category == "Sectoral Indices":
         sector_options = [
             "NIFTY AUTO", "NIFTY BANK", "NIFTY FINANCIAL SERVICES", "NIFTY FMCG",
@@ -647,9 +653,13 @@ else:
 
         with tab2:
             st.subheader(f"Constituents of {current_config['title']}")
-            if current_config['title'] in THEMES:
-                tickers = THEMES[current_config['title']]
+            
+            # Fetch constituents dynamically (cached)
+            tickers = get_cached_constituents(selected_index)
+            
+            if tickers:
                 st.write(f"**Total Stocks:** {len(tickers)}")
                 st.dataframe(pd.DataFrame(tickers, columns=["Ticker Symbol"]), use_container_width=True, hide_index=True)
-            else: st.info("Constituent list available only for Custom Industries.")
+            else:
+                st.info(f"Constituent list not available for {selected_index}.")
     else: st.error(f"Data file not found: {current_config['file']}")
