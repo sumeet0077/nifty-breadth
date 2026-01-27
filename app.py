@@ -367,18 +367,18 @@ if category == "Sector Rotation (RRG)":
                                     opacity=0.9
                                 )
                                 
-                                # Label (Text Only)
-                                fig.add_trace(go.Scatter(
-                                    x=[head['RS_Ratio']],
-                                    y=[head['RS_Momentum']],
-                                    mode='text',
-                                    name=ticker,
-                                    text=[ticker],
-                                    textposition="top center",
-                                    textfont=dict(color=color, size=12, weight="bold"),
-                                    hoverinfo='skip',
-                                    showlegend=False
-                                ))
+                                # Label (Annotation Text with Offset)
+                                fig.add_annotation(
+                                    x=head['RS_Ratio'],
+                                    y=head['RS_Momentum'],
+                                    text=ticker,
+                                    showarrow=False,
+                                    xshift=10,
+                                    yshift=10,
+                                    font=dict(color=color, size=12, weight="bold"),
+                                    bgcolor="rgba(0,0,0,0.5)", # Semi-transparent background for readability
+                                    borderpad=2
+                                )
                             else:
                                 head = t_data.iloc[-1]
                                 fig.add_trace(go.Scatter(
@@ -386,7 +386,7 @@ if category == "Sector Rotation (RRG)":
                                     y=[head['RS_Momentum']],
                                     mode='markers+text',
                                     text=[ticker],
-                                    textposition="top center",
+                                    textposition="top right",
                                     marker=dict(symbol="circle", size=8, color=color),
                                     textfont=dict(color=color, size=12, weight="bold"),
                                     showlegend=False
