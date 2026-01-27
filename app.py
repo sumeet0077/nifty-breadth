@@ -44,6 +44,7 @@ def check_and_update_data():
             with st.spinner("Fetching latest data..."):
                 subprocess.run(["python3", "fetch_breadth_data.py"], check=True)
             st.session_state['data_updated'] = True
+            st.cache_data.clear()
             st.success("Data updated! Reloading...")
             st.rerun()
         except Exception as e:
@@ -429,11 +430,12 @@ if category == "Sector Rotation (RRG)":
                     fig.add_trace(go.Scatter(
                         x=t_data['RS_Ratio'],
                         y=t_data['RS_Momentum'],
+                        customdata=t_data['Date'],
                         mode='lines+markers',
                         name=ticker,
                         marker=dict(size=4, symbol="circle", color=color, opacity=0.7),
                         line=dict(width=2, color=color),
-                        hovertemplate=f"<b>{ticker}</b><br>Ratio: %{{x:.2f}}<br>Mom: %{{y:.2f}}<extra></extra>"
+                        hovertemplate=f"<b>{ticker}</b><br>Date: %{{customdata|%d %b %Y}}<br>Ratio: %{{x:.2f}}<br>Mom: %{{y:.2f}}<extra></extra>"
                     ))
                     
                     # Arrowhead (Annotation) & Label
@@ -592,17 +594,17 @@ else:
         tab1, tab2 = st.tabs(["Breadth Chart", "Constituents"])
         with tab1:
             fig_pct = go.Figure()
-            fig_pct.add_trace(go.Scatter(x=df['Date'], y=df['Percentage'], mode='lines', name='% Above 200 SMA', line=dict(color='#3b82f6', width=2), hovertemplate='%{y:.2f}%<extra></extra>'))
+            fig_pct.add_trace(go.Scatter(x=df['Date'], y=df['Percentage'], mode='lines', name='% Above 200 SMA', line=dict(color='#3b82f6', width=2), hovertemplate='<b>%{x|%d %b %Y}</b><br>%{y:.2f}%<extra></extra>'))
             fig_pct.add_hrect(y0=80, y1=100, fillcolor="green", opacity=0.1, layer="below", line_width=0)
             fig_pct.add_hrect(y0=0, y1=20, fillcolor="red", opacity=0.1, layer="below", line_width=0)
             fig_pct.add_hline(y=50, line_dash="dash", line_color="gray", annotation_text="Neutral (50%)")
-            fig_pct.update_layout(title="Percentage of Stocks Above 200-Day SMA", yaxis_title="Percentage (%)", xaxis_title="Date", template="plotly_dark", height=500, yaxis=dict(range=[0, 100]), hovermode="x unified")
+            fig_pct.update_layout(title="Percentage of Stocks Above 200-Day SMA", yaxis_title="Percentage (%)", xaxis_title="Date", template="plotly_dark", height=500, yaxis=dict(range=[0, 100]), hovermode="x unified", xaxis=dict(hoverformat='%d %b %Y'))
             st.plotly_chart(fig_pct, use_container_width=True)
 
             fig_count = go.Figure()
             fig_count.add_trace(go.Scatter(x=df['Date'], y=df['Above'], mode='lines', name='Above', stackgroup='one', line=dict(width=0), fillcolor='rgba(34, 197, 94, 0.6)'))
             fig_count.add_trace(go.Scatter(x=df['Date'], y=df['Below'], mode='lines', name='Below', stackgroup='one', line=dict(width=0), fillcolor='rgba(239, 68, 68, 0.6)'))
-            fig_count.update_layout(title="Market Participation", yaxis_title="Stocks", xaxis_title="Date", template="plotly_dark", height=400, hovermode="x unified")
+            fig_count.update_layout(title="Market Participation", yaxis_title="Stocks", xaxis_title="Date", template="plotly_dark", height=400, hovermode="x unified", xaxis=dict(hoverformat='%d %b %Y'))
             st.plotly_chart(fig_count, use_container_width=True)
 
         with tab2:
