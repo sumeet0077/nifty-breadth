@@ -268,16 +268,22 @@ if category == "Sector Rotation (RRG)":
                         fpath = config['file']
                         if os.path.exists(fpath):
                             d = load_data_v2(fpath)
-                            if d is not None:
+                            if d is not None and not d.empty:
                                 data_dict[name] = d
                 
-                rrg_df = calculator.calculate_rrg_metrics(
-                    data_dict, 
-                    timeframe=tf_map[timeframe], 
-                    tail_length=tail
-                )
-                
-                if not rrg_df.empty:
+                if not data_dict:
+                    st.error("No data loaded for selected themes. Please check data files.")
+                else:
+                    rrg_df = calculator.calculate_rrg_metrics(
+                        data_dict, 
+                        timeframe=tf_map[timeframe], 
+                        tail_length=tail
+                    )
+                    
+                    if rrg_df.empty:
+                        st.error("RRG Calculation returned no data. Check invalid dates or insufficient history.")
+                        st.stop()
+
                     # Filter by Quadrant
                     # We need to check the LAST point for each ticker to determine current quadrant
                     last_points = rrg_df.sort_values('Date').groupby('Ticker').last()
