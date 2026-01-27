@@ -207,6 +207,12 @@ def get_performance_summary_v3(config_map):
 
 st.sidebar.title("Configuration")
 
+# Add manual refresh button to clear cache
+if st.sidebar.button("🔄 Refresh Data", help="Click if data seems stale"):
+    st.cache_data.clear()
+    st.success("Cache cleared! Reloading...")
+    st.rerun()
+
 # Config Map
 index_config = {
     "Nifty 50": {"file": "market_breadth_nifty50.csv", "title": "Nifty 50", "description": "Top 50 Blue-chip Companies"},
