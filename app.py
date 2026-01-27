@@ -216,15 +216,11 @@ if category == "Sector Rotation (RRG)":
     # Multiselect for filtering with Bulk Actions
     # EXCLUDE Broad Market indices as per user request
     theme_keys = [k for k in index_config.keys() if "Nifty" not in k and "NIFTY" not in k]
-    # Also include Sectoral Indices? User said "Keep only 43 themes". 
-    # The 43 themes are those in THEMES.
-    # index_config has keys from THEMES.
-    # Let's filter strictly for THEMES keys.
     rrg_keys = sorted([k for k in THEMES.keys() if k in index_config])
     
     # Initialize Session State
     if 'rrg_multiselect' not in st.session_state:
-        st.session_state['rrg_multiselect'] = rrg_keys # Default to All Themes? Or first 5? User said "select multiple at one go". Let's default to all.
+        st.session_state['rrg_multiselect'] = rrg_keys 
         
     b1, b2, b3 = st.columns([1, 1, 5])
     if b1.button("Select All", type="secondary"):
@@ -236,10 +232,19 @@ if category == "Sector Rotation (RRG)":
     
     selected_rrg_themes = st.multiselect("Select Themes to Display", rrg_keys, key='rrg_multiselect')
     
-    # Quadrant Filter
-    st.markdown("### Quadrant Filter")
-    quadrant_options = ["Leading", "Weakening", "Lagging", "Improving"]
-    selected_quadrants = st.multiselect("Show Themes in Quadrant:", quadrant_options, default=quadrant_options)
+    # Quadrant Filter (Checkboxes)
+    st.write(" **Filter by Phase:**")
+    q1, q2, q3, q4 = st.columns(4)
+    show_leading = q1.checkbox("Leading", value=True)
+    show_weakening = q2.checkbox("Weakening", value=True)
+    show_lagging = q3.checkbox("Lagging", value=True)
+    show_improving = q4.checkbox("Improving", value=True)
+    
+    selected_quadrants = []
+    if show_leading: selected_quadrants.append("Leading")
+    if show_weakening: selected_quadrants.append("Weakening")
+    if show_lagging: selected_quadrants.append("Lagging")
+    if show_improving: selected_quadrants.append("Improving")
         
     tf_map = {"Daily": "D", "Weekly": "W", "Monthly": "M"}
     
@@ -365,27 +370,19 @@ if category == "Sector Rotation (RRG)":
                                     showlegend=False
                                 ))
 
-                        # Watermarks (Corner placement using paper coordinates, 70% transparent i.e., 0.3 opacity)
+                        # Watermarks (Refined: Smaller, greater transparency)
+                        wm_color = "rgba(128,128,128,0.15)" # Subtle gray or keep colored but very faint? User said "more transparent"
+                        # Actually user said "names of quadrants... bring it to extreme corners and make it 70% transparent"
+                        # I used colored text before. I will keep colored but lower opacity (0.15) and smaller size (25).
+                        
                         # Top-Right (Leading)
-                        fig.add_annotation(xref="paper", yref="paper", x=0.98, y=0.98, text="LEADING", showarrow=False, font=dict(color="rgba(34, 197, 94, 0.3)", size=40, weight="bold"), xanchor="right", yanchor="top")
+                        fig.add_annotation(xref="paper", yref="paper", x=0.98, y=0.98, text="LEADING", showarrow=False, font=dict(color="rgba(34, 197, 94, 0.15)", size=30, weight="bold"), xanchor="right", yanchor="top")
                         # Bottom-Right (Weakening)
-                        fig.add_annotation(xref="paper", yref="paper", x=0.98, y=0.02, text="WEAKENING", showarrow=False, font=dict(color="rgba(234, 179, 8, 0.3)", size=40, weight="bold"), xanchor="right", yanchor="bottom")
+                        fig.add_annotation(xref="paper", yref="paper", x=0.98, y=0.02, text="WEAKENING", showarrow=False, font=dict(color="rgba(234, 179, 8, 0.15)", size=30, weight="bold"), xanchor="right", yanchor="bottom")
                         # Bottom-Left (Lagging)
-                        fig.add_annotation(xref="paper", yref="paper", x=0.02, y=0.02, text="LAGGING", showarrow=False, font=dict(color="rgba(239, 68, 68, 0.3)", size=40, weight="bold"), xanchor="left", yanchor="bottom")
+                        fig.add_annotation(xref="paper", yref="paper", x=0.02, y=0.02, text="LAGGING", showarrow=False, font=dict(color="rgba(239, 68, 68, 0.15)", size=30, weight="bold"), xanchor="left", yanchor="bottom")
                         # Top-Left (Improving)
-                        fig.add_annotation(xref="paper", yref="paper", x=0.02, y=0.98, text="IMPROVING", showarrow=False, font=dict(color="rgba(59, 130, 246, 0.3)", size=40, weight="bold"), xanchor="left", yanchor="top")
-
-                        fig.update_layout(
-                            title=f"Sector Rotation (vs Nifty 50) - {timeframe}",
-                            xaxis_title="RS-Ratio (Trend)",
-                            yaxis_title="RS-Momentum (ROC)",
-                            xaxis=dict(range=x_range, zeroline=True, zerolinecolor="gray", zerolinewidth=1), 
-                            yaxis=dict(range=y_range, zeroline=True, zerolinecolor="gray", zerolinewidth=1),
-                            template="plotly_dark",
-                            height=850,
-                            showlegend=False
-                        )
-                        st.plotly_chart(fig, use_container_width=True)
+                        fig.add_annotation(xref="paper", yref="paper", x=0.02, y=0.98, text="IMPROVING", showarrow=False, font=dict(color="rgba(59, 130, 246, 0.15)", size=30, weight="bold"), xanchor="left", yanchor="top")
 
 elif category == "Performance Overview":
     st.title("Market Performance Heatmap")
