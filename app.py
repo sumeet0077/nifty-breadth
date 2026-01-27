@@ -65,7 +65,6 @@ st.set_page_config(
 
 # Run check immediately (AFTER page config to avoid Streamlit error)
 check_and_update_data()
-st.error(f"⚠️ DEBUG: Loaded at {datetime.now().strftime('%H:%M:%S')} | CWD: {os.getcwd()}")
 
 # ---------------------------------------------------------
 # CUSTOM STYLING (Dark Theme Optimization)
@@ -111,11 +110,6 @@ st.markdown("""
 # ---------------------------------------------------------
 # DATA LOADING
 # ---------------------------------------------------------
-# ---------------------------------------------------------
-# GLOBAL DEBUG HEADER (ROOT CAUSE ANALYSIS)
-# ---------------------------------------------------------
-st.error(f"⚠️ DEBUG MODE ACTIVE: Last Refreshed: {datetime.now().strftime('%H:%M:%S')} | CWD: {os.getcwd()}")
-
 # ---------------------------------------------------------
 # DATA LOADING
 # ---------------------------------------------------------
