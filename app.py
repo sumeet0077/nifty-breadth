@@ -390,6 +390,18 @@ if category == "Sector Rotation (RRG)":
                         # Top-Left (Improving)
                         fig.add_annotation(xref="paper", yref="paper", x=0.02, y=0.98, text="IMPROVING", showarrow=False, font=dict(color="rgba(59, 130, 246, 0.15)", size=30, weight="bold"), xanchor="left", yanchor="top")
 
+                        fig.update_layout(
+                            title=f"Sector Rotation (vs Nifty 50) - {timeframe}",
+                            xaxis_title="RS-Ratio (Trend)",
+                            yaxis_title="RS-Momentum (ROC)",
+                            xaxis=dict(range=x_range, zeroline=True, zerolinecolor="gray", zerolinewidth=1), 
+                            yaxis=dict(range=y_range, zeroline=True, zerolinecolor="gray", zerolinewidth=1),
+                            template="plotly_dark",
+                            height=850,
+                            showlegend=False
+                        )
+                        st.plotly_chart(fig, use_container_width=True)
+
 elif category == "Performance Overview":
     st.title("Market Performance Heatmap")
     st.markdown("*Comparative returns of all sectors and themes based on Equal-Weighted Index*")
