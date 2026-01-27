@@ -122,7 +122,7 @@ THEMES = {
     ],
     # 26
     "Music & Content": [
-        "SAREGAMA.NS", "TIPSINDLTD.NS"
+        "SAREGAMA.NS", "TIPSMUSIC.NS"
     ],
     # 27
     "Power T&D": [
