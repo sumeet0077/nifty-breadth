@@ -373,8 +373,10 @@ if category == "Sector Rotation (RRG)":
                                     y=head['RS_Momentum'],
                                     text=ticker,
                                     showarrow=False,
-                                    xshift=10,
-                                    yshift=10,
+                                    xshift=0,
+                                    yshift=15,
+                                    xanchor="center",
+                                    yanchor="bottom",
                                     font=dict(color=color, size=12, weight="bold"),
                                     bgcolor="rgba(0,0,0,0.5)", # Semi-transparent background for readability
                                     borderpad=2
