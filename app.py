@@ -3,10 +3,54 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, time
 from nifty_themes import THEMES
 import os
+import subprocess
 from rrg_helper import RRGCalculator
+
+# ---------------------------------------------------------
+# AUTO-UPDATE LOGIC
+# ---------------------------------------------------------
+def check_and_update_data():
+    # Only run if not already updated in this session
+    if 'data_updated' in st.session_state:
+        return
+
+    req_file = "market_breadth_nifty50.csv"
+    if not os.path.exists(req_file):
+        return
+
+    mod_time = datetime.fromtimestamp(os.path.getmtime(req_file))
+    now = datetime.now()
+    
+    # Target update time: 6:00 PM today
+    today_6pm = now.replace(hour=18, minute=0, second=0, microsecond=0)
+    
+    # Conditions:
+    # 1. It is currently past 6 PM
+    # 2. Results file is OLDER than today's 6 PM
+    # 2b. (Optional) Check if day is Saturday/Sunday? No, Nifty might trade on special days. Keep simple.
+    
+    is_past_6pm = now.time() >= time(18, 0)
+    
+    # If it's past 6 PM, the file timestamp must be NEWER than today 6 PM.
+    # If mod_time < today_6pm, it is stale.
+    is_stale = mod_time < today_6pm
+    
+    if is_past_6pm and is_stale:
+        st.warning("Data is stale (last updated before 6 PM). Auto-updating market data... This may take a moment.")
+        try:
+            with st.spinner("Fetching latest data..."):
+                subprocess.run(["python3", "fetch_breadth_data.py"], check=True)
+            st.session_state['data_updated'] = True
+            st.success("Data updated! Reloading...")
+            st.rerun()
+        except Exception as e:
+            st.error(f"Auto-update failed: {e}")
+
+# Run check immediately
+check_and_update_data()
 
 # ---------------------------------------------------------
 # PAGE CONFIGURATION
@@ -231,14 +275,94 @@ if category == "Sector Rotation (RRG)":
         st.rerun()
     
     selected_rrg_themes = st.multiselect("Select Themes to Display", rrg_keys, key='rrg_multiselect')
+    tf_map = {"Daily": "D", "Weekly": "W", "Monthly": "M"}
+
+    # -------------------------------------------------------------------------
+    # GLOBAL RRG CALCULATION (For Statistics)
+    # -------------------------------------------------------------------------
+    # We calculate RRG for ALL themes to show distribution stats, regardless of selection.
     
-    # Quadrant Filter (Checkboxes)
+    global_rrg_df = pd.DataFrame()
+    stats = {"Leading": 0, "Weakening": 0, "Lagging": 0, "Improving": 0, "Unknown": 0}
+    total_themes = len(rrg_keys)
+    
+    with st.spinner("Analyzing Market Breadth..."):
+        baseline_file = index_config["Nifty 50"]["file"]
+        baseline_df = load_data_v2(baseline_file)
+        
+        if baseline_df is None:
+            st.error("Nifty 50 data missing for baseline.")
+        else:
+            calculator = RRGCalculator(baseline_df)
+            full_data_dict = {}
+            
+            # Load ALL themes
+            for name in rrg_keys:
+                config = index_config.get(name)
+                if config:
+                    fpath = config['file']
+                    if os.path.exists(fpath):
+                        d = load_data_v2(fpath)
+                        if d is not None and not d.empty:
+                            full_data_dict[name] = d
+            
+            if full_data_dict:
+                global_rrg_df = calculator.calculate_rrg_metrics(
+                    full_data_dict, 
+                    timeframe=tf_map[timeframe], 
+                    tail_length=tail
+                )
+    
+    # Calculate Stats if data exists
+    if not global_rrg_df.empty:
+        last_points_global = global_rrg_df.sort_values('Date').groupby('Ticker').last()
+        
+        def get_quadrant(row):
+            r = row['RS_Ratio']
+            m = row['RS_Momentum']
+            if r > 100 and m > 100: return "Leading"
+            if r > 100 and m < 100: return "Weakening"
+            if r < 100 and m < 100: return "Lagging"
+            if r < 100 and m > 100: return "Improving"
+            return "Unknown"
+            
+        last_points_global['Quadrant'] = last_points_global.apply(get_quadrant, axis=1)
+        quadrant_counts = last_points_global['Quadrant'].value_counts()
+        total_active = len(last_points_global)
+        
+        for q in stats.keys():
+            stats[q] = quadrant_counts.get(q, 0)
+            
+        # Helper to format stat string
+        def fmt_stat(q_name):
+            count = stats[q_name]
+            pct = (count / total_active * 100) if total_active > 0 else 0
+            return f"{count}/{total_active} ({pct:.0f}%)"
+            
+        st.caption(f"Tracking **{total_active}** Themes")
+    else:
+        st.write("No data available.")
+        def fmt_stat(q): return "-/-"
+
+    # Quadrant Filter with Stats
     st.write(" **Filter by Phase:**")
     q1, q2, q3, q4 = st.columns(4)
-    show_leading = q1.checkbox("Leading", value=True)
-    show_weakening = q2.checkbox("Weakening", value=True)
-    show_lagging = q3.checkbox("Lagging", value=True)
-    show_improving = q4.checkbox("Improving", value=True)
+    
+    with q1:
+        show_leading = st.checkbox("Leading", value=True)
+        st.markdown(f"<div style='color:rgba(255,255,255,0.5); font-size:12px; margin-top:-10px; margin-bottom:10px;'>{fmt_stat('Leading')}</div>", unsafe_allow_html=True)
+        
+    with q2:
+        show_weakening = st.checkbox("Weakening", value=True)
+        st.markdown(f"<div style='color:rgba(255,255,255,0.5); font-size:12px; margin-top:-10px; margin-bottom:10px;'>{fmt_stat('Weakening')}</div>", unsafe_allow_html=True)
+        
+    with q3:
+        show_lagging = st.checkbox("Lagging", value=True)
+        st.markdown(f"<div style='color:rgba(255,255,255,0.5); font-size:12px; margin-top:-10px; margin-bottom:10px;'>{fmt_stat('Lagging')}</div>", unsafe_allow_html=True)
+
+    with q4:
+        show_improving = st.checkbox("Improving", value=True)
+        st.markdown(f"<div style='color:rgba(255,255,255,0.5); font-size:12px; margin-top:-10px; margin-bottom:10px;'>{fmt_stat('Improving')}</div>", unsafe_allow_html=True)
     
     selected_quadrants = []
     if show_leading: selected_quadrants.append("Leading")
@@ -246,179 +370,146 @@ if category == "Sector Rotation (RRG)":
     if show_lagging: selected_quadrants.append("Lagging")
     if show_improving: selected_quadrants.append("Improving")
         
-    tf_map = {"Daily": "D", "Weekly": "W", "Monthly": "M"}
     
     if not selected_rrg_themes:
         st.warning("Please select at least one theme to display.")
     else:
-        with st.spinner("Calculating RRG Metrics..."):
-            baseline_file = index_config["Nifty 50"]["file"]
-            baseline_df = load_data_v2(baseline_file)
+        # Use the already calculated global_rrg_df, but filter for selected themes
+        if global_rrg_df.empty:
+            st.error("Nifty 50 data missing or calculation failed.")
+        else:
+            # Filter for Selected Themes AND Selected Quadrants
+            # We already have quadrant info in last_points_global
             
-            if baseline_df is None:
-                st.error("Nifty 50 data missing for baseline.")
-            else:
-                calculator = RRGCalculator(baseline_df)
-                data_dict = {}
-                
-                # Load selected themes
-                for name in selected_rrg_themes:
-                    config = index_config.get(name)
-                    if config:
-                        fpath = config['file']
-                        if os.path.exists(fpath):
-                            d = load_data_v2(fpath)
-                            if d is not None and not d.empty:
-                                data_dict[name] = d
-                
-                if not data_dict:
-                    st.error("No data loaded for selected themes. Please check data files.")
+            # 1. Filter by Quadrant (using global calc)
+            valid_tickers_by_quad = last_points_global[last_points_global['Quadrant'].isin(selected_quadrants)].index.tolist()
+            
+            # 2. Filter by User Selection
+            final_tickers = [t for t in valid_tickers_by_quad if t in selected_rrg_themes]
+            
+            rrg_view = global_rrg_df[global_rrg_df['Ticker'].isin(final_tickers)].groupby('Ticker').tail(tail)
+            
+            if rrg_view.empty:
+                # If selection is empty but data exists, check why
+                if not selected_rrg_themes:
+                     st.warning("No themes selected.")
+                elif not valid_tickers_by_quad:
+                     st.warning("No themes in selected quadrants.")
                 else:
-                    rrg_df = calculator.calculate_rrg_metrics(
-                        data_dict, 
-                        timeframe=tf_map[timeframe], 
-                        tail_length=tail
-                    )
+                     st.warning("No intersection between selected themes and selected quadrants.")
+            else:
+                min_x = rrg_view['RS_Ratio'].min()
+                max_x = rrg_view['RS_Ratio'].max()
+                min_y = rrg_view['RS_Momentum'].min()
+                max_y = rrg_view['RS_Momentum'].max()
+                
+                pad = 1.5
+                x_range = [min_x - pad, max_x + pad]
+                y_range = [min_y - pad, max_y + pad]
+                
+                fig = go.Figure()
+                        
+                # Background Quadrants - Use very large coordinates to cover dynamic range
+                rect_max = 1000 
+                rect_min = -1000
+                
+                fig.add_shape(type="rect", x0=100, y0=100, x1=rect_max, y1=rect_max, fillcolor="rgba(34, 197, 94, 0.05)", line_width=0, layer="below")
+                fig.add_shape(type="rect", x0=100, y0=rect_min, x1=rect_max, y1=100, fillcolor="rgba(234, 179, 8, 0.05)", line_width=0, layer="below")
+                fig.add_shape(type="rect", x0=rect_min, y0=rect_min, x1=100, y1=100, fillcolor="rgba(239, 68, 68, 0.05)", line_width=0, layer="below")
+                fig.add_shape(type="rect", x0=rect_min, y0=100, x1=100, y1=rect_max, fillcolor="rgba(59, 130, 246, 0.05)", line_width=0, layer="below")
+                
+                unique_tickers = rrg_view['Ticker'].unique()
+                colors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf', '#ffffff', '#00ff00', '#ffff00', '#0000ff', '#ff00ff']
+                
+                for i, ticker in enumerate(unique_tickers):
+                    t_data = rrg_view[rrg_view['Ticker'] == ticker]
+                    color = colors[i % len(colors)]
                     
-                    if rrg_df.empty:
-                        st.error("RRG Calculation returned no data. Check invalid dates or insufficient history.")
-                        st.stop()
-
-                    # Filter by Quadrant
-                    # We need to check the LAST point for each ticker to determine current quadrant
-                    last_points = rrg_df.sort_values('Date').groupby('Ticker').last()
+                    # Main Trail
+                    fig.add_trace(go.Scatter(
+                        x=t_data['RS_Ratio'],
+                        y=t_data['RS_Momentum'],
+                        mode='lines+markers',
+                        name=ticker,
+                        marker=dict(size=4, symbol="circle", color=color, opacity=0.7),
+                        line=dict(width=2, color=color),
+                        hovertemplate=f"<b>{ticker}</b><br>Ratio: %{{x:.2f}}<br>Mom: %{{y:.2f}}<extra></extra>"
+                    ))
                     
-                    def get_quadrant(row):
-                        r = row['RS_Ratio']
-                        m = row['RS_Momentum']
-                        if r > 100 and m > 100: return "Leading"
-                        if r > 100 and m < 100: return "Weakening"
-                        if r < 100 and m < 100: return "Lagging"
-                        if r < 100 and m > 100: return "Improving"
-                        return "Unknown"
+                    # Arrowhead (Annotation) & Label
+                    if len(t_data) >= 2:
+                        head = t_data.iloc[-1]
+                        prev = t_data.iloc[-2]
                         
-                    last_points['Quadrant'] = last_points.apply(get_quadrant, axis=1)
-                    ticker_quadrant_map = last_points['Quadrant'].to_dict()
-                    
-                    # Filter RRG DF
-                    valid_tickers = [t for t, q in ticker_quadrant_map.items() if q in selected_quadrants]
-                    rrg_view = rrg_df[rrg_df['Ticker'].isin(valid_tickers)].groupby('Ticker').tail(tail)
-                    
-                    if rrg_view.empty:
-                        st.warning("No themes match the selected quadrants.")
-                    else:
-                        min_x = rrg_view['RS_Ratio'].min()
-                        max_x = rrg_view['RS_Ratio'].max()
-                        min_y = rrg_view['RS_Momentum'].min()
-                        max_y = rrg_view['RS_Momentum'].max()
-                        
-                        pad = 1.5
-                        x_range = [min_x - pad, max_x + pad]
-                        y_range = [min_y - pad, max_y + pad]
-                        
-                        fig = go.Figure()
-                        
-                        # Background Quadrants - Use very large coordinates to cover dynamic range
-                        rect_max = 1000 
-                        rect_min = -1000
-                        
-                        fig.add_shape(type="rect", x0=100, y0=100, x1=rect_max, y1=rect_max, fillcolor="rgba(34, 197, 94, 0.05)", line_width=0, layer="below")
-                        fig.add_shape(type="rect", x0=100, y0=rect_min, x1=rect_max, y1=100, fillcolor="rgba(234, 179, 8, 0.05)", line_width=0, layer="below")
-                        fig.add_shape(type="rect", x0=rect_min, y0=rect_min, x1=100, y1=100, fillcolor="rgba(239, 68, 68, 0.05)", line_width=0, layer="below")
-                        fig.add_shape(type="rect", x0=rect_min, y0=100, x1=100, y1=rect_max, fillcolor="rgba(59, 130, 246, 0.05)", line_width=0, layer="below")
-                        
-                        unique_tickers = rrg_view['Ticker'].unique()
-                        colors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf', '#ffffff', '#00ff00', '#ffff00', '#0000ff', '#ff00ff']
-                        
-                        for i, ticker in enumerate(unique_tickers):
-                            t_data = rrg_view[rrg_view['Ticker'] == ticker]
-                            color = colors[i % len(colors)]
-                            
-                            # Main Trail
-                            fig.add_trace(go.Scatter(
-                                x=t_data['RS_Ratio'],
-                                y=t_data['RS_Momentum'],
-                                mode='lines+markers',
-                                name=ticker,
-                                marker=dict(size=4, symbol="circle", color=color, opacity=0.7),
-                                line=dict(width=2, color=color),
-                                hovertemplate=f"<b>{ticker}</b><br>Ratio: %{{x:.2f}}<br>Mom: %{{y:.2f}}<extra></extra>"
-                            ))
-                            
-                            # Arrowhead (Annotation) & Label
-                            if len(t_data) >= 2:
-                                head = t_data.iloc[-1]
-                                prev = t_data.iloc[-2]
-                                
-                                # Add Annotation Arrow
-                                # We use data coordinates for both head (x, y) and tail (ax, ay)
-                                fig.add_annotation(
-                                    x=head['RS_Ratio'],
-                                    y=head['RS_Momentum'],
-                                    ax=prev['RS_Ratio'],
-                                    ay=prev['RS_Momentum'],
-                                    xref="x", yref="y",
-                                    axref="x", ayref="y",
-                                    showarrow=True,
-                                    arrowhead=2, # Sharp arrow
-                                    arrowsize=1.2,
-                                    arrowwidth=2,
-                                    arrowcolor=color,
-                                    opacity=0.9
-                                )
-                                
-                                # Label (Annotation Text with Offset)
-                                fig.add_annotation(
-                                    x=head['RS_Ratio'],
-                                    y=head['RS_Momentum'],
-                                    text=ticker,
-                                    showarrow=False,
-                                    xshift=0,
-                                    yshift=15,
-                                    xanchor="center",
-                                    yanchor="bottom",
-                                    font=dict(color=color, size=12, weight="bold"),
-                                    bgcolor="rgba(0,0,0,0.5)", # Semi-transparent background for readability
-                                    borderpad=2
-                                )
-                            else:
-                                head = t_data.iloc[-1]
-                                fig.add_trace(go.Scatter(
-                                    x=[head['RS_Ratio']],
-                                    y=[head['RS_Momentum']],
-                                    mode='markers+text',
-                                    text=[ticker],
-                                    textposition="top right",
-                                    marker=dict(symbol="circle", size=8, color=color),
-                                    textfont=dict(color=color, size=12, weight="bold"),
-                                    showlegend=False
-                                ))
-
-                        # Watermarks (Refined: Smaller, greater transparency)
-                        wm_color = "rgba(128,128,128,0.15)" # Subtle gray or keep colored but very faint? User said "more transparent"
-                        # Actually user said "names of quadrants... bring it to extreme corners and make it 70% transparent"
-                        # I used colored text before. I will keep colored but lower opacity (0.15) and smaller size (25).
-                        
-                        # Top-Right (Leading)
-                        fig.add_annotation(xref="paper", yref="paper", x=0.98, y=0.98, text="LEADING", showarrow=False, font=dict(color="rgba(34, 197, 94, 0.15)", size=30, weight="bold"), xanchor="right", yanchor="top")
-                        # Bottom-Right (Weakening)
-                        fig.add_annotation(xref="paper", yref="paper", x=0.98, y=0.02, text="WEAKENING", showarrow=False, font=dict(color="rgba(234, 179, 8, 0.15)", size=30, weight="bold"), xanchor="right", yanchor="bottom")
-                        # Bottom-Left (Lagging)
-                        fig.add_annotation(xref="paper", yref="paper", x=0.02, y=0.02, text="LAGGING", showarrow=False, font=dict(color="rgba(239, 68, 68, 0.15)", size=30, weight="bold"), xanchor="left", yanchor="bottom")
-                        # Top-Left (Improving)
-                        fig.add_annotation(xref="paper", yref="paper", x=0.02, y=0.98, text="IMPROVING", showarrow=False, font=dict(color="rgba(59, 130, 246, 0.15)", size=30, weight="bold"), xanchor="left", yanchor="top")
-
-                        fig.update_layout(
-                            title=f"Sector Rotation (vs Nifty 50) - {timeframe}",
-                            xaxis_title="RS-Ratio (Trend)",
-                            yaxis_title="RS-Momentum (ROC)",
-                            xaxis=dict(range=x_range, zeroline=True, zerolinecolor="gray", zerolinewidth=1), 
-                            yaxis=dict(range=y_range, zeroline=True, zerolinecolor="gray", zerolinewidth=1, scaleanchor="x", scaleratio=1),
-                            template="plotly_dark",
-                            height=850,
-                            showlegend=False
+                        # Add Annotation Arrow
+                        # We use data coordinates for both head (x, y) and tail (ax, ay)
+                        fig.add_annotation(
+                            x=head['RS_Ratio'],
+                            y=head['RS_Momentum'],
+                            ax=prev['RS_Ratio'],
+                            ay=prev['RS_Momentum'],
+                            xref="x", yref="y",
+                            axref="x", ayref="y",
+                            showarrow=True,
+                            arrowhead=2, # Sharp arrow
+                            arrowsize=1.2,
+                            arrowwidth=2,
+                            arrowcolor=color,
+                            opacity=0.9
                         )
-                        st.plotly_chart(fig, use_container_width=True)
+                        
+                        # Label (Annotation Text with Offset)
+                        fig.add_annotation(
+                            x=head['RS_Ratio'],
+                            y=head['RS_Momentum'],
+                            text=ticker,
+                            showarrow=False,
+                            xshift=0,
+                            yshift=15,
+                            xanchor="center",
+                            yanchor="bottom",
+                            font=dict(color=color, size=12, weight="bold"),
+                            bgcolor="rgba(0,0,0,0.5)", # Semi-transparent background for readability
+                            borderpad=2
+                        )
+                    else:
+                        head = t_data.iloc[-1]
+                        fig.add_trace(go.Scatter(
+                            x=[head['RS_Ratio']],
+                            y=[head['RS_Momentum']],
+                            mode='markers+text',
+                            text=[ticker],
+                            textposition="top right",
+                            marker=dict(symbol="circle", size=8, color=color),
+                            textfont=dict(color=color, size=12, weight="bold"),
+                            showlegend=False
+                        ))
+
+                # Watermarks (Refined: Smaller, greater transparency)
+                wm_color = "rgba(128,128,128,0.15)" # Subtle gray or keep colored but very faint? User said "more transparent"
+                # Actually user said "names of quadrants... bring it to extreme corners and make it 70% transparent"
+                # I used colored text before. I will keep colored but lower opacity (0.15) and smaller size (25).
+                
+                # Top-Right (Leading)
+                fig.add_annotation(xref="paper", yref="paper", x=0.98, y=0.98, text="LEADING", showarrow=False, font=dict(color="rgba(34, 197, 94, 0.15)", size=30, weight="bold"), xanchor="right", yanchor="top")
+                # Bottom-Right (Weakening)
+                fig.add_annotation(xref="paper", yref="paper", x=0.98, y=0.02, text="WEAKENING", showarrow=False, font=dict(color="rgba(234, 179, 8, 0.15)", size=30, weight="bold"), xanchor="right", yanchor="bottom")
+                # Bottom-Left (Lagging)
+                fig.add_annotation(xref="paper", yref="paper", x=0.02, y=0.02, text="LAGGING", showarrow=False, font=dict(color="rgba(239, 68, 68, 0.15)", size=30, weight="bold"), xanchor="left", yanchor="bottom")
+                # Top-Left (Improving)
+                fig.add_annotation(xref="paper", yref="paper", x=0.02, y=0.98, text="IMPROVING", showarrow=False, font=dict(color="rgba(59, 130, 246, 0.15)", size=30, weight="bold"), xanchor="left", yanchor="top")
+
+                fig.update_layout(
+                    title=f"Sector Rotation (vs Nifty 50) - {timeframe}",
+                    xaxis_title="RS-Ratio (Trend)",
+                    yaxis_title="RS-Momentum (ROC)",
+                    xaxis=dict(range=x_range, zeroline=True, zerolinecolor="gray", zerolinewidth=1), 
+                    yaxis=dict(range=y_range, zeroline=True, zerolinecolor="gray", zerolinewidth=1, scaleanchor="x", scaleratio=1),
+                    template="plotly_dark",
+                    height=850,
+                    showlegend=False
+                )
+                st.plotly_chart(fig, use_container_width=True)
 
 elif category == "Performance Overview":
     st.title("Market Performance Heatmap")
