@@ -16,12 +16,13 @@ THEMES = {
     # 3
     "Renewable Energy Generation": [
         "ADANIGREEN.NS", "TATAPOWER.NS", "NTPC.NS", "JSWENERGY.NS", "NHPC.NS", 
-        "SJVN.NS", "INOXWIND.NS", "SUZLON.NS"
+        "SJVN.NS", "INOXWIND.NS", "SUZLON.NS", "WAAREERTL.NS"
     ],
     # 4
     "EV Ecosystem": [
         "TATAMOTORS.NS", "TVSMOTOR.NS", "OLECTRA.NS", "JBM-AUTO.NS", "HEROMOTOCO.NS", 
-        "BAJAJ-AUTO.NS", "EXIDEIND.NS", "AMARARAJA.NS", "SONACOMS.NS", "MOTHERSON.NS"
+        "BAJAJ-AUTO.NS", "EXIDEIND.NS", "AMARARAJA.NS", "SONACOMS.NS", "MOTHERSON.NS",
+        "ATHERENERG.NS"
     ],
     # 5
     "Semiconductors & EMS": [
@@ -194,5 +195,10 @@ THEMES = {
     # 43
     "Copper": [
         "HINDCOPPER.NS", "VEDL.NS", "HINDALCO.NS", "MADHAV.NS"
+    ],
+    # 44
+    "Solar Manufacturing": [
+        "WAAREEENER.NS", "PREMIERENE.NS", "VIKRAMSOLR.NS", "BORORENEW.NS", 
+        "EMMVEE.NS", "WEBELSOLAR.NS", "INA.BO"
     ]
 }
