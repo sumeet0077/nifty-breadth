@@ -115,6 +115,7 @@ st.markdown("""
 # DATA LOADING
 # ---------------------------------------------------------
 # REMOVING CACHE FOR DEBUGGING
+@st.cache_data(ttl=3600)
 def load_data_v2(file_path):
     try:
         # Load the CSV
@@ -123,10 +124,6 @@ def load_data_v2(file_path):
         # Filter: Only show 2015 onwards
         df = df[df['Date'] >= "2015-01-01"]
         sorted_df = df.sort_values('Date')
-        
-        # DEBUG PRINT INSIDE LOADER
-        latest_date = sorted_df['Date'].iloc[-1].strftime('%Y-%m-%d')
-        st.toast(f"Loaded {file_path}: Latest {latest_date}")
         
         return sorted_df
     except FileNotFoundError:
@@ -641,7 +638,7 @@ else:
             fig_pct.add_hrect(y0=80, y1=100, fillcolor="green", opacity=0.1, layer="below", line_width=0)
             fig_pct.add_hrect(y0=0, y1=20, fillcolor="red", opacity=0.1, layer="below", line_width=0)
             fig_pct.add_hline(y=50, line_dash="dash", line_color="gray", annotation_text="Neutral (50%)")
-            title_text = f"Percentage of Stocks Above 200-Day SMA (Latest: {latest['Date'].strftime('%d %b %Y')}) [DEBUG]"
+            title_text = f"Percentage of Stocks Above 200-Day SMA (Latest: {latest['Date'].strftime('%d %b %Y')})"
             fig_pct.update_layout(title=title_text, yaxis_title="Percentage (%)", xaxis_title="Date", template="plotly_dark", height=500, yaxis=dict(range=[0, 100]), hovermode="x unified", xaxis=dict(hoverformat='%d %b %Y'))
             st.plotly_chart(fig_pct, use_container_width=True)
 
