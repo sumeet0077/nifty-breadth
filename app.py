@@ -663,6 +663,19 @@ else:
         with tab2:
             st.subheader(f"Constituents of {current_config['title']}")
             
+            # Helper to generate TradingView URLs
+            def make_tv_url(ticker):
+                clean = ticker.replace(".NS", "").replace(".BO", "")
+                exchange = "BSE" if ".BO" in ticker else "NSE"
+                return f"https://www.tradingview.com/chart/?symbol={exchange}:{clean}"
+
+            # Link Column Config
+            tv_link_config = st.column_config.LinkColumn(
+                "Ticker", 
+                display_text=r"symbol=[A-Z]+:(.*)",
+                help="Click to open TradingView Chart"
+            )
+
             # Load detailed status if available
             market_status = load_market_status()
             details = market_status.get(selected_index)
@@ -674,14 +687,28 @@ else:
                 with c1:
                     st.success(f"📈 Above 200 SMA ({len(details['above'])})")
                     if details['above']:
-                        st.dataframe(pd.DataFrame(details['above'], columns=["Ticker"]), width=None, use_container_width=True, hide_index=True)
+                        df_up = pd.DataFrame(details['above'], columns=["Ticker"])
+                        df_up["Ticker"] = df_up["Ticker"].apply(make_tv_url)
+                        st.dataframe(
+                            df_up, 
+                            column_config={"Ticker": tv_link_config},
+                            use_container_width=True, 
+                            hide_index=True
+                        )
                     else:
                         st.caption("None")
                         
                 with c2:
                     st.error(f"📉 Below 200 SMA ({len(details['below'])})")
                     if details['below']:
-                        st.dataframe(pd.DataFrame(details['below'], columns=["Ticker"]), width=None, use_container_width=True, hide_index=True)
+                        df_down = pd.DataFrame(details['below'], columns=["Ticker"])
+                        df_down["Ticker"] = df_down["Ticker"].apply(make_tv_url)
+                        st.dataframe(
+                            df_down, 
+                            column_config={"Ticker": tv_link_config},
+                            use_container_width=True, 
+                            hide_index=True
+                        )
                     else:
                         st.caption("None")
                 
@@ -699,7 +726,17 @@ else:
                 
                 if tickers:
                     st.write(f"**Total Stocks:** {len(tickers)}")
-                    st.dataframe(pd.DataFrame(tickers, columns=["Ticker Symbol"]), use_container_width=True, hide_index=True)
+                    df_fallback = pd.DataFrame(tickers, columns=["Ticker Symbol"])
+                    # Rename likely column to Ticker for consistency with config logic if needed, 
+                    # but here I'll just map "Ticker Symbol"
+                    df_fallback["Ticker Symbol"] = df_fallback["Ticker Symbol"].apply(make_tv_url)
+                    
+                    st.dataframe(
+                        df_fallback, 
+                        column_config={"Ticker Symbol": tv_link_config},
+                        use_container_width=True, 
+                        hide_index=True
+                    )
                 else:
                     st.info(f"Constituent list not available for {selected_index}.")
     else: st.error(f"Data file not found: {current_config['file']}")
