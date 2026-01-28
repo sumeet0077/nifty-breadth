@@ -6,6 +6,7 @@ import plotly.graph_objects as go
 from datetime import datetime, timedelta, time
 from nifty_themes import THEMES
 import os
+import json
 import subprocess
 from rrg_helper import RRGCalculator
 from fetch_breadth_data import get_index_tickers
@@ -133,6 +134,16 @@ def load_data_v2(file_path):
 def get_cached_constituents(index_name):
     """Cached wrapper for fetching index tickers (avoids frequent network calls for Nifty lists)."""
     return get_index_tickers(index_name)
+
+@st.cache_data
+def load_market_status():
+    """Load the latest pre-computed market status details."""
+    try:
+        with open("market_status_latest.json", "r") as f:
+            return json.load(f)
+    except FileNotFoundError:
+        return {}
+
 
 @st.cache_data(ttl=3600)
 def get_performance_summary_v3(config_map):
@@ -652,12 +663,43 @@ else:
         with tab2:
             st.subheader(f"Constituents of {current_config['title']}")
             
-            # Fetch constituents dynamically (cached)
-            tickers = get_cached_constituents(selected_index)
+            # Load detailed status if available
+            market_status = load_market_status()
+            details = market_status.get(selected_index)
             
-            if tickers:
-                st.write(f"**Total Stocks:** {len(tickers)}")
-                st.dataframe(pd.DataFrame(tickers, columns=["Ticker Symbol"]), use_container_width=True, hide_index=True)
+            if details:
+                # dual column layout for Above/Below
+                c1, c2 = st.columns(2)
+                
+                with c1:
+                    st.success(f"📈 Above 200 SMA ({len(details['above'])})")
+                    if details['above']:
+                        st.dataframe(pd.DataFrame(details['above'], columns=["Ticker"]), width=None, use_container_width=True, hide_index=True)
+                    else:
+                        st.caption("None")
+                        
+                with c2:
+                    st.error(f"📉 Below 200 SMA ({len(details['below'])})")
+                    if details['below']:
+                        st.dataframe(pd.DataFrame(details['below'], columns=["Ticker"]), width=None, use_container_width=True, hide_index=True)
+                    else:
+                        st.caption("None")
+                
+                # Check for excluded/insufficient data stocks
+                all_tickers = get_cached_constituents(selected_index)
+                if all_tickers:
+                    computed = set(details['above']) | set(details['below'])
+                    excluded = [t for t in all_tickers if t not in computed]
+                    if excluded:
+                        st.info(f"ℹ️ Insufficient History / Excluded ({len(excluded)}): {', '.join(excluded)}")
+
             else:
-                st.info(f"Constituent list not available for {selected_index}.")
+                # Fallback to simple list
+                tickers = get_cached_constituents(selected_index)
+                
+                if tickers:
+                    st.write(f"**Total Stocks:** {len(tickers)}")
+                    st.dataframe(pd.DataFrame(tickers, columns=["Ticker Symbol"]), use_container_width=True, hide_index=True)
+                else:
+                    st.info(f"Constituent list not available for {selected_index}.")
     else: st.error(f"Data file not found: {current_config['file']}")

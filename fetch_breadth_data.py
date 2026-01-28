@@ -4,6 +4,8 @@ import requests
 import io
 import time
 import os
+import json
+from datetime import datetime
 from nifty_themes import THEMES
 
 def get_tickers_from_url(url):
@@ -213,7 +215,29 @@ def calculate_breadth(full_data):
         'Index_Close': index_close
     })
     
-    return breadth_df
+    
+    # 6. Extract Latest Detailed Status (Above/Below)
+    last_idx = -1
+    if not full_data.empty:
+        latest_prices = full_data.iloc[last_idx]
+        latest_smas = sma_200.iloc[last_idx]
+        
+        above_list = []
+        below_list = []
+        
+        for ticker in full_data.columns:
+            price = latest_prices.get(ticker)
+            sma = latest_smas.get(ticker)
+            
+            if pd.notna(price) and pd.notna(sma):
+                if price > sma:
+                    above_list.append(ticker)
+                else:
+                    below_list.append(ticker)
+    else:
+        above_list, below_list = [], []
+
+    return breadth_df, above_list, below_list
 
 def main():
     # 1. Define all tasks
@@ -280,6 +304,9 @@ def main():
         print("CRITICAL: No data fetched at all.")
         return
 
+    # Store detailed status for UI
+    market_details = {}
+    
     # Process each task using Master Data
     print("\nProcessing Breadth for all groups...")
     for name, filename in all_tasks:
@@ -304,12 +331,25 @@ def main():
             if subset_data.empty:
                 continue
                 
-            breadth_df = calculate_breadth(subset_data)
+            breadth_df, above_list, below_list = calculate_breadth(subset_data)
             breadth_df.to_csv(filename)
             print(f"Saved {filename} ({name})")
             
+            market_details[name] = {
+                "above": above_list,
+                "below": below_list
+            }
+            
         except Exception as e:
             print(f"Failed to process {name}: {e}")
+
+    # Save detailed status JSON
+    try:
+        with open("market_status_latest.json", "w") as f:
+            json.dump(market_details, f, indent=4)
+        print("Saved market_status_latest.json")
+    except Exception as e:
+        print(f"Failed to save JSON: {e}")
 
 if __name__ == "__main__":
     main()
