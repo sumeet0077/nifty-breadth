@@ -1151,11 +1151,10 @@
         "above": [
             "HINDCOPPER.NS",
             "VEDL.NS",
-            "HINDALCO.NS"
+            "HINDALCO.NS",
+            "MCL.NS"
         ],
-        "below": [
-            "MADHAV.NS"
-        ]
+        "below": []
     },
     "Critical Minerals": {
         "above": [
