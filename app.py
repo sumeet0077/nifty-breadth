@@ -23,34 +23,54 @@ def check_and_update_data():
     if not os.path.exists(req_file):
         return
 
-    mod_time = datetime.fromtimestamp(os.path.getmtime(req_file))
-    now = datetime.now()
-    
-    # Target update time: 6:00 PM today
-    today_6pm = now.replace(hour=18, minute=0, second=0, microsecond=0)
-    
-    # Conditions:
-    # 1. It is currently past 6 PM
-    # 2. Results file is OLDER than today's 6 PM
-    # 2b. (Optional) Check if day is Saturday/Sunday? No, Nifty might trade on special days. Keep simple.
-    
-    is_past_6pm = now.time() >= time(18, 0)
-    
-    # If it's past 6 PM, the file timestamp must be NEWER than today 6 PM.
-    # If mod_time < today_6pm, it is stale.
-    is_stale = mod_time < today_6pm
-    
-    if is_past_6pm and is_stale:
-        st.warning("Data is stale (last updated before 6 PM). Auto-updating market data... This may take a moment.")
-        try:
-            with st.spinner("Fetching latest data..."):
-                subprocess.run(["python3", "fetch_breadth_data.py"], check=True)
-            st.session_state['data_updated'] = True
-            st.cache_data.clear()
-            st.success("Data updated! Reloading...")
-            st.rerun()
-        except Exception as e:
-            st.error(f"Auto-update failed: {e}")
+    try:
+        # Robust Check: Look at the actual DATA, not the file timestamp
+        # Read only the last few lines to avoid loading full file
+        df = pd.read_csv(req_file) # Loading full file is fine (small < 1MB)
+        if df.empty or 'Date' not in df.columns:
+            return
+            
+        last_date_str = df.iloc[-1]['Date']
+        last_date = pd.to_datetime(last_date_str).date()
+        today = datetime.now().date()
+        
+        # Logic:
+        # If data is already from Today, we are good.
+        # If data is old, check if it's late enough to expect new data (6:15 PM)
+        
+        is_today_data = (last_date == today)
+        now_time = datetime.now().time()
+        
+        # Target: 6:15 PM (18:15)
+        update_threshold = time(18, 15)
+        can_expect_new_data = now_time >= update_threshold
+        
+        # Optimization: If server is UTC (Streamlit Cloud), 6 PM IST is 12:30 PM UTC.
+        # So 'today' might be different.
+        # If last_date is '2026-02-01' and Server 'today' is '2026-02-01', we are good.
+        # If Server 'today' matches, we don't update.
+        
+        if not is_today_data and can_expect_new_data:
+            st.warning(f"Data is from {last_date}, checking for updates... (Time: {now_time.strftime('%H:%M')})")
+            
+            # Additional Check: Don't hammer if recent modification time implies we TRIED updating
+            # mod_time = datetime.fromtimestamp(os.path.getmtime(req_file))
+            # if (datetime.now() - mod_time).seconds < 300: return # Cooldown
+            
+            try:
+                with st.spinner("Fetching latest market data..."):
+                    subprocess.run(["python3", "fetch_breadth_data.py"], check=True)
+                st.session_state['data_updated'] = True
+                st.cache_data.clear()
+                st.success("Data updated! Reloading...")
+                st.rerun()
+            except Exception as e:
+                # If script fails (e.g. Memory Limit on Cloud), Log it but allow App to load old data
+                st.error(f"Auto-update skipped (Resource Limit). Using available data. Details: {e}")
+                st.session_state['data_updated'] = True # Prevent infinite retry loop
+                
+    except Exception as e:
+        print(f"Update check error: {e}")
 
 # Run check immediately
 # Check moved after page_config
