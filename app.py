@@ -85,6 +85,13 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
+# Force Clear Cache on Deployment (Fix Missing Budget Data)
+if 'cache_cleared_v_budget_fix' not in st.session_state:
+    st.cache_data.clear()
+    st.session_state['cache_cleared_v_budget_fix'] = True
+
+st.sidebar.caption("App Version: Feb 02 - Fixed Missing Data")
+
 # Run check immediately (AFTER page config to avoid Streamlit error)
 check_and_update_data()
 
