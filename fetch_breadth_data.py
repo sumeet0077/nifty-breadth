@@ -5,6 +5,7 @@ import io
 import time
 import os
 import json
+import sys
 from datetime import datetime
 from nifty_themes import THEMES
 
@@ -297,12 +298,11 @@ def main():
 
     print(f"Total Unique Tickers to fetch: {len(all_tickers)}")
     
-    # Fetch Master Data
     master_data = fetch_historical_data(list(all_tickers), start_date="2014-01-01")
     
     if master_data.empty:
-        print("CRITICAL: No data fetched at all.")
-        return
+        print("CRITICAL: No data fetched at all. Exiting with Error.")
+        sys.exit(1)
 
     # Store detailed status for UI
     market_details = {}
