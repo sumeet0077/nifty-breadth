@@ -69,7 +69,6 @@
             "AJANTPHARM.NS",
             "ALKEM.NS",
             "ANANDRATHI.NS",
-            "ANGELONE.NS",
             "APARINDS.NS",
             "APLAPOLLO.NS",
             "APOLLOTYRE.NS",
@@ -562,7 +561,6 @@
             "AARTIIND.NS",
             "ABSLAMC.NS",
             "ANANDRATHI.NS",
-            "ANGELONE.NS",
             "ASAHIINDIA.NS",
             "ATHERENERG.NS",
             "ATUL.NS",
@@ -1112,7 +1110,6 @@
     "Asset Management": {
         "above": [
             "HDFCAMC.NS",
-            "ANGELONE.NS",
             "BSE.NS",
             "MCX.NS"
         ],
