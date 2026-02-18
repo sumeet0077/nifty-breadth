@@ -1621,5 +1621,29 @@
             "LICHSGFIN.NS",
             "CGCL.NS"
         ]
+    },
+    "Life Insurance": {
+        "above": [
+            "SBILIFE.NS",
+            "ICICIPRULI.NS",
+            "MFSL.NS"
+        ],
+        "below": [
+            "LICI.NS",
+            "HDFCLIFE.NS"
+        ]
+    },
+    "General Insurance": {
+        "above": [
+            "ICICIGI.NS",
+            "STARHEALTH.NS",
+            "GICRE.NS"
+        ],
+        "below": [
+            "NIACL.NS",
+            "GODIGIT.NS",
+            "NIVABUPA.NS",
+            "MEDIASSIST.NS"
+        ]
     }
 }

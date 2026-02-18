@@ -204,5 +204,14 @@ THEMES = {
     "Solar Manufacturing": [
         "WAAREEENER.NS", "PREMIERENE.NS", "VIKRAMSOLR.NS", "BORORENEW.NS", 
         "EMMVEE.NS", "WEBELSOLAR.NS", "INA.BO"
+    ],
+    # 45
+    "Life Insurance": [
+        "LICI.NS", "SBILIFE.NS", "HDFCLIFE.NS", "ICICIPRULI.NS", "MFSL.NS"
+    ],
+    # 46
+    "General Insurance": [
+        "ICICIGI.NS", "STARHEALTH.NS", "GICRE.NS", "NIACL.NS", "GODIGIT.NS", 
+        "NIVABUPA.NS", "MEDIASSIST.NS"
     ]
 }
