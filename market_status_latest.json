@@ -54,7 +54,8 @@
             "TMPV.NS",
             "TRENT.NS",
             "WIPRO.NS"
-        ]
+        ],
+        "new_stock": []
     },
     "Nifty 500": {
         "above": [
@@ -416,7 +417,6 @@
             "JKCEMENT.NS",
             "JMFINANCIL.NS",
             "JPPOWER.NS",
-            "JSWCEMENT.NS",
             "JSWENERGY.NS",
             "JSWINFRA.NS",
             "JUBLFOOD.NS",
@@ -561,6 +561,9 @@
             "ZENSARTECH.NS",
             "ZENTEC.NS",
             "ZYDUSLIFE.NS"
+        ],
+        "new_stock": [
+            "JSWCEMENT.NS"
         ]
     },
     "Nifty Smallcap 250": {
@@ -737,7 +740,6 @@
             "JINDALSAW.NS",
             "JMFINANCIL.NS",
             "JPPOWER.NS",
-            "JSWCEMENT.NS",
             "JUBLINGREA.NS",
             "JUBLPHARMA.NS",
             "JWL.NS",
@@ -817,6 +819,9 @@
             "ZEEL.NS",
             "ZENSARTECH.NS",
             "ZENTEC.NS"
+        ],
+        "new_stock": [
+            "JSWCEMENT.NS"
         ]
     },
     "NIFTY AUTO": {

@@ -266,6 +266,7 @@ def calculate_breadth(full_data):
         
         above_list = []
         below_list = []
+        new_stock_list = []
         
         for ticker in full_data.columns:
             price = latest_prices.get(ticker)
@@ -278,12 +279,11 @@ def calculate_breadth(full_data):
                     below_list.append(ticker)
             elif pd.notna(price):
                 # Stock has a valid price but no SMA yet (e.g., recent IPO/listing)
-                # Count as "below" since we can't confirm it's above its SMA
-                below_list.append(ticker)
+                new_stock_list.append(ticker)
     else:
-        above_list, below_list = [], []
+        above_list, below_list, new_stock_list = [], [], []
 
-    return breadth_df, above_list, below_list
+    return breadth_df, above_list, below_list, new_stock_list
 
 def main():
     # 1. Define all tasks
@@ -376,13 +376,14 @@ def main():
             if subset_data.empty:
                 continue
                 
-            breadth_df, above_list, below_list = calculate_breadth(subset_data)
+            breadth_df, above_list, below_list, new_stock_list = calculate_breadth(subset_data)
             breadth_df.to_csv(filename)
             print(f"Saved {filename} ({name})")
             
             market_details[name] = {
                 "above": above_list,
-                "below": below_list
+                "below": below_list,
+                "new_stock": new_stock_list
             }
             
         except Exception as e:

@@ -747,13 +747,18 @@ else:
                     else:
                         st.caption("None")
                 
-                # Check for excluded/insufficient data stocks
-                all_tickers = get_cached_constituents(selected_index)
-                if all_tickers:
-                    computed = set(details['above']) | set(details['below'])
-                    excluded = [t for t in all_tickers if t not in computed]
-                    if excluded:
-                        st.info(f"ℹ️ Insufficient History / Excluded ({len(excluded)}): {', '.join(excluded)}")
+                # New Stock section - stocks without enough history for 200 SMA
+                new_stocks = details.get('new_stock', [])
+                if new_stocks:
+                    st.warning(f"🆕 New Stock — Insufficient History for 200 SMA ({len(new_stocks)})")
+                    df_new = pd.DataFrame(new_stocks, columns=["Ticker"])
+                    df_new["Ticker"] = df_new["Ticker"].apply(make_tv_url)
+                    st.dataframe(
+                        df_new,
+                        column_config={"Ticker": tv_link_config},
+                        width="stretch",
+                        hide_index=True
+                    )
 
             else:
                 # Fallback to simple list
