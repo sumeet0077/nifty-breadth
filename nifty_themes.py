@@ -142,10 +142,7 @@ THEMES = {
         "VEDL.NS", "NMDC.NS", "MOIL.NS", "HINDZINC.NS", "NATIONALUM.NS", 
         "AMARARAJA.NS"
     ],
-    # 31
-    "Insurance Life & Health": [
-        "SBILIFE.NS", "HDFCLIFE.NS", "ICICIPRULI.NS", "LICI.NS", "NIACL.NS", "GICRE.NS"
-    ],
+
     # 32
     "Housing Finance": [
         "LICHSGFIN.NS", "PNBHOUSING.NS", "BAJAJHFL.NS", "AADHARHFC.NS", "HUDCO.NS", 

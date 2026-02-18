@@ -1302,18 +1302,6 @@
             "NCC.NS"
         ]
     },
-    "Insurance Life & Health": {
-        "above": [
-            "SBILIFE.NS",
-            "ICICIPRULI.NS",
-            "GICRE.NS"
-        ],
-        "below": [
-            "HDFCLIFE.NS",
-            "LICI.NS",
-            "NIACL.NS"
-        ]
-    },
     "Jewellery (Gold)": {
         "above": [
             "TITAN.NS",
