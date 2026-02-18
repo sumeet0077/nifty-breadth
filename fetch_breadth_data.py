@@ -168,6 +168,33 @@ def fetch_historical_data(tickers, start_date="2014-01-01"):
     # Sort index (dates)
     full_data.sort_index(inplace=True)
     
+    # Ensure index is timezone-naive to prevent mismatch with CSV data
+    if full_data.index.tz is not None:
+        full_data.index = full_data.index.tz_localize(None)
+
+    # === CUSTOM STITCHING LOGIC FOR TMPV.NS ===
+    if "TMPV.NS" in full_data.columns and os.path.exists("stitched_tmpv_history.csv"):
+        print("Injecting stitched history for TMPV.NS...")
+        try:
+            stitched_df = pd.read_csv("stitched_tmpv_history.csv")
+            stitched_df['Date'] = pd.to_datetime(stitched_df['Date'])
+            stitched_df.set_index('Date', inplace=True)
+            stitched_series = stitched_df['Close']
+            
+            # Reindex full_data to include older dates from stitched series if needed
+            full_data = full_data.reindex(full_data.index.union(stitched_series.index))
+            
+            # Overwrite TMPV.NS column with stitched data
+            full_data['TMPV.NS'] = stitched_series
+            
+            # Sort again after union
+            full_data.sort_index(inplace=True)
+            print(f"Injected {len(stitched_series)} rows for TMPV.NS")
+            
+        except Exception as e:
+            print(f"Error injecting stitched TMPV data: {e}")
+    # ==========================================
+    
     return full_data
 
 def calculate_breadth(full_data):
