@@ -308,6 +308,7 @@ category = st.sidebar.radio(
 # VIEW LOGIC
 # ---------------------------------------------------------
 
+if category == "Sector Rotation (RRG)":
     st.title("Relative Rotation Graph (RRG)")
     st.markdown("*Cycle analysis of themes vs Nifty 50*")
     
