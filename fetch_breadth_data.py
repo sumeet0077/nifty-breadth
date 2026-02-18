@@ -34,8 +34,8 @@ def get_tickers_from_url(url):
                 
                 # Transformations
                 if t == "TMPV": 
-                    # TATAMOTORS.NS is failing on Yahoo, use BSE as fallback
-                    cleaned_tickers.append("TATAMOTORS.BO") 
+                    # TATAMOTORS.NS appears to be replaced by TMPV.NS on Yahoo/NSE
+                    cleaned_tickers.append("TMPV.NS") 
                     continue
                 
                 cleaned_tickers.append(t + ".NS")
