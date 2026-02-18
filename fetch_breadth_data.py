@@ -276,6 +276,10 @@ def calculate_breadth(full_data):
                     above_list.append(ticker)
                 else:
                     below_list.append(ticker)
+            elif pd.notna(price):
+                # Stock has a valid price but no SMA yet (e.g., recent IPO/listing)
+                # Count as "below" since we can't confirm it's above its SMA
+                below_list.append(ticker)
     else:
         above_list, below_list = [], []
 
