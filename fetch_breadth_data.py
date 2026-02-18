@@ -24,28 +24,20 @@ def get_tickers_from_url(url):
             raw_tickers = df[symbol_col].dropna().astype(str).tolist()
             cleaned_tickers = []
             
-            # Special handling for Nifty 50 CSV known data issues
-            is_nifty50 = "nifty50list.csv" in url
-            
             for t in raw_tickers:
-                # Filter Garbage
-                if "DUMMY" in t or "ETERNAL" in t:
+                # Filter Garbage rows (e.g. DUMMY placeholders)
+                if "DUMMY" in t:
                     continue
                 
-                # Transformations
+                # Ticker transformations for Yahoo Finance compatibility
                 if t == "TMPV": 
-                    # TATAMOTORS.NS appears to be replaced by TMPV.NS on Yahoo/NSE
                     cleaned_tickers.append("TMPV.NS") 
+                    continue
+                if t == "KWIL":
+                    cleaned_tickers.append("KWIL.NS")
                     continue
                 
                 cleaned_tickers.append(t + ".NS")
-            
-            if is_nifty50:
-                # Manually restore missing stocks (likely replaced by DUMMY/ETERNAL in CSV)
-                missing = ["INDUSINDBK.NS", "BPCL.NS"]
-                for m in missing:
-                    if m not in cleaned_tickers:
-                        cleaned_tickers.append(m)
                         
             return sorted(list(set(cleaned_tickers)))
         return []
@@ -84,20 +76,7 @@ def get_index_tickers(index_name):
         "NIFTY OIL AND GAS": "ind_niftyoilgaslist.csv"
     }
 
-    if index_name == "Nifty 50":
-        # Hardcoded list based on User Input (Jan 27, 2026) including TMPV and ETERNAL
-        return [
-            "ADANIENT.NS", "AXISBANK.NS", "JSWSTEEL.NS", "ADANIPORTS.NS", "GRASIM.NS",
-            "TATACONSUM.NS", "TATASTEEL.NS", "TECHM.NS", "NTPC.NS", "EICHERMOT.NS",
-            "SBIN.NS", "HDFCLIFE.NS", "ULTRACEMCO.NS", "ICICIBANK.NS", "BEL.NS",
-            "JIOFIN.NS", "LT.NS", "SBILIFE.NS", "TRENT.NS", "HINDALCO.NS",
-            "HDFCBANK.NS", "WIPRO.NS", "INDIGO.NS", "ONGC.NS", "INFY.NS",
-            "NESTLEIND.NS", "BAJAJ-AUTO.NS", "COALINDIA.NS", "HCLTECH.NS", "SUNPHARMA.NS",
-            "POWERGRID.NS", "APOLLOHOSP.NS", "DRREDDY.NS", "TCS.NS", "CIPLA.NS",
-            "RELIANCE.NS", "SHRIRAMFIN.NS", "BHARTIARTL.NS", "HINDUNILVR.NS", "TITAN.NS",
-            "BAJFINANCE.NS", "ITC.NS", "BAJAJFINSV.NS", "TMPV.NS", "ETERNAL.NS",
-            "MARUTI.NS", "MAXHEALTH.NS", "KOTAKBANK.NS", "ASIANPAINT.NS", "M&M.NS"
-        ]
+    # Nifty 50 now uses the dynamic NSE CSV fetch like all other sectors
 
     if index_name in sector_map:
         base_url = "https://nsearchives.nseindia.com/content/indices/"
@@ -132,18 +111,34 @@ def fetch_historical_data(tickers, start_date="2014-01-01"):
             close_df = pd.DataFrame()
             
             if len(chunk) == 1:
-                # specific handling for single ticker
+                # Specific handling for single ticker
                 ticker = chunk[0]
                 if not data.empty:
-                    close_df[ticker] = data['Close']
+                    if isinstance(data.columns, pd.MultiIndex):
+                        # yfinance with group_by='ticker' uses (Ticker, Price) layout
+                        if ticker in data.columns.get_level_values(0):
+                            close_df[ticker] = data[ticker]['Close']
+                        elif 'Close' in data.columns.get_level_values(0):
+                            close_df[ticker] = data['Close'].iloc[:, 0]
+                    else:
+                        if 'Close' in data.columns:
+                            close_df[ticker] = data['Close']
             else:
                 for ticker in chunk:
                     try:
-                        if ticker in data.columns.levels[0]:
-                            ticker_data = data[ticker]
-                            # verify if 'Close' exists
-                            if 'Close' in ticker_data.columns:
-                                close_df[ticker] = ticker_data['Close']
+                        # Handle both MultiIndex and flat columns
+                        if isinstance(data.columns, pd.MultiIndex):
+                            if ticker in data.columns.get_level_values(0):
+                                ticker_data = data[ticker]
+                                if 'Close' in ticker_data.columns:
+                                    close_df[ticker] = ticker_data['Close']
+                            elif ticker in data.columns.get_level_values(1):
+                                # Alternative layout: ('Close', 'TICKER')
+                                if 'Close' in data.columns.get_level_values(0):
+                                    close_df[ticker] = data['Close'][ticker]
+                        else:
+                            if 'Close' in data.columns:
+                                close_df[ticker] = data['Close']
                     except Exception as e:
                         pass # Ticker might not be in response
             
