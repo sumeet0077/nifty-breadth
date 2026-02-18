@@ -1258,13 +1258,20 @@
     },
     "Housing Finance": {
         "above": [
-            "PFC.NS"
+            "CANFINHOME.NS",
+            "REPCOHOME.NS",
+            "SAMMAANCAP.NS"
         ],
         "below": [
             "LICHSGFIN.NS",
             "PNBHOUSING.NS",
+            "BAJAJHFL.NS",
+            "AADHARHFC.NS",
+            "HUDCO.NS",
             "HOMEFIRST.NS",
-            "RECLTD.NS"
+            "AAVAS.NS",
+            "APTUS.NS",
+            "INDIASHLTR.NS"
         ]
     },
     "IT Services": {
@@ -1372,15 +1379,6 @@
             "TIPSMUSIC.NS"
         ]
     },
-    "NBFC Consumer": {
-        "above": [
-            "BAJFINANCE.NS",
-            "CHOLAFIN.NS",
-            "MANAPPURAM.NS",
-            "MUTHOOTFIN.NS"
-        ],
-        "below": []
-    },
     "Oil & Gas Downstream": {
         "above": [
             "BPCL.NS",
@@ -1406,11 +1404,16 @@
             "BANKBARODA.NS",
             "PNB.NS",
             "CANBK.NS",
+            "UNIONBANK.NS",
             "INDIANB.NS",
-            "UNIONBANK.NS"
+            "BANKINDIA.NS",
+            "CENTRALBK.NS",
+            "MAHABANK.NS"
         ],
         "below": [
-            "IOB.NS"
+            "IOB.NS",
+            "PSB.NS",
+            "UCOBANK.NS"
         ]
     },
     "Paints": {
@@ -1449,9 +1452,12 @@
             "ICICIBANK.NS",
             "AXISBANK.NS",
             "KOTAKBANK.NS",
-            "BAJFINANCE.NS",
-            "CHOLAFIN.NS",
-            "BAJAJFINSV.NS"
+            "INDUSINDBK.NS",
+            "FEDERALBNK.NS",
+            "IDFCFIRSTB.NS",
+            "YESBANK.NS",
+            "RBLBANK.NS",
+            "BANDHANBNK.NS"
         ],
         "below": [
             "HDFCBANK.NS"
@@ -1597,5 +1603,23 @@
             "EICHERMOT.NS"
         ],
         "below": []
+    },
+    "NBFC": {
+        "above": [
+            "BAJFINANCE.NS",
+            "SHRIRAMFIN.NS",
+            "CHOLAFIN.NS",
+            "MUTHOOTFIN.NS",
+            "PFC.NS",
+            "M&MFIN.NS",
+            "MANAPPURAM.NS",
+            "POONAWALLA.NS",
+            "SUNDARMFIN.NS"
+        ],
+        "below": [
+            "RECLTD.NS",
+            "LICHSGFIN.NS",
+            "CGCL.NS"
+        ]
     }
 }

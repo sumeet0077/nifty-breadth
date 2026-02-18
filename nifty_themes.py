@@ -46,13 +46,13 @@ THEMES = {
     ],
     # 9
     "Private Banking": [
-        "HDFCBANK.NS", "ICICIBANK.NS", "AXISBANK.NS", "KOTAKBANK.NS", "BAJFINANCE.NS", 
-        "CHOLAFIN.NS", "BAJAJFINSV.NS"
+        "HDFCBANK.NS", "ICICIBANK.NS", "AXISBANK.NS", "KOTAKBANK.NS", "INDUSINDBK.NS", 
+        "FEDERALBNK.NS", "IDFCFIRSTB.NS", "YESBANK.NS", "RBLBANK.NS", "BANDHANBNK.NS"
     ],
     # 10
     "PSU Banking": [
-        "SBIN.NS", "BANKBARODA.NS", "PNB.NS", "CANBK.NS", "INDIANB.NS", "UNIONBANK.NS", 
-        "IOB.NS"
+        "SBIN.NS", "BANKBARODA.NS", "PNB.NS", "CANBK.NS", "UNIONBANK.NS", "INDIANB.NS", 
+        "BANKINDIA.NS", "IOB.NS", "CENTRALBK.NS", "MAHABANK.NS", "PSB.NS", "UCOBANK.NS"
     ],
     # 11
     "IT Services": [
@@ -148,11 +148,15 @@ THEMES = {
     ],
     # 32
     "Housing Finance": [
-        "LICHSGFIN.NS", "PNBHOUSING.NS", "HOMEFIRST.NS", "RECLTD.NS", "PFC.NS"
+        "LICHSGFIN.NS", "PNBHOUSING.NS", "BAJAJHFL.NS", "AADHARHFC.NS", "HUDCO.NS", 
+        "CANFINHOME.NS", "HOMEFIRST.NS", "AAVAS.NS", "APTUS.NS", "INDIASHLTR.NS", 
+        "REPCOHOME.NS", "SAMMAANCAP.NS"
     ],
     # 33
-    "NBFC Consumer": [
-        "BAJFINANCE.NS", "CHOLAFIN.NS", "MANAPPURAM.NS", "MUTHOOTFIN.NS"
+    "NBFC": [
+        "BAJFINANCE.NS", "SHRIRAMFIN.NS", "CHOLAFIN.NS", "MUTHOOTFIN.NS", "PFC.NS", 
+        "RECLTD.NS", "LICHSGFIN.NS", "M&MFIN.NS", "MANAPPURAM.NS", "POONAWALLA.NS", 
+        "SUNDARMFIN.NS", "CGCL.NS"
     ],
     # 34
     "Textiles": [
