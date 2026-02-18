@@ -579,7 +579,7 @@ category = st.sidebar.radio(
                 height=850,
                 showlegend=False
             )
-            st.plotly_chart(fig, use_container_width=True)
+            st.plotly_chart(fig, width="stretch")
 elif category == "Performance Overview":
     st.title("Market Performance Heatmap")
     st.markdown("*Comparative returns of all sectors and themes based on Equal-Weighted Index*")
@@ -599,7 +599,7 @@ elif category == "Performance Overview":
         st.dataframe(
             perf_summary.style.map(color_return, subset=perf_summary.columns[1:]).format("{:.2f}%", subset=perf_summary.columns[1:]),
             height=800,
-            use_container_width=True,
+            width="stretch",
             hide_index=True
         )
 
@@ -675,7 +675,7 @@ else:
             def color_ret(val):
                 if pd.isna(val): return ""
                 return f'color: {"#22c55e" if val >= 0 else "#ef4444"}; font-weight: bold'
-            st.dataframe(perf_df.style.map(color_ret).format("{:.2f}%"), use_container_width=True, hide_index=True)
+            st.dataframe(perf_df.style.map(color_ret).format("{:.2f}%"), width="stretch", hide_index=True)
 
         tab1, tab2 = st.tabs(["Breadth Chart", "Constituents"])
         with tab1:
@@ -686,13 +686,13 @@ else:
             fig_pct.add_hline(y=50, line_dash="dash", line_color="gray", annotation_text="Neutral (50%)")
             title_text = f"Percentage of Stocks Above 200-Day SMA (Latest: {latest['Date'].strftime('%d %b %Y')})"
             fig_pct.update_layout(title=title_text, yaxis_title="Percentage (%)", xaxis_title="Date", template="plotly_dark", height=500, yaxis=dict(range=[0, 100]), hovermode="x unified", xaxis=dict(hoverformat='%d %b %Y'))
-            st.plotly_chart(fig_pct, use_container_width=True)
+            st.plotly_chart(fig_pct, width="stretch")
 
             fig_count = go.Figure()
             fig_count.add_trace(go.Scatter(x=df['Date'], y=df['Above'], mode='lines', name='Above', stackgroup='one', line=dict(width=0), fillcolor='rgba(34, 197, 94, 0.6)'))
             fig_count.add_trace(go.Scatter(x=df['Date'], y=df['Below'], mode='lines', name='Below', stackgroup='one', line=dict(width=0), fillcolor='rgba(239, 68, 68, 0.6)'))
             fig_count.update_layout(title="Market Participation", yaxis_title="Stocks", xaxis_title="Date", template="plotly_dark", height=400, hovermode="x unified", xaxis=dict(hoverformat='%d %b %Y'))
-            st.plotly_chart(fig_count, use_container_width=True)
+            st.plotly_chart(fig_count, width="stretch")
 
         with tab2:
             st.subheader(f"Constituents of {current_config['title']}")
@@ -726,7 +726,7 @@ else:
                         st.dataframe(
                             df_up, 
                             column_config={"Ticker": tv_link_config},
-                            use_container_width=True, 
+                            width="stretch", 
                             hide_index=True
                         )
                     else:
@@ -740,7 +740,7 @@ else:
                         st.dataframe(
                             df_down, 
                             column_config={"Ticker": tv_link_config},
-                            use_container_width=True, 
+                            width="stretch", 
                             hide_index=True
                         )
                     else:
@@ -768,7 +768,7 @@ else:
                     st.dataframe(
                         df_fallback, 
                         column_config={"Ticker Symbol": tv_link_config},
-                        use_container_width=True, 
+                        width="stretch", 
                         hide_index=True
                     )
                 else:
