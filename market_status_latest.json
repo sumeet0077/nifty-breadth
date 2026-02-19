@@ -1140,6 +1140,7 @@
     "Asset Management": {
         "above": [
             "HDFCAMC.NS",
+            "NAM-INDIA.NS",
             "BSE.NS",
             "MCX.NS"
         ],
@@ -1160,7 +1161,9 @@
         "new_stock": []
     },
     "Aviation": {
-        "above": [],
+        "above": [
+            "GMRAIRPORT.NS"
+        ],
         "below": [
             "INDIGO.NS",
             "ADANIENT.NS"
@@ -1199,7 +1202,8 @@
             "NATIONALUM.NS"
         ],
         "below": [
-            "MOIL.NS"
+            "MOIL.NS",
+            "ARE&M.NS"
         ],
         "new_stock": []
     },
@@ -1228,7 +1232,8 @@
             "SOLARINDS.NS",
             "PARAS.NS",
             "ASTRAMICRO.NS",
-            "IDEAFORGE.NS"
+            "IDEAFORGE.NS",
+            "ZENTEC.NS"
         ],
         "new_stock": []
     },
@@ -1243,7 +1248,9 @@
         ],
         "below": [
             "OLECTRA.NS",
-            "EXIDEIND.NS"
+            "JBMA.NS",
+            "EXIDEIND.NS",
+            "ARE&M.NS"
         ],
         "new_stock": []
     },
@@ -1266,6 +1273,7 @@
         "above": [],
         "below": [
             "PAYTM.NS",
+            "POLICYBZR.NS",
             "CAMS.NS",
             "CDSL.NS",
             "FSL.NS"
@@ -1349,7 +1357,8 @@
     "Infrastructure & EPC": {
         "above": [
             "LT.NS",
-            "ADANIPORTS.NS"
+            "ADANIPORTS.NS",
+            "GMRAIRPORT.NS"
         ],
         "below": [
             "IRB.NS",
@@ -1405,20 +1414,9 @@
         "below": [
             "PAGEIND.NS",
             "ABFRL.NS",
+            "ETHOSLTD.NS",
             "LUXIND.NS",
             "KALYANKJIL.NS"
-        ],
-        "new_stock": []
-    },
-    "Media & Broadcasting": {
-        "above": [
-            "SUNTV.NS"
-        ],
-        "below": [
-            "ZEEL.NS",
-            "NETWORK18.NS",
-            "DEN.NS",
-            "HATHWAY.NS"
         ],
         "new_stock": []
     },
@@ -1530,6 +1528,7 @@
         "above": [
             "POWERGRID.NS",
             "CGPOWER.NS",
+            "POWERINDIA.NS",
             "SCHNEIDER.NS"
         ],
         "below": [
@@ -1576,6 +1575,7 @@
             "RITES.NS",
             "IRCON.NS",
             "RAILTEL.NS",
+            "JWL.NS",
             "TEXRAIL.NS",
             "BEML.NS"
         ],
@@ -1622,6 +1622,7 @@
             "DIXON.NS",
             "KAYNES.NS",
             "MOSCHIP.NS",
+            "SPELS.BO",
             "TATAELXSI.NS"
         ],
         "new_stock": []

@@ -6,12 +6,12 @@ THEMES = {
     "Defence & Aerospace": [
         "BEL.NS", "HAL.NS", "MAZDOCK.NS", "COCHINSHIP.NS", "BDL.NS", "GRSE.NS", 
         "SOLARINDS.NS", "DATAPATTNS.NS", "PARAS.NS", "ASTRAMICRO.NS", "MTARTECH.NS", 
-        "IDEAFORGE.NS", "ZENOTECH.NS"
+        "IDEAFORGE.NS", "ZENTEC.NS"
     ],
     # 2
     "Railways & Infrastructure": [
         "IRFC.NS", "RVNL.NS", "IRCTC.NS", "CONCOR.NS", "TITAGARH.NS", "RITES.NS", 
-        "IRCON.NS", "RAILTEL.NS", "JUPITERIN.NS", "TEXRAIL.NS", "BEML.NS"
+        "IRCON.NS", "RAILTEL.NS", "JWL.NS", "TEXRAIL.NS", "BEML.NS"
     ],
     # 3
     "Renewable Energy Generation": [
@@ -20,14 +20,14 @@ THEMES = {
     ],
     # 4
     "EV Ecosystem": [
-        "TATAMOTORS.NS", "TVSMOTOR.NS", "OLECTRA.NS", "JBM-AUTO.NS", "HEROMOTOCO.NS", 
-        "BAJAJ-AUTO.NS", "EXIDEIND.NS", "AMARARAJA.NS", "SONACOMS.NS", "MOTHERSON.NS",
+         "TVSMOTOR.NS", "OLECTRA.NS", "JBMA.NS", "HEROMOTOCO.NS", 
+        "BAJAJ-AUTO.NS", "EXIDEIND.NS", "ARE&M.NS", "SONACOMS.NS", "MOTHERSON.NS",
         "ATHERENERG.NS"
     ],
     # 5
     "Semiconductors & EMS": [
         "BEL.NS", "CGPOWER.NS", "DIXON.NS", "AVALON.NS", "KAYNES.NS", "SYRMA.NS", 
-        "MOSCHIP.NS", "SPEL.NS", "TATAELXSI.NS"
+        "MOSCHIP.NS", "SPELS.BO", "TATAELXSI.NS"
     ],
     # 6
     "Specialty Chemicals": [
@@ -42,7 +42,7 @@ THEMES = {
     # 8
     "Infrastructure & EPC": [
         "LT.NS", "ADANIPORTS.NS", "IRB.NS", "PNCINFRA.NS", "KEC.NS", "KNRCON.NS", 
-        "NCC.NS", "GMRINFRA.NS"
+        "NCC.NS", "GMRAIRPORT.NS"
     ],
     # 9
     "Private Banking": [
@@ -80,7 +80,7 @@ THEMES = {
     ],
     # 16
     "Auto Passenger & CV": [
-        "MARUTI.NS", "M&M.NS", "TATAMOTORS.NS", "EICHERMOT.NS", "ASHOKLEY.NS"
+        "MARUTI.NS", "M&M.NS",  "EICHERMOT.NS", "ASHOKLEY.NS"
     ],
     # 17
     "Two & Three Wheelers": [
@@ -107,7 +107,7 @@ THEMES = {
     # 22
     "QSR": [
         "JUBLFOOD.NS", "DEVYANI.NS", "WESTLIFE.NS", "SAPPHIRE.NS", "RBA.NS", 
-        "BARBEQUE.NS"
+        
     ],
     # 23
     "Telecom Services": [
@@ -119,7 +119,7 @@ THEMES = {
     ],
     # 25
     "Media & Broadcasting": [
-        "SUNTV.NS", "ZEEL.NS", "NETWORK18.NS", "TV18BRDCST.NS", "DEN.NS", "HATHWAY.NS"
+        "SUNTV.NS", "ZEEL.NS", "NETWORK18.NS", "NETWORK18.NS", "DEN.NS", "HATHWAY.NS"
     ],
     # 26
     "Music & Content": [
@@ -127,20 +127,20 @@ THEMES = {
     ],
     # 27
     "Power T&D": [
-        "POWERGRID.NS", "SIEMENS.NS", "CGPOWER.NS", "HITACHI.NS", "SCHNEIDER.NS"
+        "POWERGRID.NS", "SIEMENS.NS", "CGPOWER.NS", "POWERINDIA.NS", "SCHNEIDER.NS"
     ],
     # 28
     "Data Centres": [
-        "RELIANCE.NS", "TATACOMM.NS", "SIFY.NS", "E2E.NS"
+        "RELIANCE.NS", "TATACOMM.NS",  "E2E.NS"
     ],
     # 29
     "Aviation": [
-        "INDIGO.NS", "GMRINFRA.NS", "ADANIENT.NS"
+        "INDIGO.NS", "GMRAIRPORT.NS", "ADANIENT.NS"
     ],
     # 30
     "Critical Minerals": [
         "VEDL.NS", "NMDC.NS", "MOIL.NS", "HINDZINC.NS", "NATIONALUM.NS", 
-        "AMARARAJA.NS"
+        "ARE&M.NS"
     ],
 
     # 32
@@ -169,15 +169,15 @@ THEMES = {
     ],
     # 37
     "Fintech": [
-        "PAYTM.NS", "PBFINTECH.NS", "CAMS.NS", "CDSL.NS", "FSL.NS"
+        "PAYTM.NS", "POLICYBZR.NS", "CAMS.NS", "CDSL.NS", "FSL.NS"
     ],
     # 38
     "Asset Management": [
-        "HDFCAMC.NS", "NIPPONLIFE.NS", "UTIAMC.NS", "ANGELONE.NS", "BSE.NS", "MCX.NS"
+        "HDFCAMC.NS", "NAM-INDIA.NS", "UTIAMC.NS", "ANGELONE.NS", "BSE.NS", "MCX.NS"
     ],
     # 39
     "Luxury": [
-        "TITAN.NS", "PAGEIND.NS", "ABFRL.NS", "ETHOS.NS", "LUXIND.NS", "KALYANKJIL.NS"
+        "TITAN.NS", "PAGEIND.NS", "ABFRL.NS", "ETHOSLTD.NS", "LUXIND.NS", "KALYANKJIL.NS"
     ],
     # 40
     "Green Hydrogen": [
