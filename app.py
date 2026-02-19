@@ -698,10 +698,9 @@ else:
         with tab2:
             st.subheader(f"Constituents of {current_config['title']}")
             
-            # Helper to generate TradingView URLs
             def make_tv_url(ticker):
                 clean = ticker.replace(".NS", "").replace(".BO", "")
-                tv_symbol = clean.replace("-", "_")
+                tv_symbol = clean.replace("-", "_").replace("&", "_")
                 exchange = "BSE" if ".BO" in ticker else "NSE"
                 return f"https://www.tradingview.com/chart/?symbol={exchange}:{tv_symbol}"
 
