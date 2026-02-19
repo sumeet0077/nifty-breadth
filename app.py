@@ -598,6 +598,15 @@ elif category == "Performance Overview":
         perf_summary = get_performance_summary_v3(index_config)
     
     if not perf_summary.empty:
+        toggle_cagr = st.toggle("Annualize Returns (CAGR)", value=False, help="Converts 1Y, 3Y, and 5Y returns to Compound Annual Growth Rate")
+        
+        if toggle_cagr:
+            for col, yrs in [("1 Year", 1), ("3 Years", 3), ("5 Years", 5)]:
+                if col in perf_summary.columns:
+                    perf_summary[col] = perf_summary[col].apply(
+                        lambda x: (((1 + x/100)**(1/yrs)) - 1)*100 if pd.notna(x) else pd.NA
+                    )
+                    
         if "1 Year" in perf_summary.columns:
             perf_summary = perf_summary.sort_values("1 Year", ascending=False)
             
@@ -668,6 +677,7 @@ else:
 
         if 'Index_Close' in df.columns:
             st.subheader("Performance Trend (Equal Weighted)")
+            toggle_cagr_idx = st.toggle("Annualize Returns (CAGR)", value=False, key="cagr_idx", help="Converts 1Y, 3Y, and 5Y returns to Compound Annual Growth Rate")
             periods = {"1 Day": 1, "1 Week": 7, "1 Month": 30, "3 Months": 90, "6 Months": 180, "1 Year": 365, "3 Years": 365*3, "5 Years": 365*5}
             metrics = {}
             current_price = latest['Index_Close']
@@ -678,6 +688,9 @@ else:
                     past_row = df[mask].iloc[-1]
                     if past_row['Index_Close'] > 0:
                         ret = ((current_price - past_row['Index_Close']) / past_row['Index_Close']) * 100
+                        if toggle_cagr_idx and name in ["1 Year", "3 Years", "5 Years"]:
+                            yrs = 1 if name == "1 Year" else (3 if name == "3 Years" else 5)
+                            ret = (((1 + ret/100)**(1/yrs)) - 1) * 100
                         metrics[name] = ret
                     else: metrics[name] = None
                 else: metrics[name] = None
@@ -768,7 +781,7 @@ else:
                 all_tickers = get_cached_constituents(selected_index) or []
                 
                 # Setup Toggle
-                toggle_cagr = st.toggle("Annualize Returns (CAGR)", value=False, help="Converts 1Y and 5Y returns to Compound Annual Growth Rate")
+                toggle_cagr = st.toggle("Annualize Returns (CAGR)", value=False, help="Converts 1Y, 3Y, and 5Y returns to Compound Annual Growth Rate")
                 
                 rows = []
                 for ticker in all_tickers:
@@ -785,18 +798,16 @@ else:
                     
                     # Apply CAGR logic
                     y1 = perf.get("1Y")
+                    y3 = perf.get("3Y")
                     y5 = perf.get("5Y")
                     
                     if toggle_cagr:
-                        row["1Y"] = y1 # 1Y CAGR is same as absolute
-                        if y5 is not None:
-                            # CAGR = ( (1 + total_return)^(1/years) ) - 1
-                            cagr5 = ((1 + (y5/100)) ** (1/5)) - 1
-                            row["5Y"] = cagr5 * 100
-                        else:
-                            row["5Y"] = pd.NA
+                        row["1Y"] = y1 if y1 is not None else pd.NA # 1Y CAGR is same as absolute
+                        row["3Y"] = (((1 + y3/100)**(1/3)) - 1)*100 if y3 is not None else pd.NA
+                        row["5Y"] = (((1 + y5/100)**(1/5)) - 1)*100 if y5 is not None else pd.NA
                     else:
                         row["1Y"] = y1 if y1 is not None else pd.NA
+                        row["3Y"] = y3 if y3 is not None else pd.NA
                         row["5Y"] = y5 if y5 is not None else pd.NA
                         
                     # Add RS at the end
@@ -815,11 +826,12 @@ else:
                         "3M": "{:+.2f}%", 
                         "6M": "{:+.2f}%",
                         "1Y": "{:+.2f}%",
+                        "3Y": "{:+.2f}%",
                         "5Y": "{:+.2f}%",
                         "RS (20D)": "{:+.2f}%"
                     }).applymap(
                         lambda x: f"color: {'#22c55e' if x > 0 else '#ef4444' if x < 0 else 'gray'}; font-family: monospace" if pd.notnull(x) else "",
-                        subset=["1D", "1W", "1M", "3M", "6M", "1Y", "5Y", "RS (20D)"]
+                        subset=["1D", "1W", "1M", "3M", "6M", "1Y", "3Y", "5Y", "RS (20D)"]
                     ),
                     column_config={
                         "Ticker": tv_link_config,

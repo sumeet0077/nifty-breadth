@@ -294,7 +294,7 @@ def calculate_breadth(full_data):
 
 def calculate_constituent_performance(master_data, all_tickers, nifty_data):
     """
-    Computes performance metrics (1d, 1w, 1m, 3m, 6m, 1y, 5y) and 20-Day RS 
+    Computes performance metrics (1d, 1w, 1m, 3m, 6m, 1y, 3y, 5y) and 20-Day RS 
     for all tickers in master_data.
     Returns: Dict[ticker, Dict[metric, float]]
     """
@@ -305,6 +305,7 @@ def calculate_constituent_performance(master_data, all_tickers, nifty_data):
         "3M": 90,
         "6M": 180,
         "1Y": 365,
+        "3Y": 365 * 3,
         "5Y": 365 * 5
     }
     
