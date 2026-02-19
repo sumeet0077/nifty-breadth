@@ -6,7 +6,7 @@ import time
 import os
 import json
 import sys
-from datetime import datetime
+from datetime import datetime, timedelta
 from nifty_themes import THEMES
 
 def get_tickers_from_url(url):
@@ -285,6 +285,88 @@ def calculate_breadth(full_data):
 
     return breadth_df, above_list, below_list, new_stock_list
 
+def calculate_constituent_performance(master_data, all_tickers, nifty_data):
+    """
+    Computes performance metrics (1d, 1w, 1m, 3m, 6m, 1y, 5y) and 20-Day RS 
+    for all tickers in master_data.
+    Returns: Dict[ticker, Dict[metric, float]]
+    """
+    periods = {
+        "1D": 1,
+        "1W": 7,
+        "1M": 30,
+        "3M": 90,
+        "6M": 180,
+        "1Y": 365,
+        "5Y": 365 * 5
+    }
+    
+    perf_dict = {}
+    
+    # Calculate Benchmark RS Baseline
+    nifty_latest = 0
+    nifty_20d = 0
+    if not nifty_data.empty:
+        try:
+            # Handle yfinance multi-index for ^NSEI
+            if '^NSEI' in nifty_data.columns.get_level_values(0):
+                nifty_clean = nifty_data['^NSEI']['Close'].dropna()
+            else:
+                nifty_clean = nifty_data['Close']['^NSEI'].dropna()
+                
+            if not nifty_clean.empty:
+                nifty_latest = nifty_clean.iloc[-1]
+                nifty_date = nifty_clean.index[-1]
+                t_target = nifty_date - timedelta(days=20)
+                t_mask = nifty_clean.index <= t_target
+                if t_mask.any():
+                    nifty_20d = nifty_clean[t_mask].iloc[-1]
+        except Exception as e:
+            print(f"Warning: Failed to extract Nifty baseline for RS calculations: {e}")
+                
+    for ticker in all_tickers:
+        if ticker not in master_data.columns:
+            continue
+            
+        ticker_series = master_data[ticker].dropna()
+        if ticker_series.empty:
+            continue
+            
+        latest_val = ticker_series.iloc[-1]
+        current_date = ticker_series.index[-1]
+        
+        metrics = {}
+        
+        # Absolute Returns
+        for p_name, days in periods.items():
+            target_date = current_date - timedelta(days=days)
+            mask = ticker_series.index <= target_date
+            if mask.any():
+                past_val = ticker_series[mask].iloc[-1]
+                if past_val > 0:
+                    metrics[p_name] = ((latest_val - past_val) / past_val) * 100
+                else:
+                    metrics[p_name] = None
+            else:
+                metrics[p_name] = None
+                
+        # RS (20D) against Nifty 50
+        rs_val = None
+        if nifty_latest > 0 and nifty_20d > 0:
+            t_target = current_date - timedelta(days=20)
+            t_mask = ticker_series.index <= t_target
+            if t_mask.any():
+                t_past_val = ticker_series[t_mask].iloc[-1]
+                if t_past_val > 0:
+                    current_ratio = latest_val / nifty_latest
+                    past_ratio = t_past_val / nifty_20d
+                    rs_val = ((current_ratio - past_ratio) / past_ratio) * 100
+        metrics["RS (20D)"] = rs_val
+        
+        perf_dict[ticker] = metrics
+        
+    return perf_dict
+
 def main():
     # 1. Define all tasks
     broad_indices = [
@@ -349,6 +431,12 @@ def main():
         print("CRITICAL: No data fetched at all. Exiting with Error.")
         sys.exit(1)
 
+    print("Fetching benchmark data for RS calculations (^NSEI)...")
+    nifty_data = yf.download("^NSEI", start="2023-01-01", group_by="ticker", threads=False)
+
+    print("Pre-calculating constituent performance metrics (1D to 5Y)...")
+    constituent_perf = calculate_constituent_performance(master_data, all_tickers, nifty_data)
+
     # Store detailed status for UI
     market_details = {}
     
@@ -396,6 +484,14 @@ def main():
         print("Saved market_status_latest.json")
     except Exception as e:
         print(f"Failed to save JSON: {e}")
+
+    # Save constituent performance JSON
+    try:
+        with open("constituent_performance_latest.json", "w") as f:
+            json.dump(constituent_perf, f, indent=4)
+        print("Saved constituent_performance_latest.json")
+    except Exception as e:
+        print(f"Failed to save performance JSON: {e}")
 
 if __name__ == "__main__":
     main()

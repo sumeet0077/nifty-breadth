@@ -171,6 +171,15 @@ def load_market_status():
     except FileNotFoundError:
         return {}
 
+@st.cache_data
+def load_constituent_performance():
+    """Load the latest pre-computed constituent performance metrics."""
+    try:
+        with open("constituent_performance_latest.json", "r") as f:
+            return json.load(f)
+    except FileNotFoundError:
+        return {}
+
 
 @st.cache_data(ttl=3600)
 def get_performance_summary_v3(config_map):
@@ -711,64 +720,88 @@ else:
                 help="Click to open TradingView Chart"
             )
 
-            # Load detailed status if available
             market_status = load_market_status()
             details = market_status.get(selected_index)
-            
-            if details:
-                # dual column layout for Above/Below
-                c1, c2 = st.columns(2)
-                
-                with c1:
-                    st.success(f"📈 Above 200 SMA ({len(details['above'])})")
-                    if details['above']:
-                        df_up = pd.DataFrame(details['above'], columns=["Ticker"])
-                        df_up["Ticker"] = df_up["Ticker"].apply(make_tv_url)
-                        st.dataframe(
-                            df_up, 
-                            column_config={"Ticker": tv_link_config},
-                            width="stretch", 
-                            hide_index=True
-                        )
-                    else:
-                        st.caption("None")
-                        
-                with c2:
-                    st.error(f"📉 Below 200 SMA ({len(details['below'])})")
-                    if details['below']:
-                        df_down = pd.DataFrame(details['below'], columns=["Ticker"])
-                        df_down["Ticker"] = df_down["Ticker"].apply(make_tv_url)
-                        st.dataframe(
-                            df_down, 
-                            column_config={"Ticker": tv_link_config},
-                            width="stretch", 
-                            hide_index=True
-                        )
-                    else:
-                        st.caption("None")
-                
-                # New Stock section - stocks without enough history for 200 SMA
-                new_stocks = details.get('new_stock', [])
-                if new_stocks:
-                    st.warning(f"🆕 New Stock — Insufficient History for 200 SMA ({len(new_stocks)})")
-                    df_new = pd.DataFrame(new_stocks, columns=["Ticker"])
-                    df_new["Ticker"] = df_new["Ticker"].apply(make_tv_url)
-                    st.dataframe(
-                        df_new,
-                        column_config={"Ticker": tv_link_config},
-                        width="stretch",
-                        hide_index=True
-                    )
+            constituent_perf = load_constituent_performance()
 
+            if details:
+                # Merge the market status categories
+                status_map = {}
+                for t in details.get('above', []): status_map[t] = "Above 200 SMA"
+                for t in details.get('below', []): status_map[t] = "Below 200 SMA"
+                for t in details.get('new_stock', []): status_map[t] = "New Stock (<200d)"
+
+                all_tickers = get_cached_constituents(selected_index) or []
+                
+                # Setup Toggle
+                toggle_cagr = st.toggle("Annualize Returns (CAGR)", value=False, help="Converts 1Y and 5Y returns to Compound Annual Growth Rate")
+                
+                rows = []
+                for ticker in all_tickers:
+                    state = status_map.get(ticker, "Unknown")
+                    perf = constituent_perf.get(ticker, {})
+                    
+                    row = {
+                        "Ticker": make_tv_url(ticker),
+                        "Classification": state,
+                        "1D": perf.get("1D") if perf.get("1D") is not None else pd.NA,
+                        "1W": perf.get("1W") if perf.get("1W") is not None else pd.NA,
+                        "1M": perf.get("1M") if perf.get("1M") is not None else pd.NA,
+                        "3M": perf.get("3M") if perf.get("3M") is not None else pd.NA,
+                        "6M": perf.get("6M") if perf.get("6M") is not None else pd.NA,
+                        "RS (20D)": perf.get("RS (20D)") if perf.get("RS (20D)") is not None else pd.NA
+                    }
+                    
+                    # Apply CAGR logic
+                    y1 = perf.get("1Y")
+                    y5 = perf.get("5Y")
+                    
+                    if toggle_cagr:
+                        row["1Y"] = y1 # 1Y CAGR is same as absolute
+                        if y5 is not None:
+                            # CAGR = ( (1 + total_return)^(1/years) ) - 1
+                            cagr5 = ((1 + (y5/100)) ** (1/5)) - 1
+                            row["5Y"] = cagr5 * 100
+                        else:
+                            row["5Y"] = None
+                    else:
+                        row["1Y"] = y1
+                        row["5Y"] = y5
+                        
+                    rows.append(row)
+                    
+                df_perf = pd.DataFrame(rows)
+                
+                # Apply aesthetic number styling via styling configuration
+                st.dataframe(
+                    df_perf.style.format({
+                        "1D": "{:+.2f}%", 
+                        "1W": "{:+.2f}%", 
+                        "1M": "{:+.2f}%", 
+                        "3M": "{:+.2f}%", 
+                        "6M": "{:+.2f}%",
+                        "1Y": "{:+.2f}%",
+                        "5Y": "{:+.2f}%",
+                        "RS (20D)": "{:+.2f}%"
+                    }).applymap(
+                        lambda x: f"color: {'#22c55e' if x > 0 else '#ef4444' if x < 0 else 'gray'}; font-family: monospace" if pd.notnull(x) else "",
+                        subset=["1D", "1W", "1M", "3M", "6M", "1Y", "5Y", "RS (20D)"]
+                    ),
+                    column_config={
+                        "Ticker": tv_link_config,
+                        "Classification": st.column_config.SelectboxColumn("Status", width="medium"),
+                    },
+                    use_container_width=True,
+                    hide_index=True,
+                    height=600
+                )
             else:
-                # Fallback to simple list
+                # Fallback to simple list if offline caching hasn't run yet
                 tickers = get_cached_constituents(selected_index)
                 
                 if tickers:
                     st.write(f"**Total Stocks:** {len(tickers)}")
                     df_fallback = pd.DataFrame(tickers, columns=["Ticker Symbol"])
-                    # Rename likely column to Ticker for consistency with config logic if needed, 
-                    # but here I'll just map "Ticker Symbol"
                     df_fallback["Ticker Symbol"] = df_fallback["Ticker Symbol"].apply(make_tv_url)
                     
                     st.dataframe(
