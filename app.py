@@ -772,12 +772,10 @@ else:
                 
                 rows = []
                 for ticker in all_tickers:
-                    state = status_map.get(ticker, "Unknown")
                     perf = constituent_perf.get(ticker, {})
                     
                     row = {
                         "Ticker": make_tv_url(ticker),
-                        "200d SMA Status": state,
                         "1D": perf.get("1D") if perf.get("1D") is not None else pd.NA,
                         "1W": perf.get("1W") if perf.get("1W") is not None else pd.NA,
                         "1M": perf.get("1M") if perf.get("1M") is not None else pd.NA,
@@ -825,7 +823,6 @@ else:
                     ),
                     column_config={
                         "Ticker": tv_link_config,
-                        "200d SMA Status": st.column_config.SelectboxColumn("200d SMA Status", width="medium"),
                     },
                     use_container_width=True,
                     hide_index=True,

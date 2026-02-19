@@ -179,8 +179,8 @@ def fetch_historical_data(tickers, start_date="2014-01-01"):
             # Reindex full_data to include older dates from stitched series if needed
             full_data = full_data.reindex(full_data.index.union(stitched_series.index))
             
-            # Overwrite TMPV.NS column with stitched data
-            full_data['TMPV.NS'] = stitched_series
+            # Combine stitched data with live data (live data takes precedence)
+            full_data['TMPV.NS'] = full_data['TMPV.NS'].combine_first(stitched_series)
             
             # Sort again after union
             full_data.sort_index(inplace=True)
@@ -199,7 +199,7 @@ def fetch_historical_data(tickers, start_date="2014-01-01"):
             stitched_series = stitched_df['Close']
             
             full_data = full_data.reindex(full_data.index.union(stitched_series.index))
-            full_data['KWIL.NS'] = stitched_series
+            full_data['KWIL.NS'] = full_data['KWIL.NS'].combine_first(stitched_series)
             
             full_data.sort_index(inplace=True)
             print(f"Injected {len(stitched_series)} rows for KWIL.NS")

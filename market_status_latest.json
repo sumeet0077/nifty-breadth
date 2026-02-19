@@ -46,10 +46,12 @@
             "ITC.NS",
             "JIOFIN.NS",
             "KOTAKBANK.NS",
+            "KWIL.NS",
             "MAXHEALTH.NS",
             "RELIANCE.NS",
             "TCS.NS",
             "TECHM.NS",
+            "TMPV.NS",
             "TRENT.NS",
             "WIPRO.NS"
         ],
@@ -424,6 +426,7 @@
             "KPITTECH.NS",
             "KPRMILL.NS",
             "KSB.NS",
+            "KWIL.NS",
             "LALPATHLAB.NS",
             "LATENTVIEW.NS",
             "LEMONTREE.NS",
@@ -536,6 +539,7 @@
             "THERMAX.NS",
             "TIINDIA.NS",
             "TITAGARH.NS",
+            "TMPV.NS",
             "TRENT.NS",
             "TRIDENT.NS",
             "TRITURBINE.NS",
@@ -837,7 +841,8 @@
         "below": [
             "BOSCHLTD.NS",
             "EXIDEIND.NS",
-            "TIINDIA.NS"
+            "TIINDIA.NS",
+            "TMPV.NS"
         ],
         "new_stock": []
     },
@@ -904,6 +909,7 @@
             "GODREJCP.NS",
             "HINDUNILVR.NS",
             "ITC.NS",
+            "KWIL.NS",
             "PATANJALI.NS",
             "RADICO.NS",
             "UBL.NS",
