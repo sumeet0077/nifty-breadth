@@ -704,8 +704,9 @@ else:
             fig_count.update_layout(title="Market Participation", yaxis_title="Stocks", xaxis_title="Date", template="plotly_dark", height=400, hovermode="x unified", xaxis=dict(hoverformat='%d %b %Y'))
             st.plotly_chart(fig_count, width="stretch")
 
-        with tab2:
-            st.subheader(f"Constituents of {current_config['title']}")
+            # Restore original raw lists below the charts
+            market_status = load_market_status()
+            details = market_status.get(selected_index)
             
             def make_tv_url(ticker):
                 clean = ticker.replace(".NS", "").replace(".BO", "")
@@ -713,13 +714,46 @@ else:
                 exchange = "BSE" if ".BO" in ticker else "NSE"
                 return f"https://www.tradingview.com/chart/?symbol={exchange}:{tv_symbol}"
 
-            # Link Column Config
             tv_link_config = st.column_config.LinkColumn(
                 "Ticker", 
                 display_text=r"symbol=[A-Z]+:(.*)",
                 help="Click to open TradingView Chart"
             )
 
+            if details:
+                st.markdown("---")
+                c1, c2 = st.columns(2)
+                
+                with c1:
+                    st.success(f"📈 Above 200 SMA ({len(details['above'])})")
+                    if details['above']:
+                        df_up = pd.DataFrame(details['above'], columns=["Ticker"])
+                        df_up["Ticker"] = df_up["Ticker"].apply(make_tv_url)
+                        st.dataframe(df_up, column_config={"Ticker": tv_link_config}, width="stretch", hide_index=True)
+                    else:
+                        st.caption("None")
+                        
+                with c2:
+                    st.error(f"📉 Below 200 SMA ({len(details['below'])})")
+                    if details['below']:
+                        df_down = pd.DataFrame(details['below'], columns=["Ticker"])
+                        df_down["Ticker"] = df_down["Ticker"].apply(make_tv_url)
+                        st.dataframe(df_down, column_config={"Ticker": tv_link_config}, width="stretch", hide_index=True)
+                    else:
+                        st.caption("None")
+                
+                new_stocks = details.get('new_stock', [])
+                if new_stocks:
+                    st.warning(f"🆕 New Stock — Insufficient History for 200 SMA ({len(new_stocks)})")
+                    df_new = pd.DataFrame(new_stocks, columns=["Ticker"])
+                    df_new["Ticker"] = df_new["Ticker"].apply(make_tv_url)
+                    st.dataframe(df_new, column_config={"Ticker": tv_link_config}, width="stretch", hide_index=True)
+
+        with tab2:
+            st.subheader(f"Constituents of {current_config['title']}")
+            
+            # Use the functions defined in tab1 above
+            
             market_status = load_market_status()
             details = market_status.get(selected_index)
             constituent_perf = load_constituent_performance()
@@ -743,13 +777,12 @@ else:
                     
                     row = {
                         "Ticker": make_tv_url(ticker),
-                        "Classification": state,
+                        "200d SMA Status": state,
                         "1D": perf.get("1D") if perf.get("1D") is not None else pd.NA,
                         "1W": perf.get("1W") if perf.get("1W") is not None else pd.NA,
                         "1M": perf.get("1M") if perf.get("1M") is not None else pd.NA,
                         "3M": perf.get("3M") if perf.get("3M") is not None else pd.NA,
                         "6M": perf.get("6M") if perf.get("6M") is not None else pd.NA,
-                        "RS (20D)": perf.get("RS (20D)") if perf.get("RS (20D)") is not None else pd.NA
                     }
                     
                     # Apply CAGR logic
@@ -763,11 +796,14 @@ else:
                             cagr5 = ((1 + (y5/100)) ** (1/5)) - 1
                             row["5Y"] = cagr5 * 100
                         else:
-                            row["5Y"] = None
+                            row["5Y"] = pd.NA
                     else:
-                        row["1Y"] = y1
-                        row["5Y"] = y5
+                        row["1Y"] = y1 if y1 is not None else pd.NA
+                        row["5Y"] = y5 if y5 is not None else pd.NA
                         
+                    # Add RS at the end
+                    row["RS (20D)"] = perf.get("RS (20D)") if perf.get("RS (20D)") is not None else pd.NA
+                    
                     rows.append(row)
                     
                 df_perf = pd.DataFrame(rows)
@@ -789,7 +825,7 @@ else:
                     ),
                     column_config={
                         "Ticker": tv_link_config,
-                        "Classification": st.column_config.SelectboxColumn("Status", width="medium"),
+                        "200d SMA Status": st.column_config.SelectboxColumn("200d SMA Status", width="medium"),
                     },
                     use_container_width=True,
                     hide_index=True,
