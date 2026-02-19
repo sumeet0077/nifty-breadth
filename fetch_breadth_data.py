@@ -226,13 +226,20 @@ def calculate_breadth(full_data):
     # 4. Count
     above_count = (is_above & valid_universe).sum(axis=1)
     
-    # Total valid stocks on that day
+    # Total valid stocks on that day (have SMA)
     total_valid = valid_universe.sum(axis=1)
     
     # Calculate Below
     below_count = total_valid - above_count
     
-    # Percentage
+    # New Stocks (have price but no SMA)
+    new_stock_universe = full_data.notna() & sma_200.isna()
+    new_stock_count = new_stock_universe.sum(axis=1)
+    
+    # True Total that the dashboard will display (Above + Below + New Stock)
+    total_trading = total_valid + new_stock_count
+    
+    # Percentage (only uses valid_universe since new stocks can't be above/below)
     percentage = (above_count / total_valid) * 100
     percentage = percentage.fillna(0)
     
@@ -252,7 +259,7 @@ def calculate_breadth(full_data):
     breadth_df = pd.DataFrame({
         'Above': above_count,
         'Below': below_count,
-        'Total': total_valid,
+        'Total': total_trading,
         'Percentage': percentage,
         'Index_Close': index_close
     })
