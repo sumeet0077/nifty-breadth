@@ -22,7 +22,7 @@ THEMES = {
     "EV Ecosystem": [
          "TVSMOTOR.NS", "OLECTRA.NS", "JBMA.NS", "HEROMOTOCO.NS", 
         "BAJAJ-AUTO.NS", "EXIDEIND.NS", "ARE&M.NS", "SONACOMS.NS", "MOTHERSON.NS",
-        "ATHERENERG.NS"
+        "ATHERENERG.NS", "TMPV.NS", "TMCV.NS"
     ],
     # 5
     "Semiconductors & EMS": [
@@ -80,7 +80,7 @@ THEMES = {
     ],
     # 16
     "Auto Passenger & CV": [
-        "MARUTI.NS", "M&M.NS",  "EICHERMOT.NS", "ASHOKLEY.NS"
+        "MARUTI.NS", "M&M.NS",  "EICHERMOT.NS", "ASHOKLEY.NS", "TMPV.NS", "TMCV.NS"
     ],
     # 17
     "Two & Three Wheelers": [
@@ -107,7 +107,7 @@ THEMES = {
     # 22
     "QSR": [
         "JUBLFOOD.NS", "DEVYANI.NS", "WESTLIFE.NS", "SAPPHIRE.NS", "RBA.NS", 
-        
+        "UFBL.NS"
     ],
     # 23
     "Telecom Services": [

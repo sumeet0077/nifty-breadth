@@ -1157,8 +1157,12 @@
             "EICHERMOT.NS",
             "ASHOKLEY.NS"
         ],
-        "below": [],
-        "new_stock": []
+        "below": [
+            "TMPV.NS"
+        ],
+        "new_stock": [
+            "TMCV.NS"
+        ]
     },
     "Aviation": {
         "above": [
@@ -1250,9 +1254,12 @@
             "OLECTRA.NS",
             "JBMA.NS",
             "EXIDEIND.NS",
-            "ARE&M.NS"
+            "ARE&M.NS",
+            "TMPV.NS"
         ],
-        "new_stock": []
+        "new_stock": [
+            "TMCV.NS"
+        ]
     },
     "FMCG Staples": {
         "above": [
@@ -1562,7 +1569,9 @@
             "SAPPHIRE.NS",
             "RBA.NS"
         ],
-        "new_stock": []
+        "new_stock": [
+            "UFBL.NS"
+        ]
     },
     "Railways & Infrastructure": {
         "above": [],
