@@ -701,8 +701,9 @@ else:
             # Helper to generate TradingView URLs
             def make_tv_url(ticker):
                 clean = ticker.replace(".NS", "").replace(".BO", "")
+                tv_symbol = clean.replace("-", "_")
                 exchange = "BSE" if ".BO" in ticker else "NSE"
-                return f"https://www.tradingview.com/chart/?symbol={exchange}:{clean}"
+                return f"https://www.tradingview.com/chart/?symbol={exchange}:{tv_symbol}"
 
             # Link Column Config
             tv_link_config = st.column_config.LinkColumn(
