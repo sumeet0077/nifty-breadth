@@ -1391,7 +1391,8 @@
             "PNCINFRA.NS",
             "KEC.NS",
             "KNRCON.NS",
-            "NCC.NS"
+            "NCC.NS",
+            "JSWINFRA.NS"
         ],
         "new_stock": []
     },
@@ -1429,7 +1430,8 @@
         "below": [
             "CONCOR.NS",
             "GATEWAY.NS",
-            "ALLCARGO.NS"
+            "ALLCARGO.NS",
+            "JSWINFRA.NS"
         ],
         "new_stock": []
     },

@@ -42,7 +42,7 @@ THEMES = {
     # 8
     "Infrastructure & EPC": [
         "LT.NS", "ADANIPORTS.NS", "IRB.NS", "PNCINFRA.NS", "KEC.NS", "KNRCON.NS", 
-        "NCC.NS", "GMRAIRPORT.NS"
+        "NCC.NS", "GMRAIRPORT.NS", "JSWINFRA.NS"
     ],
     # 9
     "Private Banking": [
@@ -165,7 +165,8 @@ THEMES = {
     ],
     # 36
     "Logistics": [
-        "CONCOR.NS", "ADANIPORTS.NS", "GATEWAY.NS", "ALLCARGO.NS", "MAHLOG.NS"
+        "CONCOR.NS", "ADANIPORTS.NS", "GATEWAY.NS", "ALLCARGO.NS", "MAHLOG.NS", 
+        "JSWINFRA.NS"
     ],
     # 37
     "Fintech": [
