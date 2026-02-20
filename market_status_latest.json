@@ -1137,6 +1137,22 @@
         ],
         "new_stock": []
     },
+    "Alcohols & Breweries": {
+        "above": [
+            "TI.NS"
+        ],
+        "below": [
+            "UNITDSPR.BO",
+            "UBL.NS",
+            "RADICO.NS",
+            "GLOBUSSPR.NS",
+            "SULA.NS",
+            "SDBL.NS",
+            "PICCADIL.NS",
+            "ASALCBR.NS"
+        ],
+        "new_stock": []
+    },
     "Asset Management": {
         "above": [
             "HDFCAMC.NS",

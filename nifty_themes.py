@@ -221,5 +221,10 @@ THEMES = {
         "BSE.NS", "MCX.NS", "IEX.NS", "CDSL.NS", "CAMS.NS", 
         "KFINTECH.NS", "ANGELONE.NS", "MOTILALOFS.NS", "IIFLCAPS.BO", 
         "GEOJITFSL.NS", "5PAISA.NS"
+    ],
+    # 49
+    "Alcohols & Breweries": [
+        "UNITDSPR.BO", "UBL.NS", "RADICO.NS", "GLOBUSSPR.NS", "TI.NS", 
+        "SULA.NS", "SDBL.NS", "PICCADIL.NS", "ASALCBR.NS"
     ]
 }
