@@ -31,7 +31,16 @@ def get_tickers_from_url(url):
                 
                 # Ticker transformations for Yahoo Finance compatibility
                 overrides = {
-                    "ARE&M": "ARE&M.BO"
+                    "ARE&M": "ARE&M.BO",
+                    "KPIL": "KPIL.BO",
+                    "ADANIENSOL": "ADANIENSOL.BO",
+                    "LTFOODS": "LTFOODS.BO",
+                    "AIIL": "AIIL.BO",
+                    "AEGISLOG": "AEGISLOG.BO",
+                    "UNITDSPR": "UNITDSPR.BO",
+                    "HBLENGINE": "HBLENGINE.BO",
+                    "COHANCE": "COHANCE.BO",
+                    "TMPV": "TMPV.BO"
                 }
                 
                 if t in overrides:
