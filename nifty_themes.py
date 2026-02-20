@@ -76,7 +76,7 @@ THEMES = {
     # 15
     "Retail & E-Commerce": [
         "TRENT.NS", "DMART.NS", "NYKAA.NS", "ABFRL.NS", "METROBRAND.NS", "VBL.NS", 
-        "RELIANCE.NS"
+        "RELIANCE.NS", "SWIGGY.NS", "ETERNAL.NS"
     ],
     # 16
     "Auto Passenger & CV": [
