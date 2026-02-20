@@ -1141,14 +1141,14 @@
         "above": [
             "HDFCAMC.NS",
             "NAM-INDIA.NS",
-            "BSE.NS",
-            "MCX.NS"
+            "ABSLAMC.NS"
         ],
         "below": [
-            "UTIAMC.NS",
-            "ANGELONE.NS"
+            "UTIAMC.NS"
         ],
-        "new_stock": []
+        "new_stock": [
+            "ICICIAMC.NS"
+        ]
     },
     "Auto Passenger & CV": {
         "above": [

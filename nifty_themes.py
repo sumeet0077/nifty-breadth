@@ -173,7 +173,7 @@ THEMES = {
     ],
     # 38
     "Asset Management": [
-        "HDFCAMC.NS", "NAM-INDIA.NS", "UTIAMC.NS", "ANGELONE.NS", "BSE.NS", "MCX.NS"
+        "HDFCAMC.NS", "ICICIAMC.NS", "NAM-INDIA.NS", "ABSLAMC.NS", "UTIAMC.NS"
     ],
     # 39
     "Luxury": [
