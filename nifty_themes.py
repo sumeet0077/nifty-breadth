@@ -210,5 +210,15 @@ THEMES = {
     "General Insurance": [
         "ICICIGI.NS", "STARHEALTH.NS", "GICRE.NS", "NIACL.NS", "GODIGIT.NS", 
         "NIVABUPA.NS", "MEDIASSIST.NS"
+    ],
+    # 47
+    "Wealth Management": [
+        "360ONE.NS", "NUVAMA.NS", "ANANDRATHI.NS", "PRUDENT.NS"
+    ],
+    # 48
+    "Capital Market": [
+        "BSE.NS", "MCX.NS", "IEX.NS", "CDSL.NS", "CAMS.NS", 
+        "KFINTECH.NS", "ANGELONE.NS", "MOTILALOFS.NS", "IIFLSEC.NS", 
+        "GEOJITFSL.NS", "5PAISA.NS"
     ]
 }

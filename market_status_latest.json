@@ -1174,6 +1174,23 @@
         ],
         "new_stock": []
     },
+    "Capital Market": {
+        "above": [
+            "BSE.NS",
+            "MCX.NS"
+        ],
+        "below": [
+            "IEX.NS",
+            "CDSL.NS",
+            "CAMS.NS",
+            "KFINTECH.NS",
+            "ANGELONE.NS",
+            "MOTILALOFS.NS",
+            "GEOJITFSL.NS",
+            "5PAISA.NS"
+        ],
+        "new_stock": []
+    },
     "Cement": {
         "above": [
             "ULTRACEMCO.NS",
@@ -1718,6 +1735,17 @@
             "EICHERMOT.NS"
         ],
         "below": [],
+        "new_stock": []
+    },
+    "Wealth Management": {
+        "above": [
+            "ANANDRATHI.NS"
+        ],
+        "below": [
+            "360ONE.NS",
+            "NUVAMA.NS",
+            "PRUDENT.NS"
+        ],
         "new_stock": []
     }
 }
