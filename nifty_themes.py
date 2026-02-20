@@ -218,7 +218,7 @@ THEMES = {
     # 48
     "Capital Market": [
         "BSE.NS", "MCX.NS", "IEX.NS", "CDSL.NS", "CAMS.NS", 
-        "KFINTECH.NS", "ANGELONE.NS", "MOTILALOFS.NS", "IIFLSEC.NS", 
+        "KFINTECH.NS", "ANGELONE.NS", "MOTILALOFS.NS", "IIFLCAPS.NS", 
         "GEOJITFSL.NS", "5PAISA.NS"
     ]
 }

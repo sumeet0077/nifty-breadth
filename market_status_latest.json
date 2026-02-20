@@ -1177,7 +1177,8 @@
     "Capital Market": {
         "above": [
             "BSE.NS",
-            "MCX.NS"
+            "MCX.NS",
+            "IIFLCAPS.NS"
         ],
         "below": [
             "IEX.NS",
