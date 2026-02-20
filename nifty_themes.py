@@ -16,7 +16,7 @@ THEMES = {
     # 3
     "Renewable Energy Generation": [
         "ADANIGREEN.NS", "TATAPOWER.NS", "NTPC.NS", "JSWENERGY.NS", "NHPC.NS", 
-        "SJVN.NS", "INOXWIND.NS", "SUZLON.NS", "WAAREERTL.NS"
+        "SJVN.NS", "INOXWIND.NS", "SUZLON.NS", "WAAREERTL.BO"
     ],
     # 4
     "EV Ecosystem": [
@@ -107,7 +107,7 @@ THEMES = {
     # 22
     "QSR": [
         "JUBLFOOD.NS", "DEVYANI.NS", "WESTLIFE.NS", "SAPPHIRE.NS", "RBA.NS", 
-        "UFBL.NS"
+        "UFBL.BO"
     ],
     # 23
     "Telecom Services": [
@@ -218,7 +218,7 @@ THEMES = {
     # 48
     "Capital Market": [
         "BSE.NS", "MCX.NS", "IEX.NS", "CDSL.NS", "CAMS.NS", 
-        "KFINTECH.NS", "ANGELONE.NS", "MOTILALOFS.NS", "IIFLCAPS.NS", 
+        "KFINTECH.NS", "ANGELONE.NS", "MOTILALOFS.NS", "IIFLCAPS.BO", 
         "GEOJITFSL.NS", "5PAISA.NS"
     ]
 }

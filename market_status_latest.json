@@ -1178,7 +1178,7 @@
         "above": [
             "BSE.NS",
             "MCX.NS",
-            "IIFLCAPS.NS"
+            "IIFLCAPS.BO"
         ],
         "below": [
             "IEX.NS",
@@ -1579,7 +1579,9 @@
         "new_stock": []
     },
     "QSR": {
-        "above": [],
+        "above": [
+            "UFBL.BO"
+        ],
         "below": [
             "JUBLFOOD.NS",
             "DEVYANI.NS",
@@ -1587,9 +1589,7 @@
             "SAPPHIRE.NS",
             "RBA.NS"
         ],
-        "new_stock": [
-            "UFBL.NS"
-        ]
+        "new_stock": []
     },
     "Railways & Infrastructure": {
         "above": [],
@@ -1620,7 +1620,7 @@
             "SJVN.NS",
             "INOXWIND.NS",
             "SUZLON.NS",
-            "WAAREERTL.NS"
+            "WAAREERTL.BO"
         ],
         "new_stock": []
     },
