@@ -30,6 +30,14 @@ def get_tickers_from_url(url):
                     continue
                 
                 # Ticker transformations for Yahoo Finance compatibility
+                overrides = {
+                    "ARE&M": "ARE&M.BO"
+                }
+                
+                if t in overrides:
+                    cleaned_tickers.append(overrides[t])
+                    continue
+
                 if t == "TMPV": 
                     cleaned_tickers.append("TMPV.NS") 
                     continue

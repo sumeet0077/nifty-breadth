@@ -275,7 +275,7 @@
             "APLLTD.NS",
             "APOLLOTYRE.NS",
             "APTUS.NS",
-            "ARE&M.NS",
+            "ARE&M.BO",
             "ASIANPAINT.NS",
             "ASTRAZEN.NS",
             "ATGL.NS",
@@ -660,7 +660,7 @@
             "ANGELONE.NS",
             "APLLTD.NS",
             "APTUS.NS",
-            "ARE&M.NS",
+            "ARE&M.BO",
             "ASTRAZEN.NS",
             "BALRAMCHIN.NS",
             "BASF.NS",
@@ -1225,7 +1225,7 @@
         ],
         "below": [
             "MOIL.NS",
-            "ARE&M.NS"
+            "ARE&M.BO"
         ],
         "new_stock": []
     },
@@ -1272,7 +1272,7 @@
             "OLECTRA.NS",
             "JBMA.NS",
             "EXIDEIND.NS",
-            "ARE&M.NS",
+            "ARE&M.BO",
             "TMPV.NS"
         ],
         "new_stock": [

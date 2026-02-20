@@ -21,7 +21,7 @@ THEMES = {
     # 4
     "EV Ecosystem": [
          "TVSMOTOR.NS", "OLECTRA.NS", "JBMA.NS", "HEROMOTOCO.NS", 
-        "BAJAJ-AUTO.NS", "EXIDEIND.NS", "ARE&M.NS", "SONACOMS.NS", "MOTHERSON.NS",
+        "BAJAJ-AUTO.NS", "EXIDEIND.NS", "ARE&M.BO", "SONACOMS.NS", "MOTHERSON.NS",
         "ATHERENERG.NS", "TMPV.NS", "TMCV.NS"
     ],
     # 5
@@ -140,7 +140,7 @@ THEMES = {
     # 30
     "Critical Minerals": [
         "VEDL.NS", "NMDC.NS", "MOIL.NS", "HINDZINC.NS", "NATIONALUM.NS", 
-        "ARE&M.NS"
+        "ARE&M.BO"
     ],
 
     # 32
