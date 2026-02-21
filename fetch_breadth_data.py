@@ -67,7 +67,8 @@ def get_index_tickers(index_name):
     
     # Check Custom Themes first
     if index_name in THEMES:
-        return THEMES[index_name]
+        # Deduplicate to prevent pandas column-name collisions in calculate_breadth
+        return list(dict.fromkeys(THEMES[index_name]))
 
     # Map index names to verified CSV URLs
     # Source: https://nsearchives.nseindia.com/content/indices/

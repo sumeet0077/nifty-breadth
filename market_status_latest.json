@@ -1464,6 +1464,18 @@
         ],
         "new_stock": []
     },
+    "Media & Broadcasting": {
+        "above": [
+            "SUNTV.NS"
+        ],
+        "below": [
+            "ZEEL.NS",
+            "NETWORK18.NS",
+            "DEN.NS",
+            "HATHWAY.NS"
+        ],
+        "new_stock": []
+    },
     "Metals & Mining": {
         "above": [
             "TATASTEEL.NS",

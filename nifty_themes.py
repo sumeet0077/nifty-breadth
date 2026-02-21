@@ -119,7 +119,7 @@ THEMES = {
     ],
     # 25
     "Media & Broadcasting": [
-        "SUNTV.NS", "ZEEL.NS", "NETWORK18.NS", "NETWORK18.NS", "DEN.NS", "HATHWAY.NS"
+        "SUNTV.NS", "ZEEL.NS", "NETWORK18.NS", "DEN.NS", "HATHWAY.NS"
     ],
     # 26
     "Music & Content": [
