@@ -781,7 +781,7 @@ else:
 
                 all_tickers = get_cached_constituents(selected_index) or []
                 
-                if all_tickers:
+                if all_tickers and category == "Industries":
                     tv_urls = [make_tv_url(t) for t in all_tickers]
                     urls_js = json.dumps(tv_urls)
                     html_code = f"""
@@ -793,9 +793,16 @@ else:
                     <script>
                     function openAll() {{
                         var urls = {urls_js};
+                        var blocked = false;
                         urls.forEach(function(url) {{
-                            window.open(url, '_blank');
+                            var newWin = window.open(url, '_blank');
+                            if (!newWin || newWin.closed || typeof newWin.closed == 'undefined') {{
+                                blocked = true;
+                            }}
                         }});
+                        if (blocked) {{
+                            alert("⚠️ Pop-up Blocker Detected!\\n\\nYour browser is preventing multiple tabs from opening at once.\\n\\nPlease click the Pop-up Blocker icon in your browser's address bar (typically on the right), select 'Always allow pop-ups and redirects from this site', and then try again.");
+                        }}
                     }}
                     </script>
                     """
@@ -836,56 +843,67 @@ else:
                     
                     rows.append(row)
                     
-                df_perf = pd.DataFrame(rows)
+                columns_list = ["Ticker", "1D", "1W", "1M", "3M", "6M", "1Y", "3Y", "5Y", "RS (20D)"]
+                df_perf = pd.DataFrame(rows, columns=columns_list)
                 
-                # Apply aesthetic number styling via styling configuration
-                st.dataframe(
-                    df_perf.style.format({
-                        "1D": "{:+.2f}%", 
-                        "1W": "{:+.2f}%", 
-                        "1M": "{:+.2f}%", 
-                        "3M": "{:+.2f}%", 
-                        "6M": "{:+.2f}%",
-                        "1Y": "{:+.2f}%",
-                        "3Y": "{:+.2f}%",
-                        "5Y": "{:+.2f}%",
-                        "RS (20D)": "{:+.2f}%"
-                    }).applymap(
-                        lambda x: f"color: {'#22c55e' if x > 0 else '#ef4444' if x < 0 else 'gray'}; font-family: monospace" if pd.notnull(x) else "",
-                        subset=["1D", "1W", "1M", "3M", "6M", "1Y", "3Y", "5Y", "RS (20D)"]
-                    ),
-                    column_config={
-                        "Ticker": tv_link_config,
-                    },
-                    use_container_width=True,
-                    hide_index=True,
-                    height=600
-                )
+                if not df_perf.empty:
+                    # Apply aesthetic number styling via styling configuration
+                    st.dataframe(
+                        df_perf.style.format({
+                            "1D": "{:+.2f}%", 
+                            "1W": "{:+.2f}%", 
+                            "1M": "{:+.2f}%", 
+                            "3M": "{:+.2f}%", 
+                            "6M": "{:+.2f}%",
+                            "1Y": "{:+.2f}%",
+                            "3Y": "{:+.2f}%",
+                            "5Y": "{:+.2f}%",
+                            "RS (20D)": "{:+.2f}%"
+                        }).applymap(
+                            lambda x: f"color: {'#22c55e' if x > 0 else '#ef4444' if x < 0 else 'gray'}; font-family: monospace" if pd.notnull(x) else "",
+                            subset=["1D", "1W", "1M", "3M", "6M", "1Y", "3Y", "5Y", "RS (20D)"]
+                        ),
+                        column_config={
+                            "Ticker": tv_link_config,
+                        },
+                        use_container_width=True,
+                        hide_index=True,
+                        height=600
+                    )
+                else:
+                    st.warning("No constituent performance data available.")
             else:
                 # Fallback to simple list if offline caching hasn't run yet
                 tickers = get_cached_constituents(selected_index)
                 
                 if tickers:
                     st.write(f"**Total Stocks:** {len(tickers)}")
-                    
-                    tv_urls = [make_tv_url(t) for t in tickers]
-                    urls_js = json.dumps(tv_urls)
-                    html_code = f"""
-                    <div style="text-align: right; margin-bottom: 0px;">
-                        <button onclick="openAll()" style="background-color: #2563eb; color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; font-weight: bold; cursor: pointer; font-family: 'Inter', sans-serif; transition: background-color 0.2s;">
-                            ↗️ Open All in TradingView
-                        </button>
-                    </div>
-                    <script>
-                    function openAll() {{
-                        var urls = {urls_js};
-                        urls.forEach(function(url) {{
-                            window.open(url, '_blank');
-                        }});
-                    }}
-                    </script>
-                    """
-                    components.html(html_code, height=45)
+                    if category == "Industries":
+                        tv_urls = [make_tv_url(t) for t in tickers]
+                        urls_js = json.dumps(tv_urls)
+                        html_code = f"""
+                        <div style="text-align: right; margin-bottom: 0px;">
+                            <button onclick="openAll()" style="background-color: #2563eb; color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; font-weight: bold; cursor: pointer; font-family: 'Inter', sans-serif; transition: background-color 0.2s;">
+                                ↗️ Open All in TradingView
+                            </button>
+                        </div>
+                        <script>
+                        function openAll() {{
+                            var urls = {urls_js};
+                            var blocked = false;
+                            urls.forEach(function(url) {{
+                                var newWin = window.open(url, '_blank');
+                                if (!newWin || newWin.closed || typeof newWin.closed == 'undefined') {{
+                                    blocked = true;
+                                }}
+                            }});
+                            if (blocked) {{
+                                alert("⚠️ Pop-up Blocker Detected!\\n\\nYour browser is preventing multiple tabs from opening at once.\\n\\nPlease click the Pop-up Blocker icon in your browser's address bar (typically on the right), select 'Always allow pop-ups and redirects from this site', and then try again.");
+                            }}
+                        }}
+                        </script>
+                        """
+                        components.html(html_code, height=45)
                     
                     df_fallback = pd.DataFrame(tickers, columns=["Ticker Symbol"])
                     df_fallback["Ticker Symbol"] = df_fallback["Ticker Symbol"].apply(make_tv_url)
