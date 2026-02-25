@@ -648,7 +648,8 @@ elif category == "Performance Overview":
             perf_summary = perf_summary.sort_values("1 Year", ascending=False)
             
         def color_return(val):
-            if pd.isna(val): return ""
+            if pd.isna(val) or not isinstance(val, (int, float)): 
+                return ""
             color = '#22c55e' if val >= 0 else '#ef4444' 
             return f'color: {color}; font-weight: bold;'
             
