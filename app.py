@@ -779,7 +779,10 @@ else:
                 for t in details.get('below', []): status_map[t] = "Below 200 SMA"
                 for t in details.get('new_stock', []): status_map[t] = "New Stock (<200d)"
 
-                all_tickers = get_cached_constituents(selected_index) or []
+                # Fallback to offline constituents if NSE blocks the Streamlit Cloud IP
+                all_tickers = get_cached_constituents(selected_index)
+                if not all_tickers:
+                    all_tickers = details.get('above', []) + details.get('below', []) + details.get('new_stock', [])
                 
                 if all_tickers and category == "Industries":
                     tv_urls = [make_tv_url(t) for t in all_tickers]
