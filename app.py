@@ -640,7 +640,7 @@ elif category == "Performance Overview":
             width="stretch",
             hide_index=True,
             on_select="rerun",
-            selection_mode="single_row"
+            selection_mode="single-row"
         )
         
         # Handle Navigation Click
