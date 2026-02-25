@@ -647,37 +647,24 @@ elif category == "Performance Overview":
         if "1 Year" in perf_summary.columns:
             perf_summary = perf_summary.sort_values("1 Year", ascending=False)
             
-        # ---- Clickable Navigation + Red/Green Colored Table ----
-        # IMPORTANT: Streamlit column_config (LinkColumn) is SILENTLY IGNORED when a 
-        # Styler object is passed. We MUST pass a raw DataFrame for LinkColumn to work.
-        # The actual column name is "Theme/Index" (no spaces around /).
-        
-        THEME_COL = "Theme/Index"
-        numeric_cols = [c for c in perf_summary.columns if c != THEME_COL]
-        
-        # Convert the Theme/Index column values into internal nav URLs
-        if THEME_COL in perf_summary.columns:
-            perf_summary[THEME_COL] = perf_summary[THEME_COL].apply(
-                lambda name: f"/?nav={urllib.parse.quote(name)}"
-            )
-        
-        # Build column_config
-        col_config = {
-            THEME_COL: st.column_config.LinkColumn(
-                "Theme / Index",
-                help="Click to navigate to this index/theme",
-                display_text=r"/\?nav=(.*)"
-            )
-        }
-        for col in numeric_cols:
-            col_config[col] = st.column_config.NumberColumn(col, format="%.2f%%")
-        
+        def color_return(val):
+            if pd.isna(val) or not isinstance(val, (int, float)): 
+                return ""
+            color = '#22c55e' if val >= 0 else '#ef4444' 
+            return f'color: {color}; font-weight: bold;'
+            
+        def safe_format(val):
+            if pd.isna(val) or not isinstance(val, (int, float)):
+                return str(val) if pd.notna(val) else ""
+            return f"{float(val):.2f}%"
+            
+        numeric_cols = [c for c in perf_summary.columns if c != "Theme/Index"]
+
         st.dataframe(
-            perf_summary,
+            perf_summary.style.map(color_return, subset=numeric_cols).format(safe_format, subset=numeric_cols),
             height=2300,
             width="stretch",
-            hide_index=True,
-            column_config=col_config
+            hide_index=True
         )
 
 else:
