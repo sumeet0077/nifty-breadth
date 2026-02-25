@@ -1,5 +1,6 @@
 
 import streamlit as st
+import streamlit.components.v1 as components
 import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
@@ -780,6 +781,26 @@ else:
 
                 all_tickers = get_cached_constituents(selected_index) or []
                 
+                if all_tickers:
+                    tv_urls = [make_tv_url(t) for t in all_tickers]
+                    urls_js = json.dumps(tv_urls)
+                    html_code = f"""
+                    <div style="text-align: right; margin-bottom: 0px;">
+                        <button onclick="openAll()" style="background-color: #2563eb; color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; font-weight: bold; cursor: pointer; font-family: 'Inter', sans-serif; transition: background-color 0.2s;">
+                            ↗️ Open All in TradingView
+                        </button>
+                    </div>
+                    <script>
+                    function openAll() {{
+                        var urls = {urls_js};
+                        urls.forEach(function(url) {{
+                            window.open(url, '_blank');
+                        }});
+                    }}
+                    </script>
+                    """
+                    components.html(html_code, height=45)
+                
                 # Setup Toggle
                 toggle_cagr = st.toggle("Annualize Returns (CAGR)", value=False, help="Converts 1Y, 3Y, and 5Y returns to Compound Annual Growth Rate")
                 
@@ -846,6 +867,26 @@ else:
                 
                 if tickers:
                     st.write(f"**Total Stocks:** {len(tickers)}")
+                    
+                    tv_urls = [make_tv_url(t) for t in tickers]
+                    urls_js = json.dumps(tv_urls)
+                    html_code = f"""
+                    <div style="text-align: right; margin-bottom: 0px;">
+                        <button onclick="openAll()" style="background-color: #2563eb; color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; font-weight: bold; cursor: pointer; font-family: 'Inter', sans-serif; transition: background-color 0.2s;">
+                            ↗️ Open All in TradingView
+                        </button>
+                    </div>
+                    <script>
+                    function openAll() {{
+                        var urls = {urls_js};
+                        urls.forEach(function(url) {{
+                            window.open(url, '_blank');
+                        }});
+                    }}
+                    </script>
+                    """
+                    components.html(html_code, height=45)
+                    
                     df_fallback = pd.DataFrame(tickers, columns=["Ticker Symbol"])
                     df_fallback["Ticker Symbol"] = df_fallback["Ticker Symbol"].apply(make_tv_url)
                     
