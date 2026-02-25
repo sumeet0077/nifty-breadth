@@ -11,6 +11,7 @@ import json
 import subprocess
 from rrg_helper import RRGCalculator
 from fetch_breadth_data import get_index_tickers
+import urllib.parse
 
 # ---------------------------------------------------------
 # AUTO-UPDATE LOGIC
@@ -325,6 +326,23 @@ SECTOR_OPTIONS = [
     "NIFTY REALTY", "NIFTY CONSUMER DURABLES", "NIFTY OIL AND GAS"
 ]
 
+# Handle LinkColumn Navigation via Query Params
+params = st.query_params
+if "nav" in params:
+    nav_target = params["nav"]
+    if nav_target in ["Nifty 50", "Nifty 500", "Nifty Smallcap 250"]:
+         st.session_state.nav_category = "Broad Market"
+         st.session_state.nav_broad = nav_target
+    elif nav_target in SECTOR_OPTIONS:
+         st.session_state.nav_category = "Sectoral Indices"
+         st.session_state.nav_sector = nav_target
+    elif nav_target in THEMES.keys():
+         st.session_state.nav_category = "Industries"
+         st.session_state.nav_industry = nav_target
+    
+    # Clear query param so a manual category switch later isn't forced back
+    st.query_params.clear()
+
 # Category Selection
 category = st.sidebar.radio(
     "Market Segment",
@@ -634,32 +652,33 @@ elif category == "Performance Overview":
             color = '#22c55e' if val >= 0 else '#ef4444' 
             return f'color: {color}; font-weight: bold;'
             
-        event = st.dataframe(
-            perf_summary.style.map(color_return, subset=perf_summary.columns[1:]).format("{:.2f}%", subset=perf_summary.columns[1:]),
+        if "Theme / Index" in perf_summary.columns:
+            # Create a dedicated URL column to be used by LinkColumn
+            def make_internal_link(name):
+                encoded = urllib.parse.quote(name)
+                return f"/?nav={encoded}"
+            
+            perf_summary["Link"] = perf_summary["Theme / Index"].apply(make_internal_link)
+            
+        st.dataframe(
+            perf_summary.style.map(color_return, subset=[c for c in perf_summary.columns if c not in ["Theme / Index", "Link"]]).format("{:.2f}%", subset=[c for c in perf_summary.columns if c not in ["Theme / Index", "Link"]]),
             height=800,
             width="stretch",
             hide_index=True,
-            on_select="rerun",
-            selection_mode="single-row"
+            column_config={
+                "Theme / Index": st.column_config.LinkColumn(
+                    "Theme / Index",
+                    help="Click to view detailed constituents",
+                    display_text=r"/?nav=(.*)" # Not strictly used for mapping, but required by API shape
+                ),
+                "Link": st.column_config.LinkColumn(
+                    "Theme / Index",
+                    display_text=r"/?nav=([^&]+)",
+                    help="Click to view detailed constituents"
+                )
+            },
+            column_order=["Link"] + [c for c in perf_summary.columns if c not in ["Theme / Index", "Link"]] # Show Link disguised as Theme/Index
         )
-        
-        # Handle Navigation Click
-        if event and event.selection and event.selection.rows:
-            selected_row_idx = event.selection.rows[0]
-            selected_name = perf_summary.iloc[selected_row_idx]["Theme / Index"]
-            
-            # Map selected_name to proper category and update session state
-            if selected_name in ["Nifty 50", "Nifty 500", "Nifty Smallcap 250"]:
-                st.session_state.nav_category = "Broad Market"
-                st.session_state.nav_broad = selected_name
-            elif selected_name in SECTOR_OPTIONS:
-                st.session_state.nav_category = "Sectoral Indices"
-                st.session_state.nav_sector = selected_name
-            else:
-                st.session_state.nav_category = "Industries"
-                st.session_state.nav_industry = selected_name
-                
-            st.rerun()
 
 else:
     # Single Index View logic
