@@ -307,11 +307,29 @@ for theme_name in THEMES:
         "description": f"Custom Theme: {theme_name}"
     }
 
+# Initialize Session State Navigation variables
+if "nav_category" not in st.session_state:
+    st.session_state.nav_category = "Broad Market"
+if "nav_broad" not in st.session_state:
+    st.session_state.nav_broad = "Nifty 50"
+if "nav_sector" not in st.session_state:
+    st.session_state.nav_sector = "NIFTY AUTO"
+if "nav_industry" not in st.session_state:
+    st.session_state.nav_industry = sorted(THEMES.keys())[0] if THEMES else None
+
+# Define sector options globally so we can use them anywhere
+SECTOR_OPTIONS = [
+    "NIFTY AUTO", "NIFTY BANK", "NIFTY FINANCIAL SERVICES", "NIFTY FMCG",
+    "NIFTY HEALTHCARE", "NIFTY IT", "NIFTY MEDIA", "NIFTY METAL",
+    "NIFTY PHARMA", "NIFTY PRIVATE BANK", "NIFTY PSU BANK", 
+    "NIFTY REALTY", "NIFTY CONSUMER DURABLES", "NIFTY OIL AND GAS"
+]
+
 # Category Selection
 category = st.sidebar.radio(
     "Market Segment",
     ["Broad Market", "Sectoral Indices", "Industries", "Performance Overview", "Sector Rotation (RRG)"],
-    index=0
+    key="nav_category"
 )
 
 # ---------------------------------------------------------
@@ -616,29 +634,43 @@ elif category == "Performance Overview":
             color = '#22c55e' if val >= 0 else '#ef4444' 
             return f'color: {color}; font-weight: bold;'
             
-        st.dataframe(
+        event = st.dataframe(
             perf_summary.style.map(color_return, subset=perf_summary.columns[1:]).format("{:.2f}%", subset=perf_summary.columns[1:]),
             height=800,
             width="stretch",
-            hide_index=True
+            hide_index=True,
+            on_select="rerun",
+            selection_mode="single_row"
         )
+        
+        # Handle Navigation Click
+        if event and event.selection and event.selection.rows:
+            selected_row_idx = event.selection.rows[0]
+            selected_name = perf_summary.iloc[selected_row_idx]["Theme / Index"]
+            
+            # Map selected_name to proper category and update session state
+            if selected_name in ["Nifty 50", "Nifty 500", "Nifty Smallcap 250"]:
+                st.session_state.nav_category = "Broad Market"
+                st.session_state.nav_broad = selected_name
+            elif selected_name in SECTOR_OPTIONS:
+                st.session_state.nav_category = "Sectoral Indices"
+                st.session_state.nav_sector = selected_name
+            else:
+                st.session_state.nav_category = "Industries"
+                st.session_state.nav_industry = selected_name
+                
+            st.rerun()
 
 else:
     # Single Index View logic
     selected_index = None
     if category == "Broad Market":
-        selected_index = st.sidebar.radio("Select Index", ["Nifty 50", "Nifty 500", "Nifty Smallcap 250"])
+        selected_index = st.sidebar.radio("Select Index", ["Nifty 50", "Nifty 500", "Nifty Smallcap 250"], key="nav_broad")
     elif category == "Sectoral Indices":
-        sector_options = [
-            "NIFTY AUTO", "NIFTY BANK", "NIFTY FINANCIAL SERVICES", "NIFTY FMCG",
-            "NIFTY HEALTHCARE", "NIFTY IT", "NIFTY MEDIA", "NIFTY METAL",
-            "NIFTY PHARMA", "NIFTY PRIVATE BANK", "NIFTY PSU BANK", 
-            "NIFTY REALTY", "NIFTY CONSUMER DURABLES", "NIFTY OIL AND GAS"
-        ]
-        selected_index = st.sidebar.radio("Select Sector", sector_options)
+        selected_index = st.sidebar.radio("Select Sector", SECTOR_OPTIONS, key="nav_sector")
     elif category == "Industries":
         industry_options = sorted(THEMES.keys())
-        selected_index = st.sidebar.radio("Select Industry", industry_options)
+        selected_index = st.sidebar.radio("Select Industry", industry_options, key="nav_industry")
 
     current_config = index_config.get(selected_index, index_config["Nifty 50"])
 
