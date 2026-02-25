@@ -653,6 +653,11 @@ elif category == "Performance Overview":
             color = '#22c55e' if val >= 0 else '#ef4444' 
             return f'color: {color}; font-weight: bold;'
             
+        def safe_format(val):
+            if pd.isna(val) or not isinstance(val, (int, float)):
+                return str(val) if pd.notna(val) else ""
+            return f"{float(val):.2f}%"
+            
         if "Theme / Index" in perf_summary.columns:
             # Create a dedicated URL column to be used by LinkColumn
             def make_internal_link(name):
@@ -662,7 +667,7 @@ elif category == "Performance Overview":
             perf_summary["Link"] = perf_summary["Theme / Index"].apply(make_internal_link)
             
         st.dataframe(
-            perf_summary.style.map(color_return, subset=[c for c in perf_summary.columns if c not in ["Theme / Index", "Link"]]).format("{:.2f}%", subset=[c for c in perf_summary.columns if c not in ["Theme / Index", "Link"]]),
+            perf_summary.style.map(color_return, subset=[c for c in perf_summary.columns if c not in ["Theme / Index", "Link"]]).format(safe_format, subset=[c for c in perf_summary.columns if c not in ["Theme / Index", "Link"]]),
             height=800,
             width="stretch",
             hide_index=True,
