@@ -329,7 +329,7 @@ SECTOR_OPTIONS = [
 # Handle LinkColumn Navigation via Query Params
 params = st.query_params
 if "nav" in params:
-    nav_target = params["nav"]
+    nav_target = urllib.parse.unquote(params["nav"])
     if nav_target in ["Nifty 50", "Nifty 500", "Nifty Smallcap 250"]:
          st.session_state.nav_category = "Broad Market"
          st.session_state.nav_broad = nav_target
@@ -647,44 +647,35 @@ elif category == "Performance Overview":
         if "1 Year" in perf_summary.columns:
             perf_summary = perf_summary.sort_values("1 Year", ascending=False)
             
-        def color_return(val):
-            if pd.isna(val) or not isinstance(val, (int, float)): 
-                return ""
-            color = '#22c55e' if val >= 0 else '#ef4444' 
-            return f'color: {color}; font-weight: bold;'
-            
-        def safe_format(val):
-            if pd.isna(val) or not isinstance(val, (int, float)):
-                return str(val) if pd.notna(val) else ""
-            return f"{float(val):.2f}%"
-            
+        # Build clickable link in the "Theme / Index" column itself
+        # IMPORTANT: Streamlit column_config (including LinkColumn) is SILENTLY IGNORED 
+        # when a Styler object is passed. We MUST pass a raw DataFrame for LinkColumn to work.
         if "Theme / Index" in perf_summary.columns:
-            # Create a dedicated URL column to be used by LinkColumn
-            def make_internal_link(name):
-                encoded = urllib.parse.quote(name)
-                # Streamlit LinkColumn strictly requires a valid URL schema to render as clickable.
-                return f"app://?nav={encoded}"
-            
-            perf_summary["Link"] = perf_summary["Theme / Index"].apply(make_internal_link)
-            
+            perf_summary["Theme / Index"] = perf_summary["Theme / Index"].apply(
+                lambda name: f"/?nav={urllib.parse.quote(name)}"
+            )
+        
+        # Build column_config for numeric columns with percentage formatting
+        numeric_cols = [c for c in perf_summary.columns if c != "Theme / Index"]
+        col_config = {
+            "Theme / Index": st.column_config.LinkColumn(
+                "Theme / Index",
+                help="Click to navigate to this index/theme",
+                display_text=r"/\?nav=(.*)"
+            )
+        }
+        for col in numeric_cols:
+            col_config[col] = st.column_config.NumberColumn(
+                col,
+                format="%.2f%%"
+            )
+        
         st.dataframe(
-            perf_summary.style.map(color_return, subset=[c for c in perf_summary.columns if c not in ["Theme / Index", "Link"]]).format(safe_format, subset=[c for c in perf_summary.columns if c not in ["Theme / Index", "Link"]]),
+            perf_summary,
             height=800,
             width="stretch",
             hide_index=True,
-            column_config={
-                "Theme / Index": st.column_config.LinkColumn(
-                    "Theme / Index",
-                    help="Click to view detailed constituents",
-                    display_text=r"app://\?nav=(.*)" # Not strictly used for mapping, but required by API shape
-                ),
-                "Link": st.column_config.LinkColumn(
-                    "Theme / Index",
-                    display_text=r"app://\?nav=([^&]+)",
-                    help="Click to view detailed constituents"
-                )
-            },
-            column_order=["Link"] + [c for c in perf_summary.columns if c not in ["Theme / Index", "Link"]] # Show Link disguised as Theme/Index
+            column_config=col_config
         )
 
 else:
