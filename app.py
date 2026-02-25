@@ -662,7 +662,8 @@ elif category == "Performance Overview":
             # Create a dedicated URL column to be used by LinkColumn
             def make_internal_link(name):
                 encoded = urllib.parse.quote(name)
-                return f"/?nav={encoded}"
+                # Streamlit LinkColumn strictly requires a valid URL schema to render as clickable.
+                return f"app://?nav={encoded}"
             
             perf_summary["Link"] = perf_summary["Theme / Index"].apply(make_internal_link)
             
@@ -675,11 +676,11 @@ elif category == "Performance Overview":
                 "Theme / Index": st.column_config.LinkColumn(
                     "Theme / Index",
                     help="Click to view detailed constituents",
-                    display_text=r"/?nav=(.*)" # Not strictly used for mapping, but required by API shape
+                    display_text=r"app://\?nav=(.*)" # Not strictly used for mapping, but required by API shape
                 ),
                 "Link": st.column_config.LinkColumn(
                     "Theme / Index",
-                    display_text=r"/?nav=([^&]+)",
+                    display_text=r"app://\?nav=([^&]+)",
                     help="Click to view detailed constituents"
                 )
             },
