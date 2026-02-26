@@ -663,7 +663,7 @@ elif category == "Performance Overview":
         st.dataframe(
             perf_summary.style.map(color_return, subset=numeric_cols).format(safe_format, subset=numeric_cols),
             height=2300,
-            width="stretch",
+            use_container_width=False,
             hide_index=True
         )
 
@@ -737,7 +737,7 @@ else:
             def color_ret(val):
                 if pd.isna(val): return ""
                 return f'color: {"#22c55e" if val >= 0 else "#ef4444"}; font-weight: bold'
-            st.dataframe(perf_df.style.map(color_ret).format("{:.2f}%"), width="stretch", hide_index=True)
+            st.dataframe(perf_df.style.map(color_ret).format("{:.2f}%"), use_container_width=False, hide_index=True)
 
         tab1, tab2 = st.tabs(["Breadth Chart", "Constituents"])
         with tab1:
@@ -781,7 +781,7 @@ else:
                     if details['above']:
                         df_up = pd.DataFrame(details['above'], columns=["Ticker"])
                         df_up["Ticker"] = df_up["Ticker"].apply(make_tv_url)
-                        st.dataframe(df_up, column_config={"Ticker": tv_link_config}, width="stretch", hide_index=True)
+                        st.dataframe(df_up, column_config={"Ticker": tv_link_config}, use_container_width=False, hide_index=True)
                     else:
                         st.caption("None")
                         
@@ -790,7 +790,7 @@ else:
                     if details['below']:
                         df_down = pd.DataFrame(details['below'], columns=["Ticker"])
                         df_down["Ticker"] = df_down["Ticker"].apply(make_tv_url)
-                        st.dataframe(df_down, column_config={"Ticker": tv_link_config}, width="stretch", hide_index=True)
+                        st.dataframe(df_down, column_config={"Ticker": tv_link_config}, use_container_width=False, hide_index=True)
                     else:
                         st.caption("None")
                 
@@ -799,7 +799,7 @@ else:
                     st.warning(f"🆕 New Stock — Insufficient History for 200 SMA ({len(new_stocks)})")
                     df_new = pd.DataFrame(new_stocks, columns=["Ticker"])
                     df_new["Ticker"] = df_new["Ticker"].apply(make_tv_url)
-                    st.dataframe(df_new, column_config={"Ticker": tv_link_config}, width="stretch", hide_index=True)
+                    st.dataframe(df_new, column_config={"Ticker": tv_link_config}, use_container_width=False, hide_index=True)
 
         with tab2:
             st.subheader(f"Constituents of {current_config['title']}")
@@ -907,7 +907,7 @@ else:
                         column_config={
                             "Ticker": tv_link_config,
                         },
-                        use_container_width=True,
+                        use_container_width=False,
                         hide_index=True,
                         height=600
                     )
@@ -952,7 +952,7 @@ else:
                     st.dataframe(
                         df_fallback, 
                         column_config={"Ticker Symbol": tv_link_config},
-                        width="stretch", 
+                        use_container_width=False, 
                         hide_index=True
                     )
                 else:
