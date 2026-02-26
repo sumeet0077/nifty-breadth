@@ -184,48 +184,56 @@ def load_constituent_performance():
 
 def render_styled_dataframe(styler, height="600px"):
     """Renders a pandas Styler as raw HTML to completely bypass Streamlit's Glide Data Grid layout jumping on mobile."""
+    import textwrap
     styler = styler.hide(axis="index")
-    html = styler.to_html()
+    html_table = styler.to_html()
     
-    css = f"""
-    <style>
-    .custom-table-wrapper {{
-        max-height: {height};
-        overflow: auto;
-        border-radius: 4px;
-        border: 1px solid #333;
-        margin-bottom: 1rem;
-    }}
-    .custom-table-wrapper table {{
-        width: 100%;
-        border-collapse: collapse;
-        font-family: "Source Sans Pro", sans-serif;
-        color: #fafafa;
-        font-size: 14px;
-        text-align: right;
-    }}
-    .custom-table-wrapper th {{
-        background-color: #0e1117;
-        position: sticky;
-        top: 0;
-        padding: 8px 12px;
-        border-bottom: 1px solid #333;
-        text-align: right;
-        z-index: 1;
-    }}
-    .custom-table-wrapper th:first-child, .custom-table-wrapper td:first-child {{
-        text-align: left;
-    }}
-    .custom-table-wrapper td {{
-        padding: 8px 12px;
-        border-bottom: 1px solid #222;
-    }}
-    .custom-table-wrapper tr:hover {{
-        background-color: #262730;
-    }}
-    </style>
-    """
-    st.markdown(css + f'<div class="custom-table-wrapper">{html}</div>', unsafe_allow_html=True)
+    css = textwrap.dedent(f"""
+        <style>
+        .custom-table-wrapper {{
+            max-height: {height};
+            overflow: auto;
+            border-radius: 4px;
+            border: 1px solid #333;
+            margin-bottom: 1rem;
+        }}
+        .custom-table-wrapper table {{
+            width: 100%;
+            border-collapse: collapse;
+            font-family: "Source Sans Pro", sans-serif;
+            color: #fafafa;
+            font-size: 14px;
+            text-align: right;
+        }}
+        .custom-table-wrapper th {{
+            background-color: #0e1117;
+            position: sticky;
+            top: 0;
+            padding: 8px 12px;
+            border-bottom: 1px solid #333;
+            text-align: right;
+            z-index: 1;
+        }}
+        .custom-table-wrapper th:first-child, .custom-table-wrapper td:first-child {{
+            text-align: left;
+        }}
+        .custom-table-wrapper td {{
+            padding: 8px 12px;
+            border-bottom: 1px solid #222;
+        }}
+        .custom-table-wrapper tr:hover {{
+            background-color: #262730;
+        }}
+        </style>
+    """)
+    
+    final_html = css + f'<div class="custom-table-wrapper">{html_table}</div>'
+    
+    # st.html was introduced in st >= 1.34 to natively render raw HTML
+    if hasattr(st, "html"):
+        st.html(final_html)
+    else:
+        st.markdown(final_html, unsafe_allow_html=True)
 
 
 @st.cache_data(ttl=3600)
