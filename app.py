@@ -182,59 +182,6 @@ def load_constituent_performance():
     except FileNotFoundError:
         return {}
 
-def render_styled_dataframe(styler, height="600px"):
-    """Renders a pandas Styler as raw HTML to completely bypass Streamlit's Glide Data Grid layout jumping on mobile."""
-    import textwrap
-    styler = styler.hide(axis="index")
-    html_table = styler.to_html()
-    
-    css = textwrap.dedent(f"""
-        <style>
-        .custom-table-wrapper {{
-            max-height: {height};
-            overflow: auto;
-            border-radius: 4px;
-            border: 1px solid #333;
-            margin-bottom: 1rem;
-        }}
-        .custom-table-wrapper table {{
-            width: 100%;
-            border-collapse: collapse;
-            font-family: "Source Sans Pro", sans-serif;
-            color: #fafafa;
-            font-size: 14px;
-            text-align: right;
-        }}
-        .custom-table-wrapper th {{
-            background-color: #0e1117;
-            position: sticky;
-            top: 0;
-            padding: 8px 12px;
-            border-bottom: 1px solid #333;
-            text-align: right;
-            z-index: 1;
-        }}
-        .custom-table-wrapper th:first-child, .custom-table-wrapper td:first-child {{
-            text-align: left;
-        }}
-        .custom-table-wrapper td {{
-            padding: 8px 12px;
-            border-bottom: 1px solid #222;
-        }}
-        .custom-table-wrapper tr:hover {{
-            background-color: #262730;
-        }}
-        </style>
-    """)
-    
-    final_html = css + f'<div class="custom-table-wrapper">{html_table}</div>'
-    
-    # st.html was introduced in st >= 1.34 to natively render raw HTML
-    if hasattr(st, "html"):
-        st.html(final_html)
-    else:
-        st.markdown(final_html, unsafe_allow_html=True)
-
 
 @st.cache_data(ttl=3600)
 def get_performance_summary_v3(config_map):
@@ -714,7 +661,12 @@ elif category == "Performance Overview":
         numeric_cols = [c for c in perf_summary.columns if c != "Theme/Index"]
 
         styler = perf_summary.style.map(color_return, subset=numeric_cols).format(safe_format, subset=numeric_cols)
-        render_styled_dataframe(styler, height="80vh")
+        st.dataframe(
+            styler,
+            height=2300,
+            use_container_width=True,
+            hide_index=True
+        )
 
 else:
     # Single Index View logic
@@ -786,7 +738,7 @@ else:
             def color_ret(val):
                 if pd.isna(val): return ""
                 return f'color: {"#22c55e" if val >= 0 else "#ef4444"}; font-weight: bold'
-            render_styled_dataframe(perf_df.style.map(color_ret).format("{:.2f}%"), height="150px")
+            st.dataframe(perf_df.style.map(color_ret).format("{:.2f}%"), use_container_width=True, hide_index=True)
 
         tab1, tab2 = st.tabs(["Breadth Chart", "Constituents"])
         with tab1:
@@ -952,7 +904,15 @@ else:
                         lambda x: f"color: {'#22c55e' if x > 0 else '#ef4444' if x < 0 else 'gray'}; font-family: monospace" if pd.notnull(x) else "",
                         subset=["1D", "1W", "1M", "3M", "6M", "1Y", "3Y", "5Y", "RS (20D)"]
                     )
-                    render_styled_dataframe(styler, height="600px")
+                    st.dataframe(
+                        styler,
+                        column_config={
+                            "Ticker": tv_link_config,
+                        },
+                        use_container_width=True,
+                        hide_index=True,
+                        height=600
+                    )
                 else:
                     st.warning("No constituent performance data available.")
             else:
