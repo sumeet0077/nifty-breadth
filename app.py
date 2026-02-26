@@ -182,6 +182,51 @@ def load_constituent_performance():
     except FileNotFoundError:
         return {}
 
+def render_styled_dataframe(styler, height="600px"):
+    """Renders a pandas Styler as raw HTML to completely bypass Streamlit's Glide Data Grid layout jumping on mobile."""
+    styler = styler.hide(axis="index")
+    html = styler.to_html()
+    
+    css = f"""
+    <style>
+    .custom-table-wrapper {{
+        max-height: {height};
+        overflow: auto;
+        border-radius: 4px;
+        border: 1px solid #333;
+        margin-bottom: 1rem;
+    }}
+    .custom-table-wrapper table {{
+        width: 100%;
+        border-collapse: collapse;
+        font-family: "Source Sans Pro", sans-serif;
+        color: #fafafa;
+        font-size: 14px;
+        text-align: right;
+    }}
+    .custom-table-wrapper th {{
+        background-color: #0e1117;
+        position: sticky;
+        top: 0;
+        padding: 8px 12px;
+        border-bottom: 1px solid #333;
+        text-align: right;
+        z-index: 1;
+    }}
+    .custom-table-wrapper th:first-child, .custom-table-wrapper td:first-child {{
+        text-align: left;
+    }}
+    .custom-table-wrapper td {{
+        padding: 8px 12px;
+        border-bottom: 1px solid #222;
+    }}
+    .custom-table-wrapper tr:hover {{
+        background-color: #262730;
+    }}
+    </style>
+    """
+    st.markdown(css + f'<div class="custom-table-wrapper">{html}</div>', unsafe_allow_html=True)
+
 
 @st.cache_data(ttl=3600)
 def get_performance_summary_v3(config_map):
@@ -660,12 +705,8 @@ elif category == "Performance Overview":
             
         numeric_cols = [c for c in perf_summary.columns if c != "Theme/Index"]
 
-        st.dataframe(
-            perf_summary.style.map(color_return, subset=numeric_cols).format(safe_format, subset=numeric_cols),
-            height=2300,
-            use_container_width=False,
-            hide_index=True
-        )
+        styler = perf_summary.style.map(color_return, subset=numeric_cols).format(safe_format, subset=numeric_cols)
+        render_styled_dataframe(styler, height="80vh")
 
 else:
     # Single Index View logic
@@ -737,7 +778,7 @@ else:
             def color_ret(val):
                 if pd.isna(val): return ""
                 return f'color: {"#22c55e" if val >= 0 else "#ef4444"}; font-weight: bold'
-            st.dataframe(perf_df.style.map(color_ret).format("{:.2f}%"), use_container_width=False, hide_index=True)
+            render_styled_dataframe(perf_df.style.map(color_ret).format("{:.2f}%"), height="150px")
 
         tab1, tab2 = st.tabs(["Breadth Chart", "Constituents"])
         with tab1:
@@ -888,29 +929,22 @@ else:
                 df_perf = pd.DataFrame(rows, columns=columns_list)
                 
                 if not df_perf.empty:
-                    # Apply aesthetic number styling via styling configuration
-                    st.dataframe(
-                        df_perf.style.format({
-                            "1D": "{:+.2f}%", 
-                            "1W": "{:+.2f}%", 
-                            "1M": "{:+.2f}%", 
-                            "3M": "{:+.2f}%", 
-                            "6M": "{:+.2f}%",
-                            "1Y": "{:+.2f}%",
-                            "3Y": "{:+.2f}%",
-                            "5Y": "{:+.2f}%",
-                            "RS (20D)": "{:+.2f}%"
-                        }).applymap(
-                            lambda x: f"color: {'#22c55e' if x > 0 else '#ef4444' if x < 0 else 'gray'}; font-family: monospace" if pd.notnull(x) else "",
-                            subset=["1D", "1W", "1M", "3M", "6M", "1Y", "3Y", "5Y", "RS (20D)"]
-                        ),
-                        column_config={
-                            "Ticker": tv_link_config,
-                        },
-                        use_container_width=False,
-                        hide_index=True,
-                        height=600
+                    # Apply aesthetic number styling natively via HTML to bypass Data Grid bugs
+                    styler = df_perf.style.format({
+                        "1D": "{:+.2f}%", 
+                        "1W": "{:+.2f}%", 
+                        "1M": "{:+.2f}%", 
+                        "3M": "{:+.2f}%", 
+                        "6M": "{:+.2f}%",
+                        "1Y": "{:+.2f}%",
+                        "3Y": "{:+.2f}%",
+                        "5Y": "{:+.2f}%",
+                        "RS (20D)": "{:+.2f}%"
+                    }).map(
+                        lambda x: f"color: {'#22c55e' if x > 0 else '#ef4444' if x < 0 else 'gray'}; font-family: monospace" if pd.notnull(x) else "",
+                        subset=["1D", "1W", "1M", "3M", "6M", "1Y", "3Y", "5Y", "RS (20D)"]
                     )
+                    render_styled_dataframe(styler, height="600px")
                 else:
                     st.warning("No constituent performance data available.")
             else:
