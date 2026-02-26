@@ -13,6 +13,7 @@
             "EICHERMOT.NS",
             "GRASIM.NS",
             "HINDALCO.NS",
+            "ICICIBANK.NS",
             "JSWSTEEL.NS",
             "KOTAKBANK.NS",
             "LT.NS",
@@ -41,7 +42,6 @@
             "HDFCBANK.NS",
             "HDFCLIFE.NS",
             "HINDUNILVR.NS",
-            "ICICIBANK.NS",
             "INDIGO.NS",
             "INFY.NS",
             "ITC.NS",
@@ -72,6 +72,7 @@
             "ALKEM.NS",
             "AMBER.NS",
             "ANANDRATHI.NS",
+            "ANGELONE.NS",
             "APARINDS.NS",
             "APLAPOLLO.NS",
             "APOLLOHOSP.NS",
@@ -123,10 +124,10 @@
             "EICHERMOT.NS",
             "ELGIEQUIP.NS",
             "EMCURE.NS",
-            "ENDURANCE.NS",
             "ENGINERSIN.NS",
             "ESCORTS.NS",
             "FEDERALBNK.NS",
+            "FINCABLES.NS",
             "FORCEMOT.NS",
             "FORTIS.NS",
             "GESHIP.NS",
@@ -148,9 +149,9 @@
             "HINDCOPPER.NS",
             "HINDPETRO.NS",
             "HINDZINC.NS",
-            "HOMEFIRST.NS",
             "HONASA.NS",
             "HSCL.NS",
+            "ICICIBANK.NS",
             "ICICIGI.NS",
             "ICICIPRULI.NS",
             "IDBI.NS",
@@ -208,7 +209,6 @@
             "ONGC.NS",
             "PETRONET.NS",
             "PFC.NS",
-            "PFIZER.NS",
             "PHOENIXLTD.NS",
             "PIDILITIND.NS",
             "PNB.NS",
@@ -281,7 +281,6 @@
             "ALOKINDS.NS",
             "AMBUJACEM.NS",
             "ANANTRAJ.NS",
-            "ANGELONE.NS",
             "APLLTD.NS",
             "APOLLOTYRE.NS",
             "APTUS.NS",
@@ -347,12 +346,12 @@
             "EIHOTEL.NS",
             "ELECON.NS",
             "EMAMILTD.NS",
+            "ENDURANCE.NS",
             "ENRIN.NS",
             "ERIS.NS",
             "ETERNAL.NS",
             "EXIDEIND.NS",
             "FACT.NS",
-            "FINCABLES.NS",
             "FINPIPE.NS",
             "FIRSTCRY.NS",
             "FIVESTAR.NS",
@@ -380,10 +379,10 @@
             "HEXT.NS",
             "HFCL.NS",
             "HINDUNILVR.NS",
+            "HOMEFIRST.NS",
             "HONAUT.NS",
             "HUDCO.NS",
             "HYUNDAI.NS",
-            "ICICIBANK.NS",
             "IDFCFIRSTB.NS",
             "IEX.NS",
             "IGIL.NS",
@@ -476,6 +475,7 @@
             "PAYTM.NS",
             "PCBL.NS",
             "PERSISTENT.NS",
+            "PFIZER.NS",
             "PGEL.NS",
             "PGHH.NS",
             "PIIND.NS",
@@ -570,6 +570,7 @@
             "ABSLAMC.NS",
             "AMBER.NS",
             "ANANDRATHI.NS",
+            "ANGELONE.NS",
             "ASAHIINDIA.NS",
             "ASTERDM.NS",
             "ATHERENERG.NS",
@@ -588,6 +589,7 @@
             "ELGIEQUIP.NS",
             "EMCURE.NS",
             "ENGINERSIN.NS",
+            "FINCABLES.NS",
             "FORCEMOT.NS",
             "GESHIP.NS",
             "GLAND.NS",
@@ -597,7 +599,6 @@
             "GRAPHITE.NS",
             "HEG.NS",
             "HINDCOPPER.NS",
-            "HOMEFIRST.NS",
             "HONASA.NS",
             "HSCL.NS",
             "IFCI.NS",
@@ -620,7 +621,6 @@
             "NAVINFLUOR.NS",
             "NETWEB.NS",
             "NH.NS",
-            "PFIZER.NS",
             "POONAWALLA.NS",
             "PTCIL.NS",
             "RAMCOCEM.NS",
@@ -660,7 +660,6 @@
             "ALKYLAMINE.NS",
             "ALOKINDS.NS",
             "ANANTRAJ.NS",
-            "ANGELONE.NS",
             "APLLTD.NS",
             "APTUS.NS",
             "ARE&M.BO",
@@ -707,7 +706,6 @@
             "ELECON.NS",
             "EMAMILTD.NS",
             "ERIS.NS",
-            "FINCABLES.NS",
             "FINPIPE.NS",
             "FIRSTCRY.NS",
             "FIVESTAR.NS",
@@ -721,6 +719,7 @@
             "HAPPSTMNDS.NS",
             "HBLENGINE.BO",
             "HFCL.NS",
+            "HOMEFIRST.NS",
             "IEX.NS",
             "IGIL.NS",
             "IKS.NS",
@@ -770,6 +769,7 @@
             "OLECTRA.NS",
             "ONESOURCE.NS",
             "PCBL.NS",
+            "PFIZER.NS",
             "PGEL.NS",
             "PNBHOUSING.NS",
             "POLYMED.NS",
@@ -851,6 +851,7 @@
             "BANKBARODA.NS",
             "CANBK.NS",
             "FEDERALBNK.NS",
+            "ICICIBANK.NS",
             "INDUSINDBK.NS",
             "KOTAKBANK.NS",
             "PNB.NS",
@@ -859,7 +860,6 @@
         ],
         "below": [
             "HDFCBANK.NS",
-            "ICICIBANK.NS",
             "IDFCFIRSTB.NS",
             "YESBANK.NS"
         ],
@@ -872,6 +872,7 @@
             "BAJFINANCE.NS",
             "BSE.NS",
             "CHOLAFIN.NS",
+            "ICICIBANK.NS",
             "ICICIGI.NS",
             "ICICIPRULI.NS",
             "KOTAKBANK.NS",
@@ -884,7 +885,6 @@
         "below": [
             "HDFCBANK.NS",
             "HDFCLIFE.NS",
-            "ICICIBANK.NS",
             "JIOFIN.NS",
             "LICHSGFIN.NS",
             "RECLTD.NS",
@@ -1028,13 +1028,13 @@
             "AXISBANK.NS",
             "BANDHANBNK.NS",
             "FEDERALBNK.NS",
+            "ICICIBANK.NS",
             "INDUSINDBK.NS",
             "KOTAKBANK.NS",
             "RBLBANK.NS"
         ],
         "below": [
             "HDFCBANK.NS",
-            "ICICIBANK.NS",
             "IDFCFIRSTB.NS",
             "YESBANK.NS"
         ],
@@ -1190,14 +1190,14 @@
     "Capital Market": {
         "above": [
             "BSE.NS",
-            "MCX.NS"
+            "MCX.NS",
+            "ANGELONE.NS"
         ],
         "below": [
             "IEX.NS",
             "CDSL.NS",
             "CAMS.NS",
             "KFINTECH.NS",
-            "ANGELONE.NS",
             "MOTILALOFS.NS",
             "IIFLCAPS.BO",
             "GEOJITFSL.NS",
@@ -1243,11 +1243,12 @@
         "new_stock": []
     },
     "Data Centres": {
-        "above": [],
+        "above": [
+            "E2E.NS"
+        ],
         "below": [
             "RELIANCE.NS",
-            "TATACOMM.NS",
-            "E2E.NS"
+            "TATACOMM.NS"
         ],
         "new_stock": []
     },
@@ -1359,7 +1360,6 @@
     "Housing Finance": {
         "above": [
             "CANFINHOME.NS",
-            "HOMEFIRST.NS",
             "SAMMAANCAP.NS"
         ],
         "below": [
@@ -1368,6 +1368,7 @@
             "BAJAJHFL.NS",
             "AADHARHFC.NS",
             "HUDCO.NS",
+            "HOMEFIRST.NS",
             "AAVAS.NS",
             "APTUS.NS",
             "INDIASHLTR.NS",
@@ -1588,6 +1589,7 @@
     },
     "Private Banking": {
         "above": [
+            "ICICIBANK.NS",
             "AXISBANK.NS",
             "KOTAKBANK.NS",
             "INDUSINDBK.NS",
@@ -1597,7 +1599,6 @@
         ],
         "below": [
             "HDFCBANK.NS",
-            "ICICIBANK.NS",
             "IDFCFIRSTB.NS",
             "YESBANK.NS"
         ],
