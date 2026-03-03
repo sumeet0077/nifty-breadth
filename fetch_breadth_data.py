@@ -225,6 +225,24 @@ def fetch_historical_data(tickers, start_date="2014-01-01"):
         except Exception as e:
             print(f"Error injecting stitched KWIL data: {e}")
     # ==========================================
+
+    # === CUSTOM STITCHING LOGIC FOR LTM.NS (formerly LTIM.NS) ===
+    if "LTM.NS" in full_data.columns and os.path.exists("stitched_ltm_history.csv"):
+        print("Injecting stitched history for LTM.NS (from LTIM.NS)...")
+        try:
+            stitched_df = pd.read_csv("stitched_ltm_history.csv")
+            stitched_df['Date'] = pd.to_datetime(stitched_df['Date'])
+            stitched_df.set_index('Date', inplace=True)
+            stitched_series = stitched_df['Close']
+            
+            full_data = full_data.reindex(full_data.index.union(stitched_series.index))
+            full_data['LTM.NS'] = full_data['LTM.NS'].combine_first(stitched_series)
+            
+            full_data.sort_index(inplace=True)
+            print(f"Injected {len(stitched_series)} rows for LTM.NS")
+            
+        except Exception as e:
+            print(f"Error injecting stitched LTM data: {e}")
     # ==========================================
     
     return full_data
