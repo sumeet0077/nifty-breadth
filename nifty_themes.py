@@ -191,7 +191,7 @@ THEMES = {
     ],
     # 42
     "Silver": [
-        "HINDZINC.NS", "VEDL.NS", "NATIONALUM.NS", "KALYANKJIL.NS", "THANGAMAYL.NS", 
+        "HINDZINC.NS", "VEDL.NS", "KALYANKJIL.NS", "THANGAMAYL.NS", 
         "GOLDIAM.NS"
     ],
     # 43
