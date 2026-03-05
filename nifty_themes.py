@@ -153,7 +153,7 @@ THEMES = {
     "NBFC": [
         "BAJFINANCE.NS", "SHRIRAMFIN.NS", "CHOLAFIN.NS", "MUTHOOTFIN.NS", "PFC.NS", 
         "RECLTD.NS", "LICHSGFIN.NS", "M&MFIN.NS", "MANAPPURAM.NS", "POONAWALLA.NS", 
-        "SUNDARMFIN.NS", "CGCL.NS"
+        "SUNDARMFIN.NS", "CGCL.NS", "PEL.NS"
     ],
     # 34
     "Textiles": [
@@ -178,7 +178,13 @@ THEMES = {
     ],
     # 39
     "Luxury": [
-        "TITAN.NS", "PAGEIND.NS", "ABFRL.NS", "ETHOSLTD.NS", "LUXIND.NS", "KALYANKJIL.NS"
+        "TITAN.NS", "TRENT.NS", "KALYANKJIL.NS", "ETHOSLTD.NS", "SULA.NS",
+        "LANDMARK.NS", "SJVN.NS"
+    ],
+    "Sugar": [
+        "EIDPARRY.NS", "BALRAMCHIN.NS", "TRIVENI.NS", "RENUKA.NS", "BANNARI.NS", 
+        "DALMIASUG.NS", "DHAMPURSUG.NS", "DBOL.NS", "AVADHSUGAR.NS", "UGARSUGAR.NS",
+        "DCMNVL.NS", "UTTAMSUGAR.NS", "KM SUGAR.NS", "BAJAJHIND.NS"
     ],
     # 40
     "Green Hydrogen": [
@@ -226,5 +232,18 @@ THEMES = {
     "Alcohols & Breweries": [
         "UNITDSPR.BO", "UBL.NS", "RADICO.NS", "GLOBUSSPR.NS", "TI.NS", 
         "SULA.NS", "SDBL.NS", "PICCADIL.NS", "ASALCBR.NS"
+    ],
+    # 50
+    "Auto Ancillary": [
+        "MOTHERSON.NS", "BOSCHLTD.NS", "BHARATFORG.NS", "UNOMINDA.NS", "TIINDIA.NS", 
+        "SCHAEFFLER.NS", "SONACOMS.NS", "ENDURANCE.NS", "MSUMI.NS", "SUNDRMFAST.NS", 
+        "CIEINDIA.NS", "ZFCVINDIA.NS", "CRAFTSMAN.NS", "EXIDEIND.NS", "ARE&M.NS", 
+        "GABRIEL.NS", "PRICOL.NS", "SUPRAJIT.NS", "LUMAXTECH.NS", "MINDACORP.NS", 
+        "SANSERA.NS"
+    ],
+    # 51
+    "Tyres & Rubber Products": [
+        "MRF.NS", "BALKRISIND.NS", "APOLLOTYRE.NS", "CEATLTD.NS", "JKTYRE.NS", 
+        "TVSSRICHAK.NS", "GOODYEAR.NS", "TOLINS.NS", "VIAZ.NS", "MODIRUBBER.NS"
     ]
 }
