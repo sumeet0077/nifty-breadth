@@ -152,13 +152,14 @@ def fetch_historical_data(tickers, start_date="2014-01-01"):
             
         # --- SELF-HEALING ANOMALY DETECTION (STOCK SPLITS/DEMERGERS) ---
         # If the Parquet DB hasn't adjusted a very recent stock split, it will look like a massive crash.
-        # We detect >60% overnight drops in the last 15 days, and use yfinance to surgically overwrite the column.
+        # We detect >45% overnight drops (to catch 1:2 splits but safely ignore market crashes) 
+        # in the last 15 days, and use yfinance to surgically overwrite the column temporarily.
         recent_df = pivot_df.tail(15)
         pct_returns = recent_df.pct_change()
         split_anomalies = []
         
         for col in pct_returns.columns:
-            if (pct_returns[col] < -0.60).any():
+            if (pct_returns[col] < -0.45).any():
                 split_anomalies.append(col)
                 
         if split_anomalies:
