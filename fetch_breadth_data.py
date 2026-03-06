@@ -104,86 +104,57 @@ def get_index_tickers(index_name):
     return []
 
 def fetch_historical_data(tickers, start_date="2014-01-01"):
-    """Fetch historical data for tickers in chunks."""
-    chunk_size = 50
-    all_close_prices = []
+    """Fetch historical data for tickers using local adjusted Parquet database."""
     
-    print(f"Starting data download for {len(tickers)} stocks from {start_date}...")
+    parquet_path = "/Users/sumeetdas/Antigravity_NSE_Data/nse_master_adjusted_2014_onwards.parquet"
     
-    for i in range(0, len(tickers), chunk_size):
-        chunk = tickers[i:i+chunk_size]
-        print(f"Downloading batch {i//chunk_size + 1}/{(len(tickers)-1)//chunk_size + 1} ({len(chunk)} stocks)...")
+    print(f"Starting data scan for {len(tickers)} stocks from {start_date} from Local Parquet Database...")
+    
+    import pyarrow as pa
+    import pyarrow.dataset as ds
+    import pandas as pd
+    
+    # Clean tickers from yfinance suffixes (.NS, .BO) for our local database
+    clean_tickers = [t.replace('.NS', '').replace('.BO', '') for t in tickers]
+    
+    # Convert start_date string to datetime/timestamp for pyarrow filtering
+    start_dt = pd.to_datetime(start_date)
+    
+    try:
+        dataset = ds.dataset(parquet_path, format="parquet", partitioning="hive")
         
-        try:
-            # Ticker strings need to be space-separated
-            data = yf.download(
-                chunk, 
-                start=start_date, 
-                group_by='ticker', 
-                threads=True, 
-                progress=False,
-                auto_adjust=True
-            )
+        # We only need trade_date, symbol, and adj_close to build our history tables
+        columns_to_read = ['trade_date', 'symbol', 'series', 'adj_close']
+        
+        # Filter for our specific symbols AND dates >= start_date AND series == 'EQ' (Equity only, ignore NCDs/Bonds)
+        filter_expr = (ds.field('symbol').isin(clean_tickers)) & (ds.field('trade_date') >= pa.scalar(start_dt)) & (ds.field('series') == 'EQ')
+        
+        # Read the filtered table
+        table = dataset.to_table(columns=columns_to_read, filter=filter_expr)
+        df = table.to_pandas()
+        
+        # Cast float32 to float64 to ensure json.dump can serialize the final performance calculations
+        df['adj_close'] = df['adj_close'].astype(float)
+        
+        if df.empty:
+            return pd.DataFrame()
             
-            # Extract Close prices
-            close_df = pd.DataFrame()
+        # Reconstruct the expected 'TICKER.NS' strings to perfectly match downstream pipeline
+        df['ticker_with_suffix'] = df['symbol'].astype(str) + '.NS'
+        
+        # Pivot the dataframe so that we get a Date Index with Ticker columns containing Adj Close
+        pivot_df = df.pivot_table(index='trade_date', columns='ticker_with_suffix', values='adj_close')
+        pivot_df.index.name = 'Date'
+        
+        # Ensure the index is timezone-naive just to be safe
+        if pivot_df.index.tz is not None:
+            pivot_df.index = pivot_df.index.tz_localize(None)
             
-            if len(chunk) == 1:
-                # Specific handling for single ticker
-                ticker = chunk[0]
-                if not data.empty:
-                    if isinstance(data.columns, pd.MultiIndex):
-                        # yfinance with group_by='ticker' uses (Ticker, Price) layout
-                        if ticker in data.columns.get_level_values(0):
-                            close_df[ticker] = data[ticker]['Close']
-                        elif 'Close' in data.columns.get_level_values(0):
-                            close_df[ticker] = data['Close'].iloc[:, 0]
-                    else:
-                        if 'Close' in data.columns:
-                            close_df[ticker] = data['Close']
-            else:
-                for ticker in chunk:
-                    try:
-                        # Handle both MultiIndex and flat columns
-                        if isinstance(data.columns, pd.MultiIndex):
-                            if ticker in data.columns.get_level_values(0):
-                                ticker_data = data[ticker]
-                                if 'Close' in ticker_data.columns:
-                                    close_df[ticker] = ticker_data['Close']
-                            elif ticker in data.columns.get_level_values(1):
-                                # Alternative layout: ('Close', 'TICKER')
-                                if 'Close' in data.columns.get_level_values(0):
-                                    close_df[ticker] = data['Close'][ticker]
-                        else:
-                            if 'Close' in data.columns:
-                                close_df[ticker] = data['Close']
-                    except Exception as e:
-                        pass # Ticker might not be in response
-            
-            # Clean up: remove columns that are all NaN
-            close_df.dropna(axis=1, how='all', inplace=True)
-            
-            if not close_df.empty:
-                all_close_prices.append(close_df)
-                
-            time.sleep(1) # Polite delay
-            
-        except Exception as e:
-            print(f"Failed to download batch {i}: {e}")
-            
-    if not all_close_prices:
+        full_data = pivot_df
+        
+    except Exception as e:
+        print(f"Failed to scan Parquet database: {e}")
         return pd.DataFrame()
-        
-    # Combine all batches
-    print("Combining data...")
-    full_data = pd.concat(all_close_prices, axis=1)
-    
-    # Sort index (dates)
-    full_data.sort_index(inplace=True)
-    
-    # Ensure index is timezone-naive to prevent mismatch with CSV data
-    if full_data.index.tz is not None:
-        full_data.index = full_data.index.tz_localize(None)
 
     # === CUSTOM STITCHING LOGIC FOR TMPV.NS ===
     if "TMPV.NS" in full_data.columns and os.path.exists("stitched_tmpv_history.csv"):

@@ -153,7 +153,7 @@ THEMES = {
     "NBFC": [
         "BAJFINANCE.NS", "SHRIRAMFIN.NS", "CHOLAFIN.NS", "MUTHOOTFIN.NS", "PFC.NS", 
         "RECLTD.NS", "LICHSGFIN.NS", "M&MFIN.NS", "MANAPPURAM.NS", "POONAWALLA.NS", 
-        "SUNDARMFIN.NS", "CGCL.NS", "PEL.NS"
+        "SUNDARMFIN.NS", "CGCL.NS", "PIRAMALFIN.NS"
     ],
     # 34
     "Textiles": [

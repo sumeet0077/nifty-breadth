@@ -1,0 +1,5 @@
+.venv
+.venv_recovery
+__pycache__
+*.csv
+Bhavcopies
