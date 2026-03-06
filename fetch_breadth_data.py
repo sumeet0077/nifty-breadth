@@ -150,6 +150,46 @@ def fetch_historical_data(tickers, start_date="2014-01-01"):
         if pivot_df.index.tz is not None:
             pivot_df.index = pivot_df.index.tz_localize(None)
             
+        # --- SELF-HEALING ANOMALY DETECTION (STOCK SPLITS/DEMERGERS) ---
+        # If the Parquet DB hasn't adjusted a very recent stock split, it will look like a massive crash.
+        # We detect >60% overnight drops in the last 15 days, and use yfinance to surgically overwrite the column.
+        recent_df = pivot_df.tail(15)
+        pct_returns = recent_df.pct_change()
+        split_anomalies = []
+        
+        for col in pct_returns.columns:
+            if (pct_returns[col] < -0.60).any():
+                split_anomalies.append(col)
+                
+        if split_anomalies:
+            print(f"Self-Healing Triggered: Detected massive corporate action anomalies for {split_anomalies}")
+            for ticker in split_anomalies:
+                try:
+                    print(f"Fetching adjusted history for {ticker} from Yahoo Finance fallback...")
+                    # Fetch 5 years to correctly recalibrate 5Y Return metrics
+                    yf_data = yf.download(ticker, start=pivot_df.index[0], end=pivot_df.index[-1] + pd.Timedelta(days=1), progress=False, auto_adjust=True)
+                    if not yf_data.empty:
+                        if ticker in yf_data.columns.get_level_values(0):
+                            clean_series = yf_data[ticker]['Close']
+                        elif 'Close' in yf_data.columns.get_level_values(0):
+                            clean_series = yf_data['Close'].iloc[:, 0]
+                        elif 'Close' in yf_data.columns:
+                            clean_series = yf_data['Close']
+                        else:
+                            continue
+                            
+                        if clean_series.index.tz is not None:
+                            clean_series.index = clean_series.index.tz_localize(None)
+                        
+                        # Reindex clean_series perfectly to the Parquet dates to capture special weekend trading dates.
+                        # Forward-fill any YFinance missing dates using the previous trading day's true adjusted price.
+                        clean_series = clean_series.reindex(pivot_df.index).ffill().bfill()
+                        
+                        # Overwrite the broken Parquet column with the newly adjusted history securely
+                        pivot_df[ticker] = clean_series
+                except Exception as e:
+                    print(f"Failed to apply fallback for {ticker}: {e}")
+                    
         full_data = pivot_df
         
     except Exception as e:
