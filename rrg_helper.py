@@ -18,7 +18,7 @@ class RRGCalculator:
             return df
             
         # Resample to business end of frequency
-        rule = 'W-FRI' if timeframe == 'W' else 'M'
+        rule = 'W-FRI' if timeframe == 'W' else 'ME'
         
         # Resample Close using 'last'
         resampled = df.resample(rule).last()

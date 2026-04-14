@@ -31,25 +31,13 @@ def get_tickers_from_url(url):
                 
                 # Ticker transformations for Yahoo Finance compatibility
                 overrides = {
-                    "ARE&M": "ARE&M.BO",
-                    "KPIL": "KPIL.BO",
-                    "ADANIENSOL": "ADANIENSOL.BO",
-                    "LTFOODS": "LTFOODS.BO",
-                    "AIIL": "AIIL.BO",
-                    "AEGISLOG": "AEGISLOG.BO",
-                    "UNITDSPR": "UNITDSPR.BO",
-                    "HBLENGINE": "HBLENGINE.BO",
-                    "COHANCE": "COHANCE.BO",
-                    "TMPV": "TMPV.BO"
+                    "LTM": "LTIM.NS"
                 }
-                
+
                 if t in overrides:
                     cleaned_tickers.append(overrides[t])
                     continue
 
-                if t == "TMPV": 
-                    cleaned_tickers.append("TMPV.NS") 
-                    continue
                 if t == "KWIL":
                     cleaned_tickers.append("KWIL.NS")
                     continue
@@ -108,6 +96,47 @@ def fetch_historical_data(tickers, start_date="2014-01-01"):
     
     parquet_path = "/Users/sumeetdas/Antigravity_NSE_Data/nse_master_adjusted_2014_onwards.parquet"
     
+    # ── Symbol Alias Map (Support One-to-Many) ──────────────────────────
+    # Format: { "OLD_HISTORICAL_SYMBOL": ["CANONICAL_SYMBOL_1", ...] }
+    # This allows demergers (TATAMOTORS -> TMPV, TMCV) and name changes
+    # to be bridged seamlessly for continuous 5-year data.
+    # ── Symbol Alias Map (Support One-to-Many) ──────────────────────────
+    # Format: { "OLD_HISTORICAL_SYMBOL": ["CANONICAL_SYMBOL_1", ...] }
+    SYMBOL_ALIASES = {
+        "MOTHERSUMI": ["MOTHERSON"],
+        "MINDAIND": ["UNOMINDA"],
+        "TATAMOTORS": ["TMPV"],
+        "LTI": ["LTIM"], 
+        "LTM": ["LTIM"], # LTIM -> LTM transition (Feb 27 2026)
+        "IIFLWAM": ["360ONE"], # IIFL Wealth -> 360 ONE (Feb 2023)
+        "TTKHLTCARE": ["TTKHLT"], # TTK Healthcare Current Symbol Alignment
+        "TTKHEALTH": ["TTKHLT"], # Older symbol for TTK Healthcare
+        "ANGELBRKG": ["ANGELONE"],
+        "CADILAHC": ["ZYDUSLIFE"],
+        "MCDOWELL-N": ["UNITDSPR"],
+        "IBULHSGFIN": ["SAMMAANCAP"],
+        "SRTRANSFIN": ["SHRIRAMFIN"],
+        "WABCOINDIA": ["ZFCVINDIA"],
+        "WELSPUNIND": ["WELSPUNLIV"],
+    }
+
+    # ── Price Scaling for Demergers & Bonus Adjustments ────────────────
+    # Maps (OLD_SYMBOL, NEW_SYMBOL) -> Scaling Factor
+    # Calibrated to match market-accurate adjusted prices (e.g. Google Finance)
+    # This bridges data gaps in the Parquet's automated adjustment logic.
+    SYMBOL_SCALING = {
+        ("TATAMOTORS", "TMPV"): 0.6885,   # Passenger (Official Ratio)
+        ("MOTHERSUMI", "MOTHERSON"): 0.3478, # Full adjustment (Jan+Jun Demergers)
+        ("MINDAIND", "UNOMINDA"): 0.50,   # Missing 1:1 Bonus adjustment
+    }
+    
+    # Reverse map for quick lookup during expansion: canonical -> old_symbols
+    CANONICAL_TO_OLD: dict[str, list[str]] = {}
+    for old, canon_list in SYMBOL_ALIASES.items():
+        for canon in canon_list:
+            CANONICAL_TO_OLD.setdefault(canon, []).append(old)
+    # ──────────────────────────────────────────────────────────────────────
+    
     print(f"Starting data scan for {len(tickers)} stocks from {start_date} from Local Parquet Database...")
     
     import pyarrow as pa
@@ -116,6 +145,13 @@ def fetch_historical_data(tickers, start_date="2014-01-01"):
     
     # Clean tickers from yfinance suffixes (.NS, .BO) for our local database
     clean_tickers = [t.replace('.NS', '').replace('.BO', '') for t in tickers]
+    
+    # Expand clean_tickers with any known old symbols so we fetch ALL historical rows
+    expanded_tickers = set(clean_tickers)
+    for ct in clean_tickers:
+        if ct in CANONICAL_TO_OLD:
+            expanded_tickers.update(CANONICAL_TO_OLD[ct])
+    expanded_tickers = list(expanded_tickers)
     
     # Convert start_date string to datetime/timestamp for pyarrow filtering
     start_dt = pd.to_datetime(start_date)
@@ -126,8 +162,8 @@ def fetch_historical_data(tickers, start_date="2014-01-01"):
         # We only need trade_date, symbol, and adj_close to build our history tables
         columns_to_read = ['trade_date', 'symbol', 'series', 'adj_close']
         
-        # Filter for our specific symbols AND dates >= start_date AND series == 'EQ' (Equity only, ignore NCDs/Bonds)
-        filter_expr = (ds.field('symbol').isin(clean_tickers)) & (ds.field('trade_date') >= pa.scalar(start_dt)) & (ds.field('series') == 'EQ')
+        # Filter for our specific symbols AND dates >= start_date AND series in ['EQ', 'BE', 'ST', 'SM']
+        filter_expr = (ds.field('symbol').isin(expanded_tickers)) & (ds.field('trade_date') >= pa.scalar(start_dt)) & (ds.field('series').isin(['EQ', 'BE', 'ST', 'SM']))
         
         # Read the filtered table
         table = dataset.to_table(columns=columns_to_read, filter=filter_expr)
@@ -138,6 +174,29 @@ def fetch_historical_data(tickers, start_date="2014-01-01"):
         
         if df.empty:
             return pd.DataFrame()
+        
+        # Remap alias symbols to their canonical names (with row duplication and scaling)
+        rows_to_add = []
+        for old_sym, canon_list in SYMBOL_ALIASES.items():
+            mask = df['symbol'] == old_sym
+            if mask.any():
+                old_data = df[mask].copy()
+                # Remove the old symbol from the main df to avoid duplicates during replacement
+                df = df[~mask]
+                # Add a copy for each canonical symbol
+                for canon in canon_list:
+                    new_data = old_data.copy()
+                    new_data['symbol'] = canon
+                    
+                    # Apply scaling factor if it exists for this (old, new) pair
+                    scale_factor = SYMBOL_SCALING.get((old_sym, canon))
+                    if scale_factor:
+                        new_data['adj_close'] *= scale_factor
+                        
+                    rows_to_add.append(new_data)
+        
+        if rows_to_add:
+            df = pd.concat([df] + rows_to_add, ignore_index=True)
             
         # Reconstruct the expected 'TICKER.NS' strings to perfectly match downstream pipeline
         df['ticker_with_suffix'] = df['symbol'].astype(str) + '.NS'
@@ -238,23 +297,32 @@ def fetch_historical_data(tickers, start_date="2014-01-01"):
             print(f"Error injecting stitched KWIL data: {e}")
     # ==========================================
 
-    # === CUSTOM STITCHING LOGIC FOR LTM.NS (formerly LTIM.NS) ===
-    if "LTM.NS" in full_data.columns and os.path.exists("stitched_ltm_history.csv"):
-        print("Injecting stitched history for LTM.NS (from LTIM.NS)...")
+    # === CUSTOM STITCHING LOGIC FOR LTIM.NS (formerly LTI.NS) ===
+    if "LTIM.NS" in full_data.columns and os.path.exists("stitched_ltm_history.csv"):
+        print("Injecting stitched history for LTIM.NS (from LTI.NS)...")
         try:
-            stitched_df = pd.read_csv("stitched_ltm_history.csv")
+            # Check if CSV has the standard Date,Close header or the non-standard Price,Close header
+            with open("stitched_ltm_history.csv", "r") as f:
+                first_line = f.readline().strip()
+                
+            if first_line.startswith("Price"):
+                # Handle non-standard format: Skip first 3 rows (Price, Ticker, Date)
+                stitched_df = pd.read_csv("stitched_ltm_history.csv", skiprows=3, names=["Date", "Close"])
+            else:
+                stitched_df = pd.read_csv("stitched_ltm_history.csv")
+                
             stitched_df['Date'] = pd.to_datetime(stitched_df['Date'])
             stitched_df.set_index('Date', inplace=True)
             stitched_series = stitched_df['Close']
             
             full_data = full_data.reindex(full_data.index.union(stitched_series.index))
-            full_data['LTM.NS'] = full_data['LTM.NS'].combine_first(stitched_series)
+            full_data['LTIM.NS'] = full_data['LTIM.NS'].combine_first(stitched_series)
             
             full_data.sort_index(inplace=True)
-            print(f"Injected {len(stitched_series)} rows for LTM.NS")
+            print(f"Injected {len(stitched_series)} rows for LTIM.NS")
             
         except Exception as e:
-            print(f"Error injecting stitched LTM data: {e}")
+            print(f"Error injecting stitched LTIM data: {e}")
     # ==========================================
     
     return full_data
@@ -312,6 +380,24 @@ def calculate_breadth(full_data):
         'Index_Close': index_close
     })
     
+    # --- HOLIDAY FILTERING ---
+    # Filter out holidays where only a handful of stocks have data.
+    # A simple Total > 0 check fails when 1 stock has data (e.g., Jan 15 2026 → 100%).
+    # Use 10% of peak constituent count as a dynamic threshold, but be lenient for small themes.
+    peak_total = breadth_df['Total'].max()
+    if peak_total <= 15:
+        min_threshold = 1 # Small themes: as long as 1 stock is trading, it's a valid theme day
+    else:
+        min_threshold = max(5, peak_total * 0.1) # Large indices: 10% threshold
+    breadth_df = breadth_df[breadth_df['Total'] >= min_threshold]
+    
+    # --- SMA WARM-UP TRIMMING ---
+    # The 200-SMA needs ~150 trading days to produce valid values.
+    # Until then, Above + Below = 0 with 0% breadth. Trim these rows so
+    # charts start from the first date with meaningful SMA coverage.
+    valid_sma_count = breadth_df['Above'] + breadth_df['Below']
+    breadth_df = breadth_df[valid_sma_count > 0]
+    
     
     # 6. Extract Latest Detailed Status (Above/Below)
     last_idx = -1
@@ -342,7 +428,7 @@ def calculate_breadth(full_data):
 
 def calculate_constituent_performance(master_data, all_tickers, nifty_data):
     """
-    Computes performance metrics (1d, 1w, 1m, 3m, 6m, 1y, 3y, 5y) and 20-Day RS 
+    Computes performance metrics (1d, 1w, 1m, 3m, 6m, 1y, 3y, 5y) and 5/10/20/50-Day RS 
     for all tickers in master_data.
     Returns: Dict[ticker, Dict[metric, float]]
     """
@@ -361,7 +447,10 @@ def calculate_constituent_performance(master_data, all_tickers, nifty_data):
     
     # Calculate Benchmark RS Baseline
     nifty_latest = 0
+    nifty_5d = 0
+    nifty_10d = 0
     nifty_20d = 0
+    nifty_50d = 0
     if not nifty_data.empty:
         try:
             # Handle yfinance multi-index for ^NSEI
@@ -370,16 +459,19 @@ def calculate_constituent_performance(master_data, all_tickers, nifty_data):
             else:
                 nifty_clean = nifty_data['Close']['^NSEI'].dropna()
                 
-            if not nifty_clean.empty:
+            if len(nifty_clean) >= 1:
                 nifty_latest = nifty_clean.iloc[-1]
-                nifty_date = nifty_clean.index[-1]
-                t_target = nifty_date - timedelta(days=20)
-                t_mask = nifty_clean.index <= t_target
-                if t_mask.any():
-                    nifty_20d = nifty_clean[t_mask].iloc[-1]
+            if len(nifty_clean) >= 6:
+                nifty_5d = nifty_clean.iloc[-6]
+            if len(nifty_clean) >= 11:
+                nifty_10d = nifty_clean.iloc[-11]
+            if len(nifty_clean) >= 21:
+                nifty_20d = nifty_clean.iloc[-21]
+            if len(nifty_clean) >= 51:
+                nifty_50d = nifty_clean.iloc[-51]
         except Exception as e:
             print(f"Warning: Failed to extract Nifty baseline for RS calculations: {e}")
-                
+                 
     for ticker in all_tickers:
         if ticker not in master_data.columns:
             continue
@@ -393,7 +485,7 @@ def calculate_constituent_performance(master_data, all_tickers, nifty_data):
         
         metrics = {}
         
-        # Absolute Returns
+        # Absolute Returns (Calendar Days)
         for p_name, days in periods.items():
             target_date = current_date - timedelta(days=days)
             mask = ticker_series.index <= target_date
@@ -406,18 +498,45 @@ def calculate_constituent_performance(master_data, all_tickers, nifty_data):
             else:
                 metrics[p_name] = None
                 
-        # RS (20D) against Nifty 50
-        rs_val = None
-        if nifty_latest > 0 and nifty_20d > 0:
-            t_target = current_date - timedelta(days=20)
-            t_mask = ticker_series.index <= t_target
-            if t_mask.any():
-                t_past_val = ticker_series[t_mask].iloc[-1]
-                if t_past_val > 0:
-                    current_ratio = latest_val / nifty_latest
-                    past_ratio = t_past_val / nifty_20d
-                    rs_val = ((current_ratio - past_ratio) / past_ratio) * 100
-        metrics["RS (20D)"] = rs_val
+        # RS (5D) against Nifty 50 (Trading Days)
+        rs_5 = None
+        if nifty_latest > 0 and nifty_5d > 0 and len(ticker_series) >= 6:
+            t_past_val = ticker_series.iloc[-6]
+            if t_past_val > 0:
+                current_ratio = latest_val / nifty_latest
+                past_ratio = t_past_val / nifty_5d
+                rs_5 = ((current_ratio - past_ratio) / past_ratio) * 100
+        metrics["RS (5D)"] = rs_5
+
+        # RS (10D) against Nifty 50 (Trading Days)
+        rs_10 = None
+        if nifty_latest > 0 and nifty_10d > 0 and len(ticker_series) >= 11:
+            t_past_val = ticker_series.iloc[-11]
+            if t_past_val > 0:
+                current_ratio = latest_val / nifty_latest
+                past_ratio = t_past_val / nifty_10d
+                rs_10 = ((current_ratio - past_ratio) / past_ratio) * 100
+        metrics["RS (10D)"] = rs_10
+
+        # RS (20D) against Nifty 50 (Trading Days)
+        rs_20 = None
+        if nifty_latest > 0 and nifty_20d > 0 and len(ticker_series) >= 21:
+            t_past_val = ticker_series.iloc[-21]
+            if t_past_val > 0:
+                current_ratio = latest_val / nifty_latest
+                past_ratio = t_past_val / nifty_20d
+                rs_20 = ((current_ratio - past_ratio) / past_ratio) * 100
+        metrics["RS (20D)"] = rs_20
+
+        # RS (50D) against Nifty 50 (Trading Days)
+        rs_50 = None
+        if nifty_latest > 0 and nifty_50d > 0 and len(ticker_series) >= 51:
+            t_past_val = ticker_series.iloc[-51]
+            if t_past_val > 0:
+                current_ratio = latest_val / nifty_latest
+                past_ratio = t_past_val / nifty_50d
+                rs_50 = ((current_ratio - past_ratio) / past_ratio) * 100
+        metrics["RS (50D)"] = rs_50
         
         perf_dict[ticker] = metrics
         

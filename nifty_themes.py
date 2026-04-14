@@ -6,7 +6,7 @@ THEMES = {
     "Defence & Aerospace": [
         "BEL.NS", "HAL.NS", "MAZDOCK.NS", "COCHINSHIP.NS", "BDL.NS", "GRSE.NS", 
         "SOLARINDS.NS", "DATAPATTNS.NS", "PARAS.NS", "ASTRAMICRO.NS", "MTARTECH.NS", 
-        "IDEAFORGE.NS", "ZENTEC.NS"
+        "IDEAFORGE.NS", "ZENTEC.NS", "KRISHNADEF.NS", "DCXINDIA.NS"
     ],
     # 2
     "Railways & Infrastructure": [
@@ -22,12 +22,12 @@ THEMES = {
     "EV Ecosystem": [
          "TVSMOTOR.NS", "OLECTRA.NS", "JBMA.NS", "HEROMOTOCO.NS", 
         "BAJAJ-AUTO.NS", "EXIDEIND.NS", "ARE&M.BO", "SONACOMS.NS", "MOTHERSON.NS",
-        "ATHERENERG.NS", "TMPV.BO", "TMCV.NS"
+        "ATHERENERG.NS", "TMPV.NS", "TMCV.NS"
     ],
     # 5
     "Semiconductors & EMS": [
         "BEL.NS", "CGPOWER.NS", "DIXON.NS", "AVALON.NS", "KAYNES.NS", "SYRMA.NS", 
-        "MOSCHIP.NS", "SPELS.BO", "TATAELXSI.NS"
+        "MOSCHIP.NS", "TATAELXSI.NS", "PGEL.NS", "AMBER.NS"
     ],
     # 6
     "Specialty Chemicals": [
@@ -66,12 +66,14 @@ THEMES = {
     ],
     # 13
     "Hospitals": [
-        "APOLLOHOSP.NS", "MAXHEALTH.NS", "FORTIS.NS", "NH.NS", "KIMS.NS", "MEDANTA.NS"
+        "APOLLOHOSP.NS", "MAXHEALTH.NS", "FORTIS.NS", "NH.NS", "KIMS.NS", "MEDANTA.NS",
+        "ASTERDM.NS", "RAINBOW.NS", "YATHARTH.NS", "SHALBY.NS"
     ],
     # 14
     "FMCG Staples": [
         "HINDUNILVR.NS", "ITC.NS", "NESTLEIND.NS", "BRITANNIA.NS", "GODREJCP.NS", 
-        "DABUR.NS", "COLPAL.NS", "MARICO.NS"
+        "DABUR.NS", "COLPAL.NS", "MARICO.NS", "TATACONSUM.NS", "CCL.NS", 
+        "COFFEEDAY.NS", "VINCOFE.NS"
     ],
     # 15
     "Retail & E-Commerce": [
@@ -80,7 +82,7 @@ THEMES = {
     ],
     # 16
     "Auto Passenger & CV": [
-        "MARUTI.NS", "M&M.NS",  "EICHERMOT.NS", "ASHOKLEY.NS", "TMPV.BO", "TMCV.NS"
+        "MARUTI.NS", "M&M.NS",  "EICHERMOT.NS", "ASHOKLEY.NS", "TMPV.NS", "TMCV.NS"
     ],
     # 17
     "Two & Three Wheelers": [
@@ -88,7 +90,7 @@ THEMES = {
     ],
     # 18
     "Oil & Gas Upstream": [
-        "ONGC.NS", "OIL.NS", "GAIL.NS", "RELIANCE.NS"
+        "ONGC.NS", "OIL.NS", "RELIANCE.NS"
     ],
     # 19
     "Oil & Gas Downstream": [
@@ -119,19 +121,22 @@ THEMES = {
     ],
     # 25
     "Media & Broadcasting": [
-        "SUNTV.NS", "ZEEL.NS", "NETWORK18.NS", "DEN.NS", "HATHWAY.NS"
+        "SUNTV.NS", "ZEEL.NS", "NETWORK18.NS", "DEN.NS", "HATHWAY.NS", "PFOCUS.NS", 
+        "TV18BRDCST.NS", "NDTV.NS", "DISHTV.NS", "PVRINOX.NS"
     ],
     # 26
     "Music & Content": [
-        "SAREGAMA.NS", "TIPSMUSIC.NS"
+        "SAREGAMA.NS", "TIPSMUSIC.NS", "SHEMAROO.NS", "EROSMEDIA.NS", "NAZARA.NS"
     ],
     # 27
     "Power T&D": [
-        "POWERGRID.NS", "SIEMENS.NS", "CGPOWER.NS", "POWERINDIA.NS", "SCHNEIDER.NS"
+        "POWERGRID.NS", "SIEMENS.NS", "CGPOWER.NS", "POWERINDIA.NS", "SCHNEIDER.NS",
+        "QPOWER.NS", "GET&D.NS", "TRIL.NS", "VOLTAMP.NS", "APARINDS.NS", "KEC.NS", 
+        "KPIL.NS", "TRANSRAILL.NS"
     ],
     # 28
-    "Data Centres": [
-        "RELIANCE.NS", "TATACOMM.NS",  "E2E.NS"
+    "Data Centre and AI": [
+        "NETWEB.NS", "E2E.NS", "TATACOMM.NS", "TECHNOE.NS", "ANANTRAJ.NS", "SCHNEIDER.NS", "AURIONPRO.NS"
     ],
     # 29
     "Aviation": [
@@ -225,7 +230,7 @@ THEMES = {
     # 48
     "Capital Market": [
         "BSE.NS", "MCX.NS", "IEX.NS", "CDSL.NS", "CAMS.NS", 
-        "KFINTECH.NS", "ANGELONE.NS", "MOTILALOFS.NS", "IIFLCAPS.BO", 
+        "KFINTECH.NS", "ANGELONE.NS", "MOTILALOFS.NS", "IIFLCAPS.NS", 
         "GEOJITFSL.NS", "5PAISA.NS"
     ],
     # 49
@@ -245,5 +250,86 @@ THEMES = {
     "Tyres & Rubber Products": [
         "MRF.NS", "BALKRISIND.NS", "APOLLOTYRE.NS", "CEATLTD.NS", "JKTYRE.NS", 
         "TVSSRICHAK.NS", "GOODYEAR.NS", "TOLINS.NS", "VIAZ.NS", "MODIRUBBER.NS"
+    ],
+    # 52
+    "Paper": [
+        "JKPAPER.NS", "WSTCSTPAPR.NS", "TNPL.NS", "ANDHRAPAP.NS", 
+        "ORIENTPPR.NS", "SESHAPAPER.NS", "KUANTUM.NS", "STARPAPER.NS", 
+        "EMAMIPAP.NS"
+    ],
+    # 53
+    "Wires and Cables": [
+        "POLYCAB.NS", "KEI.NS", "APARINDS.NS", "FINCABLES.NS", 
+        "RRKABEL.NS", "VGUARD.NS", "BPL.NS", "DIAMINESQ.NS"
+    ],
+    # 54
+    "Hotels & Hospitality": [
+        "INDHOTEL.NS", "LEMONTREE.NS", "EIHOTEL.NS", "CHALET.NS", 
+        "TAJGVK.NS", "ORIENTHOT.NS", "MHRIL.NS", "BYKE.NS", "HLVLTD.NS", "ITCHOTELS.NS"
+    ],
+    # 55
+    "PVC Pipes & Plumbing": [
+        "SUPREMEIND.NS", "ASTRAL.NS", "JINDALPOLY.NS", "FINPIPE.NS", 
+        "APOLLOPIPE.NS", "PRAKASH.NS", "PRINCEPIPE.NS"
+    ],
+    # 56
+    "Building Materials": [
+        "KAJARIACER.NS", "AGI.NS", "CARYSIL.NS", "CERA.NS", "CENTURYPLY.NS", 
+        "GREENPLY.NS", "GREENPANEL.NS", "SOMANYCERA.NS", "RUSHIL.NS"
+    ],
+    # 57
+    "White Goods & Durables": [
+        "DIXON.NS", "VOLTAS.NS", "HAVELLS.NS", "CROMPTON.NS", "BLUESTARCO.NS", 
+        "WHIRLPOOL.NS", "BAJAJELEC.NS", "VGUARD.NS", "SYMPHONY.NS", 
+        "EUREKAFORB.NS", "TTKPRESTIG.NS"
+    ],
+    # 58
+    "Footwear": [
+        "BATAINDIA.NS", "METROBRAND.NS", "CAMPUS.NS", "RELAXO.NS", 
+        "KHADIM.NS", "MIRZAINT.NS", "LIBERTSHOE.NS"
+    ],
+    # 59
+    "Diagnostics & Pathology": [
+        "LALPATHLAB.NS", "THYROCARE.NS", "VIJAYA.NS", "METROPOLIS.NS", "KRSNAA.NS"
+    ],
+    # 60
+    "Packaging Solutions": [
+        "JINDALPOLY.NS", "EPL.NS", "POLYPLEX.NS", "GARFIBRES.NS", 
+        "MOLDTKPAC.NS", "HUHTAMAKI.NS", "TCPLPACK.NS", "UFLEX.NS", "HINDCOMPOS.NS"
+    ],
+    # 61
+    "Shipbuilding": [
+        "MAZDOCK.NS", "GRSE.NS", "SCI.NS", "COCHINSHIP.NS"
+    ],
+    # 62
+    "Capital Goods": [
+        "LT.NS", "BHEL.NS", "ABB.NS", "SIEMENS.NS", "CGPOWER.NS", "THERMAX.NS",
+        "CUMMINSIND.NS", "ELGIEQUIP.NS", "KIRLOSENG.NS", "JYOTICNC.NS", "AIAENG.NS",
+        "PTCIL.NS", "APARINDS.NS", "CARBORUNIV.NS", "HONAUT.NS", "TIMKEN.NS",
+        "ISGEC.NS", "TRITURBINE.NS", "GRINDWELL.NS", "SKFINDIA.NS", "SCHAEFFLER.NS",
+        "BEL.NS"
+    ],
+    # 63
+    "Personal Care & Wellness": [
+        "CUPID.NS", "PGHH.NS", "GILLETTE.NS", "ZYDUSWELL.NS",
+        "BAJAJCON.NS", "EMAMILTD.NS", "JHS.NS"
+    ],
+    # 65
+    "Marine & Offshore Services": [
+        "SEAMECLTD.NS", "DREDGECORP.NS", "GLOBOFFS.NS", "SHREEJISPG.NS", "GESHIP.NS"
+    ],
+    # 66
+    "Power Generation": [
+        "NTPC.NS", "ADANIPOWER.NS", "TATAPOWER.NS", "JSWENERGY.NS", "NHPC.NS", 
+        "NLCINDIA.NS", "SJVN.NS", "TORNTPOWER.NS", "CESC.NS"
+    ],
+    # 67
+    "Carbon and Graphite": [
+        "GRAPHITE.NS", "HEG.NS", "PCBL.NS", "GOACARBON.NS"
+    ],
+    # 68
+    "Oil & Gas Midstream": [
+        "GAIL.NS", "PETRONET.NS", "GSPL.NS", "IGL.NS", "MGL.NS", 
+        "GUJGASLTD.NS", "ATGL.NS", "DEEPINDS.NS"
     ]
 }

@@ -6,7 +6,7 @@ import glob
 
 # Paths
 BACKUP_ZIP = "/Users/sumeetdas/Desktop/Nifty_Streamlit_bkp_01022026.zip"
-CURRENT_DIR = "/Users/sumeetdas/Desktop/Stock Market/Nifty Dashboard"
+CURRENT_DIR = "/Users/sumeetdas/Projects/nifty-breadth"
 TEMP_DIR = os.path.join(CURRENT_DIR, "temp_restore")
 
 def restore_missing_date(missing_date="2026-02-01"):
