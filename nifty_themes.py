@@ -307,7 +307,7 @@ THEMES = {
         "CUMMINSIND.NS", "ELGIEQUIP.NS", "KIRLOSENG.NS", "JYOTICNC.NS", "AIAENG.NS",
         "PTCIL.NS", "APARINDS.NS", "CARBORUNIV.NS", "HONAUT.NS", "TIMKEN.NS",
         "ISGEC.NS", "TRITURBINE.NS", "GRINDWELL.NS", "SKFINDIA.NS", "SCHAEFFLER.NS",
-        "BEL.NS", "TDPOWRE.NS"
+        "BEL.NS", "TDPOWERSYS.NS"
     ],
     # 63
     "Personal Care & Wellness": [

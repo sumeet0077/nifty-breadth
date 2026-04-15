@@ -1243,7 +1243,8 @@
             "CARBORUNIV.NS",
             "TIMKEN.NS",
             "ISGEC.NS",
-            "BEL.NS"
+            "BEL.NS",
+            "TDPOWERSYS.NS"
         ],
         "below": [
             "JYOTICNC.NS",
