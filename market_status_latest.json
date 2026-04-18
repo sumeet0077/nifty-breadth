@@ -1948,13 +1948,9 @@
     "Silver": {
         "above": [
             "HINDZINC.NS",
-            "VEDL.NS",
-            "NMDC.NS",
-            "HINDALCO.NS"
+            "VEDL.NS"
         ],
-        "below": [
-            "ADANIENT.NS"
-        ],
+        "below": [],
         "new_stock": []
     },
     "Solar Manufacturing": {

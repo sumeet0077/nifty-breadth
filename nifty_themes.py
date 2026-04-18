@@ -202,7 +202,7 @@ THEMES = {
     ],
     # 42
     "Silver": [
-        "HINDZINC.NS", "VEDL.NS", "NMDC.NS", "ADANIENT.NS", "HINDALCO.NS"
+        "HINDZINC.NS", "VEDL.NS"
     ],
     # 43
     "Copper": [
