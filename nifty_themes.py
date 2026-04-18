@@ -206,7 +206,7 @@ THEMES = {
     ],
     # 43
     "Copper": [
-        "HINDCOPPER.NS", "HINDALCO.NS", "PRECWIRE.NS"
+        "HINDCOPPER.NS", "HINDALCO.NS", "PRECWIRE.NS", "ADANIENT.NS", "BHAGYANGR.NS"
     ],
     # 44
     "Solar Manufacturing": [
