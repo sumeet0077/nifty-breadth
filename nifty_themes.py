@@ -202,12 +202,11 @@ THEMES = {
     ],
     # 42
     "Silver": [
-        "HINDZINC.NS", "VEDL.NS", "KALYANKJIL.NS", "THANGAMAYL.NS", 
-        "GOLDIAM.NS"
+        "HINDZINC.NS", "VEDL.NS", "NMDC.NS"
     ],
     # 43
     "Copper": [
-        "HINDCOPPER.NS", "VEDL.NS", "HINDALCO.NS", "MCL.NS"
+        "HINDCOPPER.NS", "HINDALCO.NS", "PRECWIRE.NS"
     ],
     # 44
     "Solar Manufacturing": [
