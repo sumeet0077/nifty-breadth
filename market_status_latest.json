@@ -1949,9 +1949,12 @@
         "above": [
             "HINDZINC.NS",
             "VEDL.NS",
-            "NMDC.NS"
+            "NMDC.NS",
+            "HINDALCO.NS"
         ],
-        "below": [],
+        "below": [
+            "ADANIENT.NS"
+        ],
         "new_stock": []
     },
     "Solar Manufacturing": {
