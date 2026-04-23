@@ -132,7 +132,7 @@ THEMES = {
     "Power T&D": [
         "POWERGRID.NS", "SIEMENS.NS", "CGPOWER.NS", "POWERINDIA.NS", "SCHNEIDER.NS",
         "QPOWER.NS", "GET&D.NS", "TRIL.NS", "VOLTAMP.NS", "APARINDS.NS", "KEC.NS", 
-        "KPIL.NS", "TRANSRAILL.NS"
+        "KPIL.NS", "TRANSRAILL.NS", "GENUSPOWER.NS"
     ],
     # 28
     "Data Centre and AI": [
@@ -306,7 +306,7 @@ THEMES = {
         "CUMMINSIND.NS", "ELGIEQUIP.NS", "KIRLOSENG.NS", "JYOTICNC.NS", "AIAENG.NS",
         "PTCIL.NS", "APARINDS.NS", "CARBORUNIV.NS", "HONAUT.NS", "TIMKEN.NS",
         "ISGEC.NS", "TRITURBINE.NS", "GRINDWELL.NS", "SKFINDIA.NS", "SCHAEFFLER.NS",
-        "BEL.NS", "TDPOWERSYS.NS"
+        "BEL.NS", "TDPOWERSYS.NS", "GENUSPOWER.NS"
     ],
     # 63
     "Personal Care & Wellness": [
