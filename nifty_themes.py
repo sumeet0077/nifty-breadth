@@ -95,7 +95,7 @@ THEMES = {
     ],
     # 19
     "Oil & Gas Downstream": [
-        "BPCL.NS", "IOC.NS", "HINDPETRO.NS", "MRPL.NS"
+        "BPCL.NS", "IOC.NS", "HINDPETRO.NS", "MRPL.NS", "CONFIPET.NS"
     ],
     # 20
     "Metals & Mining": [

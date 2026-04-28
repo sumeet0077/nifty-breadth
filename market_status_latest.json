@@ -1668,7 +1668,8 @@
     },
     "Oil & Gas Downstream": {
         "above": [
-            "MRPL.NS"
+            "MRPL.NS",
+            "CONFIPET.NS"
         ],
         "below": [
             "BPCL.NS",
