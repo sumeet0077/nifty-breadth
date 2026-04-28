@@ -27,7 +27,8 @@ THEMES = {
     # 5
     "Semiconductors & EMS": [
         "BEL.NS", "CGPOWER.NS", "DIXON.NS", "AVALON.NS", "KAYNES.NS", "SYRMA.NS", 
-        "MOSCHIP.NS", "TATAELXSI.NS", "PGEL.NS", "AMBER.NS"
+        "MOSCHIP.NS", "TATAELXSI.NS", "PGEL.NS", "AMBER.NS", "CYIENT.NS", 
+        "CYIENTDLM.NS", "LTTS.NS"
     ],
     # 6
     "Specialty Chemicals": [
