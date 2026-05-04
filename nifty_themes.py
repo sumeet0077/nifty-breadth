@@ -33,7 +33,7 @@ THEMES = {
     # 6
     "Specialty Chemicals": [
         "SRF.NS", "PIDILITIND.NS", "DEEPAKNTR.NS", "AARTIIND.NS", "ATUL.NS", 
-        "NAVINFLUOR.NS", "PIIND.NS", "FINEORG.NS"
+        "NAVINFLUOR.NS", "PIIND.NS", "FINEORG.NS", "DIAMINESQ.NS"
     ],
     # 7
     "Agrochemicals & Fertilisers": [
@@ -260,7 +260,7 @@ THEMES = {
     # 53
     "Wires and Cables": [
         "POLYCAB.NS", "KEI.NS", "APARINDS.NS", "FINCABLES.NS", 
-        "RRKABEL.NS", "VGUARD.NS", "BPL.NS", "DIAMINESQ.NS"
+        "RRKABEL.NS", "VGUARD.NS"
     ],
     # 54
     "Hotels & Hospitality": [
@@ -281,7 +281,7 @@ THEMES = {
     "White Goods & Durables": [
         "DIXON.NS", "VOLTAS.NS", "HAVELLS.NS", "CROMPTON.NS", "BLUESTARCO.NS", 
         "WHIRLPOOL.NS", "BAJAJELEC.NS", "VGUARD.NS", "SYMPHONY.NS", 
-        "EUREKAFORB.NS", "TTKPRESTIG.NS"
+        "EUREKAFORB.NS", "TTKPRESTIG.NS", "BPL.NS"
     ],
     # 58
     "Footwear": [
