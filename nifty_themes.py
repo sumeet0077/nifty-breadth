@@ -62,8 +62,15 @@ THEMES = {
     ],
     # 12
     "Pharma Formulations": [
-        "SUNPHARMA.NS", "DRREDDY.NS", "CIPLA.NS", "DIVISLAB.NS", "TORNTPHARM.NS", 
-        "MANKIND.NS", "LUPIN.NS"
+        "SUNPHARMA.NS", "CIPLA.NS", "DRREDDY.NS", "TORNTPHARM.NS", "MANKIND.NS",
+        "LUPIN.NS", "AUROPHARMA.NS", "ZYDUSLIFE.NS", "ALKEM.NS", "GLENMARK.NS",
+        "ABBOTINDIA.NS", "IPCALAB.NS", "AJANTPHARM.NS", "NATCOPHARM.NS", "GRANULES.NS",
+        "PFIZER.NS", "JBCHEPHARM.NS", "ERIS.NS", "SANOFI.NS", "GLAXO.NS", "LINCOLN.NS"
+    ],
+    "Pharma CDMO & API": [
+        "DIVISLAB.NS", "SYNGENE.NS", "LAURUSLABS.NS", "GLAND.NS", "BIOCON.NS",
+        "SUVENPHAR.NS", "PPLPHARMA.NS", "NEULANDLAB.NS", "JUBLPHARMA.NS",
+        "CONCORDBIO.NS", "AARTIPHARM.NS", "AMIORG.NS"
     ],
     # 13
     "Hospitals": [
@@ -167,7 +174,8 @@ THEMES = {
     ],
     # 35
     "Paints": [
-        "ASIANPAINT.NS", "BERGEPAINT.NS", "KANSAINER.NS", "AKZOINDIA.NS"
+        "ASIANPAINT.NS", "BERGEPAINT.NS", "KANSAINER.NS", "AKZOINDIA.NS", 
+        "INDIGOPNTS.NS", "SIRCA.NS", "SHALPAINTS.NS", "KAMOPAINTS.NS"
     ],
     # 36
     "Logistics": [
