@@ -205,9 +205,9 @@ THEMES = {
         "NTPC.NS", "ADANIGREEN.NS", "JSWENERGY.NS", "TATAPOWER.NS", "GAIL.NS"
     ],
     # 41
-    "Jewellery (Gold)": [
-        "TITAN.NS", "KALYANKJIL.NS", "RAJESHEXPO.NS", "GOLDIAM.NS", "THANGAMAYL.NS", 
-        "MUTHOOTFIN.NS", "MANAPPURAM.NS"
+    "Jewellery & Gold": [
+        "TITAN.NS", "KALYANKJIL.NS", "SENCO.NS", "PNGJL.NS", "SKYGOLD.NS", 
+        "RAJESHEXPO.NS", "GOLDIAM.NS", "THANGAMAYL.NS"
     ],
     # 42
     "Silver": [
