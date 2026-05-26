@@ -162,8 +162,11 @@ def fetch_historical_data(tickers, start_date="2014-01-01"):
     try:
         dataset = ds.dataset(parquet_path, format="parquet", partitioning="hive")
         
-        # We only need trade_date, symbol, and adj_close to build our history tables
-        columns_to_read = ['trade_date', 'symbol', 'series', 'adj_close']
+        # Detect if schema uses 'adj_close' or 'adjusted_close' (backward compatibility)
+        close_col = "adj_close" if "adj_close" in dataset.schema.names else "adjusted_close"
+        
+        # We only need trade_date, symbol, and close to build our history tables
+        columns_to_read = ['trade_date', 'symbol', 'series', close_col]
         
         # Filter for our specific symbols AND dates >= start_date AND series in ['EQ', 'BE', 'ST', 'SM']
         filter_expr = (ds.field('symbol').isin(expanded_tickers)) & (ds.field('trade_date') >= pa.scalar(start_dt)) & (ds.field('series').isin(['EQ', 'BE', 'ST', 'SM']))
@@ -172,6 +175,10 @@ def fetch_historical_data(tickers, start_date="2014-01-01"):
         table = dataset.to_table(columns=columns_to_read, filter=filter_expr)
         df = table.to_pandas()
         
+        # Normalize close column name to 'adj_close' if necessary
+        if close_col != 'adj_close':
+            df = df.rename(columns={close_col: 'adj_close'})
+            
         # Cast float32 to float64 to ensure json.dump can serialize the final performance calculations
         df['adj_close'] = df['adj_close'].astype(float)
         
