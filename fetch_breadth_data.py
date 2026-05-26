@@ -94,7 +94,10 @@ def get_index_tickers(index_name):
 def fetch_historical_data(tickers, start_date="2014-01-01"):
     """Fetch historical data for tickers using local adjusted Parquet database."""
     
-    parquet_path = "/Users/sumeetdas/Antigravity_NSE_Data/nse_master_adjusted_2014_onwards.parquet"
+    if os.path.exists("/home/ubuntu/NSE_data/nse_master_adjusted_2014_onwards.parquet"):
+        parquet_path = "/home/ubuntu/NSE_data/nse_master_adjusted_2014_onwards.parquet"
+    else:
+        parquet_path = "/Users/sumeetdas/Antigravity_NSE_Data/nse_master_adjusted_2014_onwards.parquet"
     
     # ── Symbol Alias Map (Support One-to-Many) ──────────────────────────
     # Format: { "OLD_HISTORICAL_SYMBOL": ["CANONICAL_SYMBOL_1", ...] }
