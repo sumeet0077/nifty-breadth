@@ -33,7 +33,7 @@ THEMES = {
     # 6
     "Specialty Chemicals": [
         "SRF.NS", "PIDILITIND.NS", "DEEPAKNTR.NS", "AARTIIND.NS", "ATUL.NS", 
-        "NAVINFLUOR.NS", "PIIND.NS", "FINEORG.NS", "DIAMINESQ.NS"
+        "NAVINFLUOR.NS", "PIIND.NS", "FINEORG.NS", "DIAMINESQ.NS", "HSCL.NS"
     ],
     # 7
     "Agrochemicals & Fertilisers": [
@@ -170,7 +170,7 @@ THEMES = {
     ],
     # 34
     "Textiles": [
-        "PAGEIND.NS", "ABFRL.NS", "KPRMILL.NS", "TRIDENT.NS", "WELSPUNLIV.NS"
+        "PAGEIND.NS", "ABFRL.NS", "KPRMILL.NS", "TRIDENT.NS", "WELSPUNLIV.NS", "LUXIND.NS"
     ],
     # 35
     "Paints": [
@@ -180,7 +180,7 @@ THEMES = {
     # 36
     "Logistics": [
         "CONCOR.NS", "ADANIPORTS.NS", "GATEWAY.NS", "ALLCARGO.NS", "MAHLOG.NS", 
-        "JSWINFRA.NS"
+        "JSWINFRA.NS", "SHADOWFAX.NS"
     ],
     # 37
     "Fintech": [
@@ -333,11 +333,29 @@ THEMES = {
     ],
     # 67
     "Carbon and Graphite": [
-        "GRAPHITE.NS", "HEG.NS", "PCBL.NS", "GOACARBON.NS"
+        "GRAPHITE.NS", "HEG.NS", "PCBL.NS", "GOACARBON.NS", "HSCL.NS"
     ],
     # 68
     "Oil & Gas Midstream": [
         "GAIL.NS", "PETRONET.NS", "GSPL.NS", "IGL.NS", "MGL.NS", 
         "GUJGASLTD.NS", "ATGL.NS", "DEEPINDS.NS"
+    ],
+    # 69
+    "Travel & Tourism": [
+        "IXIGO.NS", "IRCTC.NS", "TBOTEK.NS", "THOMASCOOK.NS", "YATRA.NS", "BLS.NS", 
+        "WONDERLA.NS", "IMAGICAA.NS"
+    ],
+    # 70
+    "Business Services": [
+        "CMSINFO.NS", "SIS.NS", "QUESS.NS", "TEAMLEASE.NS"
+    ],
+    # 71
+    "Technology Hardware Distribution": [
+        "REDINGTON.NS", "RPTECH.NS", "OPTIEMUS.NS", "DLINKINDIA.NS", "CREATIVE.NS"
+    ],
+    # 72
+    "IT Hardware & Peripherals": [
+        "TVSELECT.NS", "CONTROLPR.NS", "PANACHE.NS", "EBGNG.NS", "ACCEL.BO", 
+        "WEPSOLN.BO", "ESCONET.NS", "SMARTLINK.NS", "DCI.NS"
     ]
 }
