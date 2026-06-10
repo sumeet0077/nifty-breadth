@@ -62,6 +62,7 @@ def get_index_tickers(index_name):
     # Source: https://nsearchives.nseindia.com/content/indices/
     sector_map = {
         "Nifty 50": "ind_nifty50list.csv",
+        "Nifty Next 50": "ind_niftynext50list.csv",
         "Nifty 500": "ind_nifty500list.csv",
         # Smallcap
         "Nifty Smallcap 250": "ind_niftysmallcap250list.csv", # Fallback
@@ -556,6 +557,7 @@ def main():
     # 1. Define all tasks
     broad_indices = [
         ("Nifty 50", "market_breadth_nifty50.csv"),
+        ("Nifty Next 50", "market_breadth_niftynext50.csv"),
         ("Nifty 500", "market_breadth_nifty500.csv"),
         ("Nifty Smallcap 250", "market_breadth_smallcap.csv"),
     ]
