@@ -357,5 +357,11 @@ THEMES = {
     "IT Hardware & Peripherals": [
         "TVSELECT.NS", "CONTROLPR.NS", "PANACHE.NS", "EBGNG.NS", "ACCEL.BO", 
         "WEPSOLN.BO", "ESCONET.NS", "SMARTLINK.NS", "DCI.NS"
+    ],
+    # 73
+    "Water & Irrigation Infrastructure": [
+        "SHAKTIPUMP.NS", "KIRLOSBROS.NS", "KSB.NS", "WPIL.NS", "ROTO.NS", 
+        "WABAG.NS", "IONEXCHANG.NS", "JISLJALEQS.NS"
     ]
 }
+
