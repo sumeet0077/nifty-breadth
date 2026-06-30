@@ -64,6 +64,7 @@ def get_index_tickers(index_name):
         "Nifty 50": "ind_nifty50list.csv",
         "Nifty Next 50": "ind_niftynext50list.csv",
         "Nifty 500": "ind_nifty500list.csv",
+        "Nifty Midcap 150": "ind_niftymidcap150list.csv",
         # Smallcap
         "Nifty Smallcap 250": "ind_niftysmallcap250list.csv", # Fallback
         # Sectors
@@ -80,7 +81,9 @@ def get_index_tickers(index_name):
         "NIFTY PSU BANK": "ind_niftypsubanklist.csv",
         "NIFTY REALTY": "ind_niftyrealtylist.csv",
         "NIFTY CONSUMER DURABLES": "ind_niftyconsumerdurableslist.csv",
-        "NIFTY OIL AND GAS": "ind_niftyoilgaslist.csv"
+        "NIFTY OIL AND GAS": "ind_niftyoilgaslist.csv",
+        "NIFTY ENERGY": "ind_niftyenergylist.csv",
+        "NIFTY INFRASTRUCTURE": "ind_niftyinfralist.csv"
     }
 
     # Nifty 50 now uses the dynamic NSE CSV fetch like all other sectors
@@ -559,6 +562,7 @@ def main():
         ("Nifty 50", "market_breadth_nifty50.csv"),
         ("Nifty Next 50", "market_breadth_niftynext50.csv"),
         ("Nifty 500", "market_breadth_nifty500.csv"),
+        ("Nifty Midcap 150", "market_breadth_midcap.csv"),
         ("Nifty Smallcap 250", "market_breadth_smallcap.csv"),
     ]
     
@@ -576,7 +580,9 @@ def main():
         ("NIFTY PSU BANK", "breadth_psubank.csv"),
         ("NIFTY REALTY", "breadth_realty.csv"),
         ("NIFTY CONSUMER DURABLES", "breadth_consumer.csv"),
-        ("NIFTY OIL AND GAS", "breadth_oilgas.csv")
+        ("NIFTY OIL AND GAS", "breadth_oilgas.csv"),
+        ("NIFTY ENERGY", "breadth_energy.csv"),
+        ("NIFTY INFRASTRUCTURE", "breadth_infra.csv")
     ]
     
     # Add Themes to list (Name, CSV Name)
