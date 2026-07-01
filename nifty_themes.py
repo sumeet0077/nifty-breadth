@@ -268,7 +268,7 @@ THEMES = {
     # 53
     "Wires and Cables": [
         "POLYCAB.NS", "KEI.NS", "APARINDS.NS", "FINCABLES.NS", 
-        "RRKABEL.NS", "VGUARD.NS", "UNIVCABLES.NS"
+        "RRKABEL.NS", "VGUARD.NS", "UNIVCABLES.NS", "BANSALWIRE.NS"
     ],
     # 54
     "Hotels & Hospitality": [
