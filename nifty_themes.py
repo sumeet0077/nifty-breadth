@@ -98,7 +98,7 @@ THEMES = {
     ],
     # 18
     "Oil & Gas Upstream": [
-        "ONGC.NS", "OIL.NS", "RELIANCE.NS"
+        "ONGC.NS", "OIL.NS", "RELIANCE.NS", "VOGL.NS"
     ],
     # 19
     "Oil & Gas Downstream": [
@@ -107,7 +107,7 @@ THEMES = {
     # 20
     "Metals & Mining": [
         "TATASTEEL.NS", "JSWSTEEL.NS", "HINDALCO.NS", "VEDL.NS", "NMDC.NS", 
-        "COALINDIA.NS", "JINDALSTEL.NS"
+        "COALINDIA.NS", "JINDALSTEL.NS", "VAML.NS", "VISL.NS"
     ],
     # 21
     "Cement": [
@@ -329,7 +329,7 @@ THEMES = {
     # 66
     "Power Generation": [
         "NTPC.NS", "ADANIPOWER.NS", "TATAPOWER.NS", "JSWENERGY.NS", "NHPC.NS", 
-        "NLCINDIA.NS", "SJVN.NS", "TORNTPOWER.NS", "CESC.NS"
+        "NLCINDIA.NS", "SJVN.NS", "TORNTPOWER.NS", "CESC.NS", "VEDPOWER.NS"
     ],
     # 67
     "Carbon and Graphite": [
