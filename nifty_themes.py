@@ -193,7 +193,7 @@ THEMES = {
     # 39
     "Luxury": [
         "TITAN.NS", "TRENT.NS", "KALYANKJIL.NS", "ETHOSLTD.NS", "SULA.NS",
-        "LANDMARK.NS", "SJVN.NS"
+        "LANDMARK.NS"
     ],
     "Sugar": [
         "EIDPARRY.NS", "BALRAMCHIN.NS", "TRIVENI.NS", "RENUKA.NS", "BANNARI.NS", 
