@@ -86,7 +86,7 @@ THEMES = {
     # 15
     "Retail & E-Commerce": [
         "TRENT.NS", "DMART.NS", "NYKAA.NS", "ABFRL.NS", "METROBRAND.NS", "VBL.NS", 
-        "RELIANCE.NS", "SWIGGY.NS", "ETERNAL.NS"
+        "RELIANCE.NS", "SWIGGY.NS", "ETERNAL.NS", "EMIL.NS", "MEESHO.NS"
     ],
     # 16
     "Auto Passenger & CV": [
@@ -252,7 +252,7 @@ THEMES = {
         "SCHAEFFLER.NS", "SONACOMS.NS", "ENDURANCE.NS", "MSUMI.NS", "SUNDRMFAST.NS", 
         "CIEINDIA.NS", "ZFCVINDIA.NS", "CRAFTSMAN.NS", "EXIDEIND.NS", "ARE&M.NS", 
         "GABRIEL.NS", "PRICOL.NS", "SUPRAJIT.NS", "LUMAXTECH.NS", "MINDACORP.NS", 
-        "SANSERA.NS"
+        "SANSERA.NS", "TALBROAUTO.NS"
     ],
     # 51
     "Tyres & Rubber Products": [
