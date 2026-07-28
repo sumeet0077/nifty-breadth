@@ -126,6 +126,7 @@ def fetch_historical_data(tickers, start_date="2014-01-01"):
         "SRTRANSFIN": ["SHRIRAMFIN"],
         "WABCOINDIA": ["ZFCVINDIA"],
         "WELSPUNIND": ["WELSPUNLIV"],
+        "AKZOINDIA": ["JSWDULUX"],   # AkzoNobel India -> JSW Dulux (Apr 2026)
     }
 
     # ── Price Scaling for Demergers & Bonus Adjustments ────────────────
