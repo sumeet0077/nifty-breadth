@@ -22,7 +22,7 @@ THEMES = {
     "EV Ecosystem": [
          "TVSMOTOR.NS", "OLECTRA.NS", "JBMA.NS", "HEROMOTOCO.NS", 
         "BAJAJ-AUTO.NS", "EXIDEIND.NS", "ARE&M.BO", "SONACOMS.NS", "MOTHERSON.NS",
-        "ATHERENERG.NS", "TMPV.NS", "TMCV.NS"
+        "ATHERENERG.NS", "TMPV.NS", "TMCV.NS", "EXICOM.NS"
     ],
     # 5
     "Semiconductors & EMS": [
@@ -48,7 +48,8 @@ THEMES = {
     # 9
     "Private Banking": [
         "HDFCBANK.NS", "ICICIBANK.NS", "AXISBANK.NS", "KOTAKBANK.NS", "INDUSINDBK.NS", 
-        "FEDERALBNK.NS", "IDFCFIRSTB.NS", "YESBANK.NS", "RBLBANK.NS", "BANDHANBNK.NS"
+        "FEDERALBNK.NS", "IDFCFIRSTB.NS", "YESBANK.NS", "RBLBANK.NS", "BANDHANBNK.NS",
+        "KARURVYSYA.NS", "J&KBANK.NS"
     ],
     # 10
     "PSU Banking": [
@@ -58,7 +59,8 @@ THEMES = {
     # 11
     "IT Services": [
         "TCS.NS", "INFY.NS", "HCLTECH.NS", "TECHM.NS", "WIPRO.NS", "LTIM.NS", 
-        "PERSISTENT.NS", "MPHASIS.NS", "COFORGE.NS", "KPITTECH.NS"
+        "PERSISTENT.NS", "MPHASIS.NS", "COFORGE.NS", "KPITTECH.NS",
+        "NEWGEN.NS", "ZENSARTECH.NS"
     ],
     # 12
     "Pharma Formulations": [
@@ -140,7 +142,7 @@ THEMES = {
     "Power T&D": [
         "POWERGRID.NS", "SIEMENS.NS", "CGPOWER.NS", "POWERINDIA.NS", "SCHNEIDER.NS",
         "QPOWER.NS", "GET&D.NS", "TRIL.NS", "VOLTAMP.NS", "APARINDS.NS", "KEC.NS", 
-        "KPIL.NS", "TRANSRAILL.NS", "GENUSPOWER.NS"
+        "KPIL.NS", "TRANSRAILL.NS", "GENUSPOWER.NS", "SKIPPER.NS"
     ],
     # 28
     "Data Centre and AI": [
