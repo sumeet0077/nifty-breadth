@@ -16,12 +16,12 @@ THEMES = {
     # 3
     "Renewable Energy Generation": [
         "ADANIGREEN.NS", "TATAPOWER.NS", "NTPC.NS", "JSWENERGY.NS", "NHPC.NS", 
-        "SJVN.NS", "INOXWIND.NS", "SUZLON.NS", "WAAREERTL.BO"
+        "SJVN.NS", "INOXWIND.NS", "SUZLON.NS", "WAAREERTL.NS"
     ],
     # 4
     "EV Ecosystem": [
          "TVSMOTOR.NS", "OLECTRA.NS", "JBMA.NS", "HEROMOTOCO.NS", 
-        "BAJAJ-AUTO.NS", "EXIDEIND.NS", "ARE&M.BO", "SONACOMS.NS", "MOTHERSON.NS",
+        "BAJAJ-AUTO.NS", "EXIDEIND.NS", "ARE&M.NS", "SONACOMS.NS", "MOTHERSON.NS",
         "ATHERENERG.NS", "TMPV.NS", "TMCV.NS", "EXICOM.NS"
     ],
     # 5
@@ -43,7 +43,7 @@ THEMES = {
     # 8
     "Infrastructure & EPC": [
         "LT.NS", "ADANIPORTS.NS", "IRB.NS", "PNCINFRA.NS", "KEC.NS", "KNRCON.NS", 
-        "NCC.NS", "GMRAIRPORT.NS", "JSWINFRA.NS"
+        "NCC.NS", "GMRAIRPORT.NS", "JSWINFRA.NS", "PSPPROJECT.NS"
     ],
     # 9
     "Private Banking": [
@@ -109,7 +109,7 @@ THEMES = {
     # 20
     "Metals & Mining": [
         "TATASTEEL.NS", "JSWSTEEL.NS", "HINDALCO.NS", "VEDL.NS", "NMDC.NS", 
-        "COALINDIA.NS", "JINDALSTEL.NS", "VAML.NS", "VISL.NS"
+        "COALINDIA.NS", "JINDALSTEL.NS", "VAML.NS", "VISL.NS", "GMDC.NS"
     ],
     # 21
     "Cement": [
@@ -119,7 +119,7 @@ THEMES = {
     # 22
     "QSR": [
         "JUBLFOOD.NS", "DEVYANI.NS", "WESTLIFE.NS", "SAPPHIRE.NS", "RBA.NS", 
-        "UFBL.BO"
+        "UFBL.NS"
     ],
     # 23
     "Telecom Services": [
@@ -155,7 +155,7 @@ THEMES = {
     # 30
     "Critical Minerals": [
         "VEDL.NS", "NMDC.NS", "MOIL.NS", "HINDZINC.NS", "NATIONALUM.NS", 
-        "ARE&M.BO"
+        "ARE&M.NS", "GMDC.NS"
     ],
 
     # 32
@@ -168,11 +168,11 @@ THEMES = {
     "NBFC": [
         "BAJFINANCE.NS", "SHRIRAMFIN.NS", "CHOLAFIN.NS", "MUTHOOTFIN.NS", "PFC.NS", 
         "RECLTD.NS", "LICHSGFIN.NS", "M&MFIN.NS", "MANAPPURAM.NS", "POONAWALLA.NS", 
-        "SUNDARMFIN.NS", "CGCL.NS", "PIRAMALFIN.NS", "TATACAP.NS"
+        "SUNDARMFIN.NS", "CGCL.NS", "PIRAMALFIN.NS", "TATACAP.NS", "IFCI.NS", "CREDITACC.NS"
     ],
     # 34
     "Textiles": [
-        "PAGEIND.NS", "ABFRL.NS", "KPRMILL.NS", "TRIDENT.NS", "WELSPUNLIV.NS", "LUXIND.NS"
+        "PAGEIND.NS", "ABFRL.NS", "KPRMILL.NS", "TRIDENT.NS", "WELSPUNLIV.NS", "LUXIND.NS", "PGIL.NS"
     ],
     # 35
     "Paints": [
@@ -186,7 +186,7 @@ THEMES = {
     ],
     # 37
     "Fintech": [
-        "PAYTM.NS", "POLICYBZR.NS", "CAMS.NS", "CDSL.NS", "FSL.NS"
+        "PAYTM.NS", "POLICYBZR.NS", "CAMS.NS", "CDSL.NS", "FSL.NS", "ALGOQUANT.NS"
     ],
     # 38
     "Asset Management": [
@@ -222,7 +222,7 @@ THEMES = {
     # 44
     "Solar Manufacturing": [
         "WAAREEENER.NS", "PREMIERENE.NS", "VIKRAMSOLR.NS", "BORORENEW.NS", 
-        "EMMVEE.NS", "WEBELSOLAR.NS", "INA.BO"
+        "EMMVEE.NS", "WEBELSOLAR.NS", "INA.NS", "UTLSOLAR.NS"
     ],
     # 45
     "Life Insurance": [
@@ -245,7 +245,7 @@ THEMES = {
     ],
     # 49
     "Alcohols & Breweries": [
-        "UNITDSPR.BO", "UBL.NS", "RADICO.NS", "GLOBUSSPR.NS", "TI.NS", 
+        "UNITDSPR.NS", "UBL.NS", "RADICO.NS", "GLOBUSSPR.NS", "TI.NS", 
         "SULA.NS", "SDBL.NS", "PICCADIL.NS", "ASALCBR.NS"
     ],
     # 50
@@ -357,8 +357,8 @@ THEMES = {
     ],
     # 72
     "IT Hardware & Peripherals": [
-        "TVSELECT.NS", "CONTROLPR.NS", "PANACHE.NS", "EBGNG.NS", "ACCEL.BO", 
-        "WEPSOLN.BO", "ESCONET.NS", "SMARTLINK.NS", "DCI.NS"
+        "TVSELECT.NS", "CONTROLPR.NS", "PANACHE.NS", "EBGNG.NS", "ESCONET.NS", 
+        "SMARTLINK.NS", "DCI.NS"
     ],
     # 73
     "Water & Irrigation Infrastructure": [
