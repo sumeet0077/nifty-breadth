@@ -182,7 +182,8 @@ THEMES = {
     # 36
     "Logistics": [
         "CONCOR.NS", "ADANIPORTS.NS", "GATEWAY.NS", "ALLCARGO.NS", "MAHLOG.NS", 
-        "JSWINFRA.NS", "SHADOWFAX.NS"
+        "JSWINFRA.NS", "SHADOWFAX.NS", "DELHIVERY.NS", "BLUEDART.NS", "TCI.NS", 
+        "TCIEXP.NS", "VRLLOG.NS", "TVSSCS.NS", "AEGISLOG.NS", "SNOWMAN.NS"
     ],
     # 37
     "Fintech": [
