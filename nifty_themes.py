@@ -142,7 +142,7 @@ THEMES = {
     "Power T&D": [
         "POWERGRID.NS", "SIEMENS.NS", "CGPOWER.NS", "POWERINDIA.NS", "SCHNEIDER.NS",
         "QPOWER.NS", "GET&D.NS", "TRIL.NS", "VOLTAMP.NS", "APARINDS.NS", "KEC.NS", 
-        "KPIL.NS", "TRANSRAILL.NS", "GENUSPOWER.NS", "SKIPPER.NS", "ADANIENSOL.NS"
+        "KPIL.NS", "TRANSRAILL.NS", "GENUSPOWER.NS", "SKIPPER.NS", "ADANIENSOL.NS", "ENRIN.NS"
     ],
     # 28
     "Data Centre and AI": [
@@ -332,7 +332,7 @@ THEMES = {
     # 66
     "Power Generation": [
         "NTPC.NS", "ADANIPOWER.NS", "TATAPOWER.NS", "JSWENERGY.NS", "NHPC.NS", 
-        "NLCINDIA.NS", "SJVN.NS", "TORNTPOWER.NS", "CESC.NS", "VEDPOWER.NS"
+        "NLCINDIA.NS", "SJVN.NS", "TORNTPOWER.NS", "CESC.NS", "VEDPOWER.NS", "ENRIN.NS"
     ],
     # 67
     "Carbon and Graphite": [
@@ -365,6 +365,11 @@ THEMES = {
     "Water & Irrigation Infrastructure": [
         "SHAKTIPUMP.NS", "KIRLOSBROS.NS", "KSB.NS", "WPIL.NS", "ROTO.NS", 
         "WABAG.NS", "IONEXCHANG.NS", "JISLJALEQS.NS"
+    ],
+    # 74
+    "Real Estate & Realty": [
+        "DLF.NS", "LODHA.NS", "GODREJPROP.NS", "OBEROIRLTY.NS", "PRESTIGE.NS", 
+        "PHOENIXLTD.NS", "BRIGADE.NS", "SOBHA.NS", "ANANTRAJ.NS", "ABREL.NS", "SIGNATURE.NS"
     ]
 }
 
