@@ -1901,7 +1901,8 @@
             "M&M.NS",
             "EICHERMOT.NS",
             "ASHOKLEY.NS",
-            "TMCV.NS"
+            "TMCV.NS",
+            "HYUNDAI.NS"
         ],
         "below": [
             "MARUTI.NS",
@@ -2140,7 +2141,8 @@
         ],
         "below": [
             "POLICYBZR.NS",
-            "CDSL.NS"
+            "CDSL.NS",
+            "JIOFIN.NS"
         ],
         "new_stock": [
             "ALGOQUANT.NS"
@@ -2632,7 +2634,8 @@
             "APARINDS.NS",
             "KPIL.NS",
             "GENUSPOWER.NS",
-            "SKIPPER.NS"
+            "SKIPPER.NS",
+            "ADANIENSOL.NS"
         ],
         "below": [
             "KEC.NS",

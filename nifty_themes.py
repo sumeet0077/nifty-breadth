@@ -92,7 +92,7 @@ THEMES = {
     ],
     # 16
     "Auto Passenger & CV": [
-        "MARUTI.NS", "M&M.NS",  "EICHERMOT.NS", "ASHOKLEY.NS", "TMPV.NS", "TMCV.NS"
+        "MARUTI.NS", "M&M.NS",  "EICHERMOT.NS", "ASHOKLEY.NS", "TMPV.NS", "TMCV.NS", "HYUNDAI.NS"
     ],
     # 17
     "Two & Three Wheelers": [
@@ -142,7 +142,7 @@ THEMES = {
     "Power T&D": [
         "POWERGRID.NS", "SIEMENS.NS", "CGPOWER.NS", "POWERINDIA.NS", "SCHNEIDER.NS",
         "QPOWER.NS", "GET&D.NS", "TRIL.NS", "VOLTAMP.NS", "APARINDS.NS", "KEC.NS", 
-        "KPIL.NS", "TRANSRAILL.NS", "GENUSPOWER.NS", "SKIPPER.NS"
+        "KPIL.NS", "TRANSRAILL.NS", "GENUSPOWER.NS", "SKIPPER.NS", "ADANIENSOL.NS"
     ],
     # 28
     "Data Centre and AI": [
@@ -187,7 +187,7 @@ THEMES = {
     ],
     # 37
     "Fintech": [
-        "PAYTM.NS", "POLICYBZR.NS", "CAMS.NS", "CDSL.NS", "FSL.NS", "ALGOQUANT.NS"
+        "PAYTM.NS", "POLICYBZR.NS", "CAMS.NS", "CDSL.NS", "FSL.NS", "ALGOQUANT.NS", "JIOFIN.NS"
     ],
     # 38
     "Asset Management": [
