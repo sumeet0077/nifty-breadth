@@ -454,6 +454,7 @@ def calculate_constituent_performance(master_data, all_tickers, nifty_data):
         "1M": 30,
         "3M": 90,
         "6M": 180,
+        "YTD": None,
         "1Y": 365,
         "3Y": 365 * 3,
         "5Y": 365 * 5
@@ -501,18 +502,33 @@ def calculate_constituent_performance(master_data, all_tickers, nifty_data):
         
         metrics = {}
         
-        # Absolute Returns (Calendar Days)
+        # Strip timezone for clean date comparison
+        tz_naive_index = ticker_series.index.tz_localize(None) if hasattr(ticker_series.index, "tz") and ticker_series.index.tz is not None else ticker_series.index
+        
+        # Absolute Returns (Calendar Days & YTD)
         for p_name, days in periods.items():
-            target_date = current_date - timedelta(days=days)
-            mask = ticker_series.index <= target_date
-            if mask.any():
-                past_val = ticker_series[mask].iloc[-1]
-                if past_val > 0:
-                    metrics[p_name] = ((latest_val - past_val) / past_val) * 100
+            if p_name == "YTD":
+                ytd_target = pd.Timestamp(year=current_date.year - 1, month=12, day=31)
+                mask = tz_naive_index <= ytd_target
+                if mask.any():
+                    past_val = ticker_series[mask].iloc[-1]
+                    if past_val > 0:
+                        metrics["YTD"] = round(((latest_val - past_val) / past_val) * 100, 2)
+                    else:
+                        metrics["YTD"] = None
+                else:
+                    metrics["YTD"] = None
+            else:
+                target_date = current_date - timedelta(days=days)
+                mask = ticker_series.index <= target_date
+                if mask.any():
+                    past_val = ticker_series[mask].iloc[-1]
+                    if past_val > 0:
+                        metrics[p_name] = round(((latest_val - past_val) / past_val) * 100, 2)
+                    else:
+                        metrics[p_name] = None
                 else:
                     metrics[p_name] = None
-            else:
-                metrics[p_name] = None
                 
         # RS (5D) against Nifty 50 (Trading Days)
         rs_5 = None
