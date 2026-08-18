@@ -16,7 +16,7 @@ THEMES = {
     # 3
     "Renewable Energy Generation": [
         "ADANIGREEN.NS", "TATAPOWER.NS", "NTPC.NS", "JSWENERGY.NS", "NHPC.NS", 
-        "SJVN.NS", "INOXWIND.NS", "SUZLON.NS", "WAAREERTL.NS"
+        "SJVN.NS", "INOXWIND.NS", "SUZLON.NS", "WAAREERTL.NS", "NTPCGREEN.NS"
     ],
     # 4
     "EV Ecosystem": [
@@ -49,7 +49,7 @@ THEMES = {
     "Private Banking": [
         "HDFCBANK.NS", "ICICIBANK.NS", "AXISBANK.NS", "KOTAKBANK.NS", "INDUSINDBK.NS", 
         "FEDERALBNK.NS", "IDFCFIRSTB.NS", "YESBANK.NS", "RBLBANK.NS", "BANDHANBNK.NS",
-        "KARURVYSYA.NS", "J&KBANK.NS"
+        "KARURVYSYA.NS", "J&KBANK.NS", "AUBANK.NS"
     ],
     # 10
     "PSU Banking": [
@@ -60,19 +60,19 @@ THEMES = {
     "IT Services": [
         "TCS.NS", "INFY.NS", "HCLTECH.NS", "TECHM.NS", "WIPRO.NS", "LTIM.NS", 
         "PERSISTENT.NS", "MPHASIS.NS", "COFORGE.NS", "KPITTECH.NS",
-        "NEWGEN.NS", "ZENSARTECH.NS"
+        "NEWGEN.NS", "ZENSARTECH.NS", "OFSS.NS"
     ],
     # 12
     "Pharma Formulations": [
         "SUNPHARMA.NS", "CIPLA.NS", "DRREDDY.NS", "TORNTPHARM.NS", "MANKIND.NS",
         "LUPIN.NS", "AUROPHARMA.NS", "ZYDUSLIFE.NS", "ALKEM.NS", "GLENMARK.NS",
         "ABBOTINDIA.NS", "IPCALAB.NS", "AJANTPHARM.NS", "NATCOPHARM.NS", "GRANULES.NS",
-        "PFIZER.NS", "JBCHEPHARM.NS", "ERIS.NS", "SANOFI.NS", "GLAXO.NS", "LINCOLN.NS"
+        "PFIZER.NS", "JBCHEPHARM.NS", "ERIS.NS", "SANOFI.NS", "GLAXO.NS", "LINCOLN.NS", "WOCKPHARMA.NS"
     ],
     "Pharma CDMO & API": [
         "DIVISLAB.NS", "SYNGENE.NS", "LAURUSLABS.NS", "GLAND.NS", "BIOCON.NS",
         "SUVENPHAR.NS", "PPLPHARMA.NS", "NEULANDLAB.NS", "JUBLPHARMA.NS",
-        "CONCORDBIO.NS", "AARTIPHARM.NS", "AMIORG.NS", "RUBICON.NS"
+        "CONCORDBIO.NS", "AARTIPHARM.NS", "AMIORG.NS", "RUBICON.NS", "SAILIFE.NS"
     ],
     # 13
     "Hospitals": [
@@ -83,7 +83,7 @@ THEMES = {
     "FMCG Staples": [
         "HINDUNILVR.NS", "ITC.NS", "NESTLEIND.NS", "BRITANNIA.NS", "GODREJCP.NS", 
         "DABUR.NS", "COLPAL.NS", "MARICO.NS", "TATACONSUM.NS", "CCL.NS", 
-        "COFFEEDAY.NS", "VINCOFE.NS"
+        "COFFEEDAY.NS", "VINCOFE.NS", "PATANJALI.NS"
     ],
     # 15
     "Retail & E-Commerce": [
@@ -104,17 +104,18 @@ THEMES = {
     ],
     # 19
     "Oil & Gas Downstream": [
-        "BPCL.NS", "IOC.NS", "HINDPETRO.NS", "MRPL.NS", "CONFIPET.NS"
+        "BPCL.NS", "IOC.NS", "HINDPETRO.NS", "MRPL.NS", "CONFIPET.NS", "CASTROLIND.NS"
     ],
     # 20
     "Metals & Mining": [
         "TATASTEEL.NS", "JSWSTEEL.NS", "HINDALCO.NS", "VEDL.NS", "NMDC.NS", 
-        "COALINDIA.NS", "JINDALSTEL.NS", "VAML.NS", "VISL.NS", "GMDC.NS"
+        "COALINDIA.NS", "JINDALSTEL.NS", "VAML.NS", "VISL.NS", "GMDC.NS",
+        "SAIL.NS", "JSL.NS", "LLOYDSME.NS"
     ],
     # 21
     "Cement": [
         "ULTRACEMCO.NS", "AMBUJACEM.NS", "ACC.NS", "SHREECEM.NS", "RAMCOCEM.NS", 
-        "DALBHARAT.NS", "JKCEMENT.NS"
+        "DALBHARAT.NS", "JKCEMENT.NS", "GRASIM.NS"
     ],
     # 22
     "QSR": [
@@ -132,7 +133,7 @@ THEMES = {
     # 25
     "Media & Broadcasting": [
         "SUNTV.NS", "ZEEL.NS", "NETWORK18.NS", "DEN.NS", "HATHWAY.NS", "PFOCUS.NS", 
-        "TV18BRDCST.NS", "NDTV.NS", "DISHTV.NS", "PVRINOX.NS"
+        "TV18BRDCST.NS", "NDTV.NS", "DISHTV.NS", "PVRINOX.NS", "DBCORP.NS"
     ],
     # 26
     "Music & Content": [
@@ -141,7 +142,7 @@ THEMES = {
     # 27
     "Power T&D": [
         "POWERGRID.NS", "SIEMENS.NS", "CGPOWER.NS", "POWERINDIA.NS", "SCHNEIDER.NS",
-        "QPOWER.NS", "GET&D.NS", "TRIL.NS", "VOLTAMP.NS", "APARINDS.NS", "KEC.NS", 
+        "QPOWER.NS", "GET&D.NS", "GVT&D.NS", "TRIL.NS", "VOLTAMP.NS", "APARINDS.NS", "KEC.NS", 
         "KPIL.NS", "TRANSRAILL.NS", "GENUSPOWER.NS", "SKIPPER.NS", "ADANIENSOL.NS", "ENRIN.NS"
     ],
     # 28
@@ -168,7 +169,8 @@ THEMES = {
     "NBFC": [
         "BAJFINANCE.NS", "SHRIRAMFIN.NS", "CHOLAFIN.NS", "MUTHOOTFIN.NS", "PFC.NS", 
         "RECLTD.NS", "LICHSGFIN.NS", "M&MFIN.NS", "MANAPPURAM.NS", "POONAWALLA.NS", 
-        "SUNDARMFIN.NS", "CGCL.NS", "PIRAMALFIN.NS", "TATACAP.NS", "IFCI.NS", "CREDITACC.NS"
+        "SUNDARMFIN.NS", "CGCL.NS", "PIRAMALFIN.NS", "TATACAP.NS", "IFCI.NS", "CREDITACC.NS",
+        "BAJAJFINSV.NS"
     ],
     # 34
     "Textiles": [
@@ -187,7 +189,8 @@ THEMES = {
     ],
     # 37
     "Fintech": [
-        "PAYTM.NS", "POLICYBZR.NS", "CAMS.NS", "CDSL.NS", "FSL.NS", "ALGOQUANT.NS", "JIOFIN.NS"
+        "PAYTM.NS", "POLICYBZR.NS", "CAMS.NS", "CDSL.NS", "FSL.NS", "ALGOQUANT.NS", "JIOFIN.NS",
+        "SBICARD.NS"
     ],
     # 38
     "Asset Management": [
@@ -286,13 +289,13 @@ THEMES = {
     # 56
     "Building Materials": [
         "KAJARIACER.NS", "AGI.NS", "CARYSIL.NS", "CERA.NS", "CENTURYPLY.NS", 
-        "GREENPLY.NS", "GREENPANEL.NS", "SOMANYCERA.NS", "RUSHIL.NS"
+        "GREENPLY.NS", "GREENPANEL.NS", "SOMANYCERA.NS", "RUSHIL.NS", "APLAPOLLO.NS"
     ],
     # 57
     "White Goods & Durables": [
         "DIXON.NS", "VOLTAS.NS", "HAVELLS.NS", "CROMPTON.NS", "BLUESTARCO.NS", 
         "WHIRLPOOL.NS", "BAJAJELEC.NS", "VGUARD.NS", "SYMPHONY.NS", 
-        "EUREKAFORB.NS", "TTKPRESTIG.NS", "BPL.NS"
+        "EUREKAFORB.NS", "TTKPRESTIG.NS", "BPL.NS", "LGEINDIA.NS"
     ],
     # 58
     "Footwear": [
@@ -332,7 +335,8 @@ THEMES = {
     # 66
     "Power Generation": [
         "NTPC.NS", "ADANIPOWER.NS", "TATAPOWER.NS", "JSWENERGY.NS", "NHPC.NS", 
-        "NLCINDIA.NS", "SJVN.NS", "TORNTPOWER.NS", "CESC.NS", "VEDPOWER.NS", "ENRIN.NS"
+        "NLCINDIA.NS", "SJVN.NS", "TORNTPOWER.NS", "CESC.NS", "VEDPOWER.NS", "ENRIN.NS",
+        "JPPOWER.NS", "RPOWER.NS", "NAVA.NS"
     ],
     # 67
     "Carbon and Graphite": [
@@ -364,7 +368,7 @@ THEMES = {
     # 73
     "Water & Irrigation Infrastructure": [
         "SHAKTIPUMP.NS", "KIRLOSBROS.NS", "KSB.NS", "WPIL.NS", "ROTO.NS", 
-        "WABAG.NS", "IONEXCHANG.NS", "JISLJALEQS.NS"
+        "WABAG.NS", "IONEXCHANG.NS", "JISLJALEQS.NS", "WELCORP.NS"
     ],
     # 74
     "Real Estate & Realty": [
