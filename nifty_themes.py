@@ -83,11 +83,11 @@ THEMES = {
     "FMCG Staples": [
         "HINDUNILVR.NS", "ITC.NS", "NESTLEIND.NS", "BRITANNIA.NS", "GODREJCP.NS", 
         "DABUR.NS", "COLPAL.NS", "MARICO.NS", "TATACONSUM.NS", "CCL.NS", 
-        "COFFEEDAY.NS", "VINCOFE.NS", "PATANJALI.NS"
+        "COFFEEDAY.NS", "VINCOFE.NS", "PATANJALI.NS", "VBL.NS"
     ],
     # 15
     "Retail & E-Commerce": [
-        "TRENT.NS", "DMART.NS", "NYKAA.NS", "ABFRL.NS", "METROBRAND.NS", "VBL.NS", 
+        "TRENT.NS", "DMART.NS", "NYKAA.NS", "ABFRL.NS", "METROBRAND.NS", 
         "RELIANCE.NS", "SWIGGY.NS", "ETERNAL.NS", "EMIL.NS", "MEESHO.NS"
     ],
     # 16
