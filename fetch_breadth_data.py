@@ -569,8 +569,99 @@ def calculate_constituent_performance(master_data, all_tickers, nifty_data):
                 past_ratio = t_past_val / nifty_50d
                 rs_50 = ((current_ratio - past_ratio) / past_ratio) * 100
         metrics["RS (50D)"] = rs_50
+
+        # IPO Metadata
+        listing_days = int(len(ticker_series))
+        metrics["listing_days"] = listing_days
+        metrics["is_ipo"] = bool(listing_days < 252)
+
+        # IBD RS 4-Quarter Weighted Score
+        q1_ret, q2_ret, q3_ret, q4_ret = None, None, None, None
+        if listing_days >= 64:
+            p_q1 = float(ticker_series.iloc[-64])
+            if p_q1 > 0:
+                q1_ret = ((latest_val - p_q1) / p_q1) * 100
+        if listing_days >= 127:
+            p_q1 = float(ticker_series.iloc[-64])
+            p_q2 = float(ticker_series.iloc[-127])
+            if p_q2 > 0:
+                q2_ret = ((p_q1 - p_q2) / p_q2) * 100
+        if listing_days >= 190:
+            p_q2 = float(ticker_series.iloc[-127])
+            p_q3 = float(ticker_series.iloc[-190])
+            if p_q3 > 0:
+                q3_ret = ((p_q2 - p_q3) / p_q3) * 100
+        if listing_days >= 253:
+            p_q3 = float(ticker_series.iloc[-190])
+            p_q4 = float(ticker_series.iloc[-253])
+            if p_q4 > 0:
+                q4_ret = ((p_q3 - p_q4) / p_q4) * 100
+
+        rs_raw = None
+        if q1_ret is not None and q2_ret is not None and q3_ret is not None and q4_ret is not None:
+            rs_raw = (0.4 * q1_ret) + (0.2 * q2_ret) + (0.2 * q3_ret) + (0.2 * q4_ret)
+        elif q1_ret is not None and q2_ret is not None and q3_ret is not None:
+            rs_raw = (0.5 * q1_ret) + (0.25 * q2_ret) + (0.25 * q3_ret)
+        elif q1_ret is not None and q2_ret is not None:
+            rs_raw = (0.6 * q1_ret) + (0.4 * q2_ret)
+        elif q1_ret is not None:
+            rs_raw = 1.0 * q1_ret
+
+        metrics["rs_raw_score"] = round(rs_raw, 2) if rs_raw is not None else None
+
+        # Absolute RS Line vs Nifty 50 & 52-Week Lead Breakout Detection
+        rs_52w_high = False
+        price_52w_high = False
+        rs_lead = False
+        rs_dist_pct = None
+        price_dist_pct = None
+
+        if not nifty_data.empty:
+            try:
+                aligned = pd.concat([ticker_series.rename("stock"), nifty_clean.rename("nifty")], axis=1, join="inner").dropna()
+                if len(aligned) >= 20:
+                    rs_line = (aligned["stock"] / aligned["nifty"]) * 1000.0
+                    lookback_len = min(252, len(rs_line))
+                    rs_curr = float(rs_line.iloc[-1])
+                    price_curr = float(aligned["stock"].iloc[-1])
+
+                    if lookback_len > 1:
+                        rs_prior_max = float(rs_line.iloc[-lookback_len:-1].max())
+                        price_prior_max = float(aligned["stock"].iloc[-lookback_len:-1].max())
+
+                        rs_52w_high = bool(rs_curr >= rs_prior_max)
+                        price_52w_high = bool(price_curr >= price_prior_max)
+                        rs_lead = bool(rs_52w_high and price_curr < price_prior_max * 0.995)
+
+                        if rs_prior_max > 0:
+                            rs_dist_pct = round(((rs_curr - rs_prior_max) / rs_prior_max) * 100, 2)
+                        if price_prior_max > 0:
+                            price_dist_pct = round(((price_curr - price_prior_max) / price_prior_max) * 100, 2)
+            except Exception as e:
+                pass
+
+        metrics["rs_line_52w_high"] = rs_52w_high
+        metrics["price_52w_high"] = price_52w_high
+        metrics["rs_lead_breakout"] = rs_lead
+        metrics["rs_dist_52w_pct"] = rs_dist_pct
+        metrics["price_dist_52w_pct"] = price_dist_pct
         
         perf_dict[ticker] = metrics
+
+    # Calculate Percentile-Ranked IBD RS Rating (1-99) across all stocks
+    raw_scores = {t: m["rs_raw_score"] for t, m in perf_dict.items() if m.get("rs_raw_score") is not None}
+    if raw_scores:
+        score_series = pd.Series(raw_scores)
+        ranks = score_series.rank(pct=True, method="average")
+        rs_ratings = (ranks * 98).round().astype(int) + 1
+        for sym, rating in rs_ratings.items():
+            if sym in perf_dict:
+                import numpy as np
+                perf_dict[sym]["ibd_rs_rating"] = int(np.clip(rating, 1, 99))
+
+    for sym, m in perf_dict.items():
+        if "ibd_rs_rating" not in m:
+            m["ibd_rs_rating"] = None
         
     return perf_dict
 
