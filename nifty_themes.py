@@ -28,7 +28,7 @@ THEMES = {
     "Semiconductors & EMS": [
         "BEL.NS", "CGPOWER.NS", "DIXON.NS", "AVALON.NS", "KAYNES.NS", "SYRMA.NS", 
         "MOSCHIP.NS", "TATAELXSI.NS", "PGEL.NS", "AMBER.NS", "CYIENT.NS", 
-        "CYIENTDLM.NS", "LTTS.NS"
+        "CYIENTDLM.NS", "LTTS.NS", "ELIN.NS"
     ],
     # 6
     "Specialty Chemicals": [
@@ -293,9 +293,11 @@ THEMES = {
     ],
     # 57
     "White Goods & Durables": [
-        "DIXON.NS", "VOLTAS.NS", "HAVELLS.NS", "CROMPTON.NS", "BLUESTARCO.NS", 
+        "VOLTAS.NS", "HAVELLS.NS", "CROMPTON.NS", "BLUESTARCO.NS", 
         "WHIRLPOOL.NS", "BAJAJELEC.NS", "VGUARD.NS", "SYMPHONY.NS", 
-        "EUREKAFORB.NS", "TTKPRESTIG.NS", "BPL.NS", "LGEINDIA.NS"
+        "EUREKAFORB.NS", "TTKPRESTIG.NS", "BPL.NS", "LGEINDIA.NS",
+        "STOVEKRAFT.NS", "BUTTERFLY.NS", "HAWKINSCOOK.NS", "CELLO.NS", 
+        "BOROLTD.NS", "ORIENTELEC.NS", "IFBIND.NS"
     ],
     # 58
     "Footwear": [
