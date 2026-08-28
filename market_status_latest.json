@@ -2777,7 +2777,8 @@
         "below": [
             "BEL.NS",
             "TATAELXSI.NS",
-            "LTTS.NS"
+            "LTTS.NS",
+            "ELIN.NS"
         ],
         "new_stock": []
     },
@@ -2968,10 +2969,11 @@
     },
     "White Goods & Durables": {
         "above": [
-            "DIXON.NS",
             "VGUARD.NS",
             "TTKPRESTIG.NS",
-            "LGEINDIA.NS"
+            "LGEINDIA.NS",
+            "STOVEKRAFT.NS",
+            "IFBIND.NS"
         ],
         "below": [
             "VOLTAS.NS",
@@ -2982,7 +2984,11 @@
             "BAJAJELEC.NS",
             "SYMPHONY.NS",
             "EUREKAFORB.NS",
-            "BPL.NS"
+            "BPL.NS",
+            "BUTTERFLY.NS",
+            "CELLO.NS",
+            "BOROLTD.NS",
+            "ORIENTELEC.NS"
         ],
         "new_stock": []
     },
