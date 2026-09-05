@@ -2864,6 +2864,7 @@
     },
     "Telecom Infra": {
         "above": [
+            "EXICOM.NS",
             "HFCL.NS",
             "STLTECH.NS",
             "TEJASNET.NS",

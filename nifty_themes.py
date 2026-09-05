@@ -128,7 +128,7 @@ THEMES = {
     ],
     # 24
     "Telecom Infra": [
-        "HFCL.NS", "INDUSTOWER.NS", "ITI.NS", "RAILTEL.NS", "STLTECH.NS", "TEJASNET.NS", "VINDHYATEL.NS"
+        "EXICOM.NS", "HFCL.NS", "INDUSTOWER.NS", "ITI.NS", "RAILTEL.NS", "STLTECH.NS", "TEJASNET.NS", "VINDHYATEL.NS"
     ],
     # 25
     "Media & Broadcasting": [
