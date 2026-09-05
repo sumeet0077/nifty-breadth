@@ -263,10 +263,67 @@ def get_performance_summary_v3(config_map):
             
             row["RS (20D)"] = rs_val
             
+            # IBD RS Raw Score Calculation (4 Quarters: 40% Q1, 20% Q2, 20% Q3, 20% Q4)
+            q1_ret = None
+            q2_ret = None
+            q3_ret = None
+            q4_ret = None
+            
+            n_bars = len(df)
+            if n_bars >= 64:
+                p_q1 = float(df.iloc[-64]['Index_Close'])
+                if p_q1 > 0:
+                    q1_ret = ((current_price - p_q1) / p_q1) * 100
+            if n_bars >= 127:
+                p_q1 = float(df.iloc[-64]['Index_Close'])
+                p_q2 = float(df.iloc[-127]['Index_Close'])
+                if p_q2 > 0:
+                    q2_ret = ((p_q1 - p_q2) / p_q2) * 100
+            if n_bars >= 190:
+                p_q2 = float(df.iloc[-127]['Index_Close'])
+                p_q3 = float(df.iloc[-190]['Index_Close'])
+                if p_q3 > 0:
+                    q3_ret = ((p_q2 - p_q3) / p_q3) * 100
+            if n_bars >= 253:
+                p_q3 = float(df.iloc[-190]['Index_Close'])
+                p_q4 = float(df.iloc[-253]['Index_Close'])
+                if p_q4 > 0:
+                    q4_ret = ((p_q3 - p_q4) / p_q4) * 100
+
+            rs_raw = None
+            if q1_ret is not None and q2_ret is not None and q3_ret is not None and q4_ret is not None:
+                rs_raw = (0.4 * q1_ret) + (0.2 * q2_ret) + (0.2 * q3_ret) + (0.2 * q4_ret)
+            elif q1_ret is not None and q2_ret is not None and q3_ret is not None:
+                rs_raw = (0.5 * q1_ret) + (0.25 * q2_ret) + (0.25 * q3_ret)
+            elif q1_ret is not None and q2_ret is not None:
+                rs_raw = (0.6 * q1_ret) + (0.4 * q2_ret)
+            elif q1_ret is not None:
+                rs_raw = 1.0 * q1_ret
+
+            row["rs_raw_score"] = round(rs_raw, 2) if rs_raw is not None else None
+            
             summary_data.append(row)
         except Exception:
             continue
             
+    if summary_data:
+        # Calculate Percentile-Ranked IBD RS Rating (1-99)
+        raw_scores = {r["Theme/Index"]: r["rs_raw_score"] for r in summary_data if r.get("rs_raw_score") is not None}
+        if raw_scores:
+            score_series = pd.Series(raw_scores)
+            ranks = score_series.rank(pct=True, method="average")
+            rs_ratings = (ranks * 98).round().astype(int) + 1
+            for r in summary_data:
+                t = r["Theme/Index"]
+                if t in rs_ratings:
+                    import numpy as np
+                    r["IBD RS Rating"] = int(np.clip(rs_ratings[t], 1, 99))
+                else:
+                    r["IBD RS Rating"] = None
+        else:
+            for r in summary_data:
+                r["IBD RS Rating"] = None
+
     return pd.DataFrame(summary_data)
 
 st.sidebar.title("Configuration")

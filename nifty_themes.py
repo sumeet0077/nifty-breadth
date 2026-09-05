@@ -124,11 +124,11 @@ THEMES = {
     ],
     # 23
     "Telecom Services": [
-        "BHARTIARTL.NS", "IDEA.NS", "TATACOMM.NS"
+        "BHARTIARTL.NS", "IDEA.NS", "NELCO.NS", "TATACOMM.NS", "TTML.NS"
     ],
     # 24
     "Telecom Infra": [
-        "INDUSTOWER.NS", "TEJASNET.NS", "HFCL.NS"
+        "HFCL.NS", "INDUSTOWER.NS", "ITI.NS", "RAILTEL.NS", "STLTECH.NS", "TEJASNET.NS", "VINDHYATEL.NS"
     ],
     # 25
     "Media & Broadcasting": [
